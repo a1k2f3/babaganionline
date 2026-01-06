@@ -8,7 +8,11 @@ import CategoriesSection from '@/components/card/CategorySection';     // Your l
 import TrendingProducts from '@/components/card/TrendingProducts';       // Carousel or grid
 import ProductsSection from '@/components/featureproducts/ProductSection';         // All/New Arrivals
 
-
+export const metadata = {
+  title: "Privacy Policy | Baba Gani Online",
+  description:
+    "Learn how Baba Gani Online collects, uses, and protects your personal information. We are committed to your privacy and data security.",
+};
 export default function Home() {
   return (
     <main className="min-h-screen bg-white ">
