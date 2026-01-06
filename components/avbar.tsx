@@ -206,13 +206,7 @@ const Navbar = () => {
           <span className="text-xs mt-1">Shop</span>
         </Link>
 
-        <Link href="/shop/cart" className="flex flex-col items-center text-gray-600 hover:text-indigo-600 transition relative">
-          <FiShoppingCart size={26} />
-          <span className="absolute -top-1 -right-3 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-            3
-          </span>
-          <span className="text-xs mt-1">Cart</span>
-        </Link>
+        
 
         <Link href="/profile" className="flex flex-col items-center text-gray-600 hover:text-indigo-600 transition">
           <FiUser size={24} />

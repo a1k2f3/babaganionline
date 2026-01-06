@@ -11,7 +11,7 @@ import ProductsSection from '@/components/featureproducts/ProductSection';      
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
+    <main className="min-h-screen bg-gray-50 ">
       {/* 1. Hero Section */}
       <HeroSection />
 
