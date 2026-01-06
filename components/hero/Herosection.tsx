@@ -31,7 +31,7 @@ const HeroSection = () => {
           {/* Call to Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/shop"
+              href="/"
               className="inline-block bg-white text-gray-900 font-semibold px-8 py-4 rounded-md hover:bg-gray-100 transition transform hover:scale-105 text-lg"
             >
               Shop Now

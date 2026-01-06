@@ -1,6 +1,14 @@
 // app/cookies/page.tsx
+
 import Link from "next/link";
 import { Cookie, Shield, Settings, Globe, CheckCircle, Eye, EyeOff } from "lucide-react";
+
+// Optional: Add page-specific metadata (recommended for SEO)
+export const metadata = {
+  title: "Cookie Policy | BabaGaniOnline",
+  description:
+    "Learn how BabaGaniOnline uses cookies to improve your shopping experience, keep your cart secure, and personalize recommendations. You control your privacy.",
+};
 
 export default function CookiePolicyPage() {
   const lastUpdated = "January 07, 2026";
@@ -14,14 +22,12 @@ export default function CookiePolicyPage() {
             <Cookie className="w-6 h-6" />
             Cookie Policy
           </div>
-
           <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 mb-6">
             We Use Cookies
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
             Cookies help us deliver a better shopping experience, keep your cart safe, and show you products you’ll love.
           </p>
-
           <p className="text-sm text-gray-500 mt-8">
             Last updated: <span className="font-semibold">{lastUpdated}</span>
           </p>
@@ -36,7 +42,7 @@ export default function CookiePolicyPage() {
                 What Are Cookies?
               </h2>
               <p className="text-gray-700 leading-relaxed mb-6">
-                Cookies are tiny text files stored on your device when you visit a website. They help the site remember you, 
+                Cookies are tiny text files stored on your device when you visit a website. They help the site remember you,
                 save your preferences, and make things faster and smoother.
               </p>
               <p className="text-gray-700">
@@ -51,7 +57,6 @@ export default function CookiePolicyPage() {
           <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
             Types of Cookies We Use
           </h2>
-
           <div className="grid md:grid-cols-2 gap-8">
             {/* Essential */}
             <div className="bg-gradient-to-br from-indigo-50 to-white rounded-3xl p-8 shadow-md border border-indigo-100">
@@ -134,7 +139,7 @@ export default function CookiePolicyPage() {
               </ul>
             </div>
 
-            {/* Marketing (Optional) */}
+            {/* Marketing */}
             <div className="bg-gradient-to-br from-green-50 to-white rounded-3xl p-8 shadow-md border border-green-100">
               <div className="flex items-center gap-4 mb-6">
                 <EyeOff className="w-12 h-12 text-green-600" />
@@ -166,15 +171,20 @@ export default function CookiePolicyPage() {
             You Control Your Cookies
           </h2>
           <p className="text-lg text-gray-700 max-w-3xl mx-auto mb-10">
-            You can manage or delete cookies through your browser settings at any time. 
+            You can manage or delete cookies through your browser settings at any time.
             Note: disabling essential cookies may affect site functionality.
           </p>
-
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            
+            <button
+              onClick={() => {
+                // Placeholder: In real app, open cookie consent banner or preferences modal
+                alert("Cookie preferences will open here (integrate with your consent tool)");
+              }}
+              className="inline-flex items-center gap-3 bg-indigo-600 text-white hover:bg-indigo-700 font-bold py-5 px-10 rounded-2xl transition shadow-lg"
+            >
               <Settings className="w-6 h-6" />
               Manage Cookie Preferences
-            
+            </button>
 
             <Link
               href="/support/contact"
@@ -196,9 +206,14 @@ export default function CookiePolicyPage() {
               We only use cookies to make your experience better — never to invade your privacy.
             </p>
           </div>
-
           <p className="text-sm text-gray-500 mt-12">
-            Questions? Reach out anytime at <Link href="mailto:support@babaganionline.com" className="text-indigo-600 hover:underline">support@babaganionline.com</Link>
+            Questions? Reach out anytime at{" "}
+            <a
+              href="mailto:support@babaganionline.com"
+              className="text-indigo-600 hover:underline font-medium"
+            >
+              support@babaganionline.com
+            </a>
           </p>
         </section>
       </div>
