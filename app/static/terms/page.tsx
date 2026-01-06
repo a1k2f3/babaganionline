@@ -1,13 +1,19 @@
-'use client';
+// app/static/terms/page.tsx  (or wherever your Terms page is located)
 
-export const dynamic = "force-dynamic";
-export const revalidate = 60;
+import Link from "next/link";
+import { FileText, Shield, Truck, CreditCard, Ban, Gavel, Mail } from "lucide-react";
 
-import React from 'react';
-import { FileText, Shield, Truck, CreditCard, Ban, Gavel, Mail } from 'lucide-react';
+export const metadata = {
+  title: "Terms of Service | Baba Gani Online",
+  description:
+    "Read the Terms of Service for Baba Gani Online. Understand your rights and responsibilities as a buyer or seller on our trusted e-commerce marketplace.",
+};
+
+// Fully static page — no client interactivity needed
+export const revalidate = false;
 
 export default function TermsOfServicePage() {
-  const lastUpdated = "January 04, 2026";
+  const lastUpdated = "January 07, 2026";
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -21,7 +27,7 @@ export default function TermsOfServicePage() {
             Welcome to <span className="font-semibold text-indigo-600">Baba Gani Online</span> — Your Trusted Marketplace
           </p>
           <p className="mt-4 text-sm text-gray-500">
-            Last updated: {lastUpdated}
+            Last updated: <span className="font-semibold">{lastUpdated}</span>
           </p>
         </div>
 
@@ -36,7 +42,12 @@ export default function TermsOfServicePage() {
             By accessing or using the Platform, you agree to be bound by these Terms. If you do not agree, please do not use our services.
           </p>
           <p className="mt-4 text-gray-700">
-            Baba Gani Online is an e-commerce marketplace that connects buyers and independent sellers. We facilitate transactions but are not a party to the sale unless explicitly stated.
+            Baba Gani Online is an e-commerce marketplace that connects buyers and independent sellers. We facilitate transactions but are not a party to the sale unless explicitly stated. 
+            Please also review our{" "}
+            <Link href="/static/privacy-policy" className="text-indigo-600 hover:underline font-medium">
+              Privacy Policy
+            </Link>
+            .
           </p>
         </section>
 
@@ -54,7 +65,7 @@ export default function TermsOfServicePage() {
           </ul>
         </section>
 
-        {/* User Accounts */}
+        {/* Buyer Responsibilities */}
         <section className="bg-white rounded-2xl shadow-lg p-8 mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
             <CreditCard className="w-8 h-8 text-indigo-600" />
@@ -153,21 +164,30 @@ export default function TermsOfServicePage() {
           </p>
         </section>
 
-        {/* Governing Law & Contact */}
-        {/* <section className="bg-indigo-50 rounded-2xl p-8 text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center justify-center gap-3">
-            <Mail className="w-8 h-8 text-indigo-600" />
+        {/* Contact Us */}
+        <section className="bg-indigo-50 rounded-2xl p-10 text-center my-12">
+          <Mail className="w-12 h-12 text-indigo-600 mx-auto mb-6" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
             Contact Us
           </h2>
-          <p className="text-gray-700 leading-relaxed max-w-2xl mx-auto">
-            For questions about these Terms, please contact us at:
+          <p className="text-gray-700 leading-relaxed max-w-2xl mx-auto mb-8">
+            For questions about these Terms, please contact us:
           </p>
-          <div className="mt-6 space-y-2">
-            <p className="font-medium">Email: <a href="mailto:legal@babaganionline.com" className="text-indigo-600 hover:underline">legal@babaganionline.com</a></p>
-            <p>Support: <a href="mailto:support@babaganionline.com" className="text-indigo-600 hover:underline">support@babaganionline.com</a></p>
-            <p>Address: <span className="font-medium">123 Marketplace Street, Commerce City, CC 12345</span></p>
+          <div className="space-y-4 text-lg">
+            <p>
+              Legal:{" "}
+              <a href="mailto:legal@babaganionline.com" className="text-indigo-600 hover:underline font-medium">
+                legal@babaganionline.com
+              </a>
+            </p>
+            <p>
+              Support:{" "}
+              <a href="mailto:support@babaganionline.com" className="text-indigo-600 hover:underline font-medium">
+                support@babaganionline.com
+              </a>
+            </p>
           </div>
-        </section> */}
+        </section>
 
         <p className="text-center text-sm text-gray-500 mt-12">
           Thank you for being part of the <strong>Baba Gani Online</strong> community.

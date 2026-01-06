@@ -4,15 +4,9 @@ import Link from "next/link";
 import { Cookie, Shield, Settings, Globe, CheckCircle, Eye, EyeOff } from "lucide-react";
 
 // Optional: Add page-specific metadata (recommended for SEO)
-export const metadata = {
-  title: "Cookie Policy | BabaGaniOnline",
-  description:
-    "Learn how BabaGaniOnline uses cookies to improve your shopping experience, keep your cart secure, and personalize recommendations. You control your privacy.",
-};
 
 export default function CookiePolicyPage() {
   const lastUpdated = "January 07, 2026";
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-16 px-6">
       <div className="max-w-4xl mx-auto">
@@ -175,16 +169,7 @@ export default function CookiePolicyPage() {
             Note: disabling essential cookies may affect site functionality.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <button
-              onClick={() => {
-                // Placeholder: In real app, open cookie consent banner or preferences modal
-                alert("Cookie preferences will open here (integrate with your consent tool)");
-              }}
-              className="inline-flex items-center gap-3 bg-indigo-600 text-white hover:bg-indigo-700 font-bold py-5 px-10 rounded-2xl transition shadow-lg"
-            >
-              <Settings className="w-6 h-6" />
-              Manage Cookie Preferences
-            </button>
+         
 
             <Link
               href="/support/contact"

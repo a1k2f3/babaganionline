@@ -1,7 +1,6 @@
 'use client';
 
-export const dynamic = "force-dynamic";
-export const revalidate = 60;
+
 
 import React from 'react';
 import { Shield, Lock, CreditCard, Truck, Mail, Cookie } from 'lucide-react';

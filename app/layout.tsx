@@ -1,108 +1,68 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import Navbar from "@/components/avbar"; // Likely "@/components/Navbar"
-import Footer from "@/components/footer/Footer";
+// app/static/privacy-policy/page.tsx
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import Link from "next/link";
+import type { Metadata, Viewport } from "next";
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  // themeColor: "#6366f1", // optional: match your brand
+};
+// Remove "use client" entirely (no interactivity needed)
 
 export const metadata: Metadata = {
-  title: {
-    default: "BabaGaniOnline - Premium Physical Products Online Store",
-    template: "%s | BabaGaniOnline", // Great for product pages: e.g., "Product Name | BabaGaniOnline"
-  },
-  description:
-    "Shop premium physical products at BabaGaniOnline by Akif Imran. Discover high-quality items with fast shipping, secure payments, and excellent customer service. Your trusted online store for [your product categories, e.g., fashion, electronics, home goods].",
-  keywords: [
-    "online shopping",
-    "buy physical products online",
-    "premium products",
-    "ecommerce store",
-    "fast shipping",
-    "secure payment",
-    "Akif Imran",
-    "BabaGaniOnline",
-    "shop online", // Add specific categories here, e.g., "men's clothing", "gadgets", "home decor"
-    "best deals online",
-    "quality products",
-    "reliable online store",
-  ],
-  authors: [{ name: "Akif Imran", url: "https://babaganionline.com" }],
-  creator: "Akif Imran",
-  publisher: "BabaGaniOnline",
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
-  },
-  viewport: "width=device-width, initial-scale=1",
-  alternates: {
-    canonical: "https://babaganionline.com",
-  },
-  verification: {
-    google: "your-google-site-verification-code", // Add your Google Search Console code here
-  },
-  openGraph: {
-    title: "BabaGaniOnline - Shop Premium Physical Products Online",
-    description:
-      "Explore and buy high-quality physical products from BabaGaniOnline. Enjoy secure shopping, quick delivery, and top-notch customer support by Akif Imran.",
-    url: "https://babaganionline.com",
-    siteName: "BabaGaniOnline",
-    images: [
-      {
-        url: "https://babaganionline.com/og-image.jpg", // 1200x630 recommended – feature your store logo/products
-        width: 1200,
-        height: 630,
-        alt: "BabaGaniOnline - Premium Physical Products Store by Akif Imran",
-      },
-    ],
-    locale: "en_US",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "BabaGaniOnline - Premium Physical Products Online",
-    description:
-      "Shop the best physical products online with fast shipping and secure checkout at BabaGaniOnline.",
-    images: ["https://babaganionline.com/twitter-image.jpg"], // Reuse OG image
-    creator: "@yourtwitterhandle", // Update with your handle
-    site: "@yourtwitterhandle",
-  },
-  icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon-16x16.png",
-    apple: "/apple-touch-icon.png",
-  },
+  title: "Privacy Policy | BabaGaniOnline",
+  description: "Read our privacy policy to understand how BabaGaniOnline collects, uses, and protects your personal information.",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+// Optional: Make it fully static (best for policy pages)
+export const revalidate = false; // or remove this line entirely
+
+export default function PrivacyPolicyPage() {
+  const lastUpdated = "January 07, 2026";
+
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <Navbar />
-        {children}
-        <Footer />
-      </body>
-    </html>
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-16 px-6">
+      <div className="max-w-4xl mx-auto text-center">
+        <h1 className="text-5xl font-extrabold text-gray-900 mb-8">Privacy Policy</h1>
+        <p className="text-xl text-gray-600 mb-12">
+          We respect your privacy and are committed to protecting your personal data.
+        </p>
+        <p className="text-sm text-gray-500">
+          Last updated: <span className="font-semibold">{lastUpdated}</span>
+        </p>
+
+        {/* Add your full privacy policy content here */}
+        <div className="mt-16 text-left bg-white rounded-3xl shadow-lg p-10 space-y-8">
+          <section>
+            <h2 className="text-2xl font-bold mb-4">1. Information We Collect</h2>
+            <p className="text-gray-700">
+              We collect information you provide directly, such as when you create an account, place an order, or contact us.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-bold mb-4">2. How We Use Your Information</h2>
+            <p className="text-gray-700">
+              To process orders, improve our services, communicate with you, and comply with legal obligations.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-bold mb-4">3. Your Rights</h2>
+            <p className="text-gray-700">
+              You have the right to access, correct, or delete your personal data at any time.
+            </p>
+          </section>
+
+          <p className="text-sm text-gray-500 mt-12">
+            Questions? contact us at{" "}
+            <Link href="mailto:support@babaganionline.com" className="text-indigo-600 hover:underline">
+              Contact
+            </Link>
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }
