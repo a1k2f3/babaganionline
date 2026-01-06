@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { FiSearch, FiShoppingCart, FiUser, FiMenu, FiHome, FiGrid } from 'react-icons/fi'; // Assuming react-icons is installed
 import Searchbar from './Searchbar';
+import NavSearch from './Searchbar';
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -25,7 +26,7 @@ const Navbar = () => {
           <Image src="/logo2.jpg" alt="logo" width={50} height={50} className="inline-block ml-2"/>
           BabaGaniOnline
         </Link>
-  <form onSubmit={handleSearch} className="flex items-center border border-gray-300 rounded-md px-3 py-2">
+  {/* <form onSubmit={handleSearch} className="flex items-center border border-gray-300 rounded-md px-3 py-2">
           <input
             type="text"
             placeholder="Search products..."
@@ -36,7 +37,8 @@ const Navbar = () => {
           <button type="submit" className="ml-2 text-gray-600">
             <FiSearch size={20} />
           </button>
-        </form>
+        </form> */}
+        <NavSearch/>
         {/* Navigation Links */}
         <div className="flex space-x-6">
           <Link href="/" className="text-gray-600 hover:text-gray-900">Home</Link>
@@ -83,8 +85,8 @@ const Navbar = () => {
             <FiSearch size={16} />
           </button>
         </form> */}
-        <Searchbar />
-
+        {/* <Searchba /> */}
+<NavSearch/>
         {/* Menu Toggle */}
         <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-gray-600">
           <FiMenu size={24} />

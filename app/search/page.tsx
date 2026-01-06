@@ -1,7 +1,7 @@
 // app/search/page.tsx  (or wherever your search route is)
 
 import { Suspense } from "react";
-import SearchResultsClient from "@/components/Search/Searchpage";
+import SearchResultsClient from "@/components/card/SearchResultsClient";
 
 // Optional: Add metadata for better SEO
 export const metadata = {
