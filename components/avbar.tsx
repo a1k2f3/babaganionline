@@ -29,7 +29,7 @@ const Navbar = () => {
         {/* Navigation Links */}
         <div className="flex space-x-6">
           <Link href="/" className="text-gray-600 hover:text-gray-900">Home</Link>
-          <Link href="/order" className="text-gray-600 hover:text-gray-900">Shop</Link>
+          <Link href="/shop/orders" className="text-gray-600 hover:text-gray-900">Shop</Link>
           <Link href="/categories" className="text-gray-600 hover:text-gray-900">Categories</Link>
           <Link href="/about" className="text-gray-600 hover:text-gray-900">About</Link>
           <Link href="/contact" className="text-gray-600 hover:text-gray-900">Contact</Link>
@@ -38,7 +38,7 @@ const Navbar = () => {
 
         {/* Icons: Cart and User */}
         <div className="flex space-x-4">
-          <Link href="/cart" className="text-gray-600 hover:text-gray-900 relative">
+          <Link href="/shop/cart" className="text-gray-600 hover:text-gray-900 relative">
             <FiShoppingCart size={24} />
             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
           </Link>
@@ -61,7 +61,7 @@ const Navbar = () => {
           <button onClick={() => setIsSearchOpen(true)} className="text-gray-600">
             <FiSearch size={24} />
           </button>
-          <Link href="/cart" className="text-gray-600 relative">
+          <Link href="/shop/cart" className="text-gray-600 relative">
             <FiShoppingCart size={24} />
             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
           </Link>
@@ -108,11 +108,11 @@ const Navbar = () => {
           <FiHome size={24} />
           <span className="text-xs">Home</span>
         </Link>
-        <Link href="/shop" className="flex flex-col items-center text-gray-600 hover:text-gray-900">
+        <Link href="/shop/orders" className="flex flex-col items-center text-gray-600 hover:text-gray-900">
           <FiGrid size={24} />
-          <span className="text-xs">Shop</span>
+          <span className="text-xs">Orders</span>
         </Link>
-        <Link href="/cart" className="flex flex-col items-center text-gray-600 hover:text-gray-900 relative">
+        <Link href="/shopcart" className="flex flex-col items-center text-gray-600 hover:text-gray-900 relative">
           <FiShoppingCart size={24} />
           <span className="absolute -top-1 -right-3 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
           <span className="text-xs">Cart</span>

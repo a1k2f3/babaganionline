@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "date-fns": "^4.1.0",
     "framer-motion": "^12.24.7",
     "loadash": "^1.0.0",
     "lodash": "^4.17.21",
