@@ -1,6 +1,6 @@
 // app/cookies/page.tsx
 import Link from "next/link";
-import { Cookie, Shield, Settings, Globe, Clock, CheckCircle } from "lucide-react";
+import { Cookie, Shield, Settings, Globe, CheckCircle, Eye, EyeOff } from "lucide-react";
 
 export default function CookiePolicyPage() {
   const lastUpdated = "January 07, 2026";
@@ -10,213 +10,195 @@ export default function CookiePolicyPage() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-3 bg-indigo-100 text-indigo-700 px-6 py-3 rounded-full text-sm font-medium mb-6">
+          <div className="inline-flex items-center gap-3 bg-indigo-100 text-indigo-700 px-6 py-3 rounded-full text-sm font-medium mb-6 shadow-sm">
             <Cookie className="w-6 h-6" />
             Cookie Policy
           </div>
 
           <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 mb-6">
-            Our Cookie Policy
+            We Use Cookies
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            We use cookies to improve your experience, analyze traffic, and personalize content on BabaGaniOnline.
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Cookies help us deliver a better shopping experience, keep your cart safe, and show you products you’ll love.
           </p>
 
           <p className="text-sm text-gray-500 mt-8">
-            Last updated: <span className="font-medium">{lastUpdated}</span>
+            Last updated: <span className="font-semibold">{lastUpdated}</span>
           </p>
         </div>
 
-        {/* Introduction */}
+        {/* What Are Cookies */}
         <section className="bg-white rounded-3xl shadow-lg p-10 mb-12">
-          <div className="flex items-start gap-4 mb-6">
-            <Shield className="w-10 h-10 text-indigo-600 flex-shrink-0" />
+          <div className="flex items-start gap-6">
+            <Cookie className="w-12 h-12 text-indigo-600 flex-shrink-0" />
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">What Are Cookies?</h2>
-              <p className="text-gray-700 leading-relaxed">
-                Cookies are small text files that are placed on your device (computer, smartphone, or tablet) when you visit a website. 
-                They help websites remember your preferences, understand how you use the site, and provide a better experience.
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                What Are Cookies?
+              </h2>
+              <p className="text-gray-700 leading-relaxed mb-6">
+                Cookies are tiny text files stored on your device when you visit a website. They help the site remember you, 
+                save your preferences, and make things faster and smoother.
+              </p>
+              <p className="text-gray-700">
+                At BabaGaniOnline, we use cookies responsibly to improve your experience — never to track you across the web or sell your data.
               </p>
             </div>
           </div>
-
-          <p className="text-gray-600 italic">
-            We respect your privacy and only use cookies to enhance your shopping experience on BabaGaniOnline.
-          </p>
         </section>
 
         {/* Types of Cookies */}
-        <section className="space-y-8 mb-16">
+        <section className="space-y-10 mb-16">
           <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
             Types of Cookies We Use
           </h2>
 
           <div className="grid md:grid-cols-2 gap-8">
-            {/* Essential Cookies */}
-            <div className="bg-white rounded-2xl shadow-md p-8 border border-gray-100">
+            {/* Essential */}
+            <div className="bg-gradient-to-br from-indigo-50 to-white rounded-3xl p-8 shadow-md border border-indigo-100">
               <div className="flex items-center gap-4 mb-6">
                 <Settings className="w-12 h-12 text-indigo-600" />
                 <h3 className="text-xl font-bold text-gray-900">Essential Cookies</h3>
               </div>
-              <p className="text-gray-700 mb-4">
-                These cookies are necessary for the website to function properly.
+              <p className="text-gray-700 mb-5">
+                Required for the website to work properly.
               </p>
               <ul className="space-y-3 text-gray-600">
-                <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span>Remember your login session</span>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  Keep you logged in
                 </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span>Keep items in your shopping cart</span>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  Remember items in your cart
                 </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span>Secure checkout process</span>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  Secure checkout process
                 </li>
               </ul>
               <p className="text-sm text-gray-500 mt-6">
-                <strong>Cannot be disabled</strong> — required for core functionality.
+                <strong>Cannot be turned off</strong> — needed for core features.
               </p>
             </div>
 
-            {/* Analytics & Performance */}
-            <div className="bg-white rounded-2xl shadow-md p-8 border border-gray-100">
+            {/* Performance & Analytics */}
+            <div className="bg-gradient-to-br from-purple-50 to-white rounded-3xl p-8 shadow-md border border-purple-100">
               <div className="flex items-center gap-4 mb-6">
                 <Globe className="w-12 h-12 text-purple-600" />
-                <h3 className="text-xl font-bold text-gray-900">Analytics Cookies</h3>
+                <h3 className="text-xl font-bold text-gray-900">Performance Cookies</h3>
               </div>
-              <p className="text-gray-700 mb-4">
-                These help us understand how visitors use our site so we can improve it.
+              <p className="text-gray-700 mb-5">
+                Help us improve site speed and performance.
               </p>
               <ul className="space-y-3 text-gray-600">
-                <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span>Track page views and navigation</span>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  Measure page load times
                 </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span>Measure site performance</span>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  Track popular products
                 </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span>Identify popular products</span>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  Fix bugs faster
                 </li>
               </ul>
               <p className="text-sm text-gray-500 mt-6">
-                Anonymous data only — no personal identification.
+                Anonymous data only — we never identify you personally.
               </p>
             </div>
 
-            {/* Marketing Cookies */}
-            <div className="bg-white rounded-2xl shadow-md p-8 border border-gray-100">
+            {/* Functional */}
+            <div className="bg-gradient-to-br from-pink-50 to-white rounded-3xl p-8 shadow-md border border-pink-100">
               <div className="flex items-center gap-4 mb-6">
-                <Clock className="w-12 h-12 text-pink-600" />
+                <Eye className="w-12 h-12 text-pink-600" />
                 <h3 className="text-xl font-bold text-gray-900">Functional Cookies</h3>
               </div>
-              <p className="text-gray-700 mb-4">
-                These remember your preferences to make your experience better.
+              <p className="text-gray-700 mb-5">
+                Remember your preferences for a better experience.
               </p>
               <ul className="space-y-3 text-gray-600">
-                <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span>Save your language preference</span>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  Save your language or currency
                 </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span>Remember recently viewed items</span>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  Show recently viewed items
                 </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span>Personalized recommendations</span>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  Personalize recommendations
                 </li>
               </ul>
             </div>
 
-            {/* Third-Party */}
-            <div className="bg-white rounded-2xl shadow-md p-8 border border-gray-100">
+            {/* Marketing (Optional) */}
+            <div className="bg-gradient-to-br from-green-50 to-white rounded-3xl p-8 shadow-md border border-green-100">
               <div className="flex items-center gap-4 mb-6">
-                <Globe className="w-12 h-12 text-orange-600" />
-                <h3 className="text-xl font-bold text-gray-900">Third-Party Cookies</h3>
+                <EyeOff className="w-12 h-12 text-green-600" />
+                <h3 className="text-xl font-bold text-gray-900">Marketing Cookies</h3>
               </div>
-              <p className="text-gray-700 mb-4">
-                Used by trusted partners for advertising and social features.
+              <p className="text-gray-700 mb-5">
+                Show you relevant offers (with your consent).
               </p>
               <ul className="space-y-3 text-gray-600">
-                <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span>Facebook Pixel (retargeting)</span>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  Retargeting on social media
                 </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span>Google Analytics</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span>Payment gateway partners</span>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  Personalized promotions
                 </li>
               </ul>
+              <p className="text-sm text-gray-500 mt-6">
+                You can disable these anytime.
+              </p>
             </div>
           </div>
         </section>
 
-        {/* How to Manage Cookies */}
-        <section className="bg-indigo-50 rounded-3xl p-10 mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">
-            Manage Your Cookie Preferences
+        {/* Manage Cookies */}
+        <section className="bg-indigo-50 rounded-3xl p-12 mb-16 text-center">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8">
+            You Control Your Cookies
           </h2>
-          <p className="text-lg text-gray-700 text-center max-w-3xl mx-auto mb-10">
-            You can control cookies through your browser settings or our cookie consent banner (shown on first visit).
+          <p className="text-lg text-gray-700 max-w-3xl mx-auto mb-10">
+            You can manage or delete cookies through your browser settings at any time. 
+            Note: disabling essential cookies may affect site functionality.
           </p>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <div className="bg-white rounded-2xl p-6 shadow-md">
-              <h4 className="font-bold text-lg mb-3">Browser Settings</h4>
-              <p className="text-gray-600">
-                Most browsers allow you to refuse cookies or delete them. Learn how:
-              </p>
-              <ul className="mt-4 space-y-2 text-sm">
-                <li><a href="https://support.google.com/chrome/answer/95647" target="_blank" rel="noopener" className="text-indigo-600 hover:underline">Chrome</a></li>
-                <li><a href="https://support.mozilla.org/en-US/kb/enable-and-disable-cookies-website-preferences" target="_blank" rel="noopener" className="text-indigo-600 hover:underline">Firefox</a></li>
-                <li><a href="https://support.apple.com/guide/safari/manage-cookies-sfri11471/mac" target="_blank" rel="noopener" className="text-indigo-600 hover:underline">Safari</a></li>
-              </ul>
-            </div>
+          <div className="flex flex-col sm:flex-row gap-6 justify-center">
+            
+              <Settings className="w-6 h-6" />
+              Manage Cookie Preferences
+            
 
-            <div className="bg-white rounded-2xl p-6 shadow-md">
-              <h4 className="font-bold text-lg mb-3">Our Consent Tool</h4>
-              <p className="text-gray-600 mb-4">
-                Click below to adjust your preferences anytime.
-              </p>
-              <button
-                onClick={() => {
-                  // In real app, trigger your cookie consent banner
-                  alert("Cookie preferences will open here (integrate your consent tool)");
-                }}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-xl transition shadow-lg"
-              >
-                Manage Preferences
-              </button>
-            </div>
+            <Link
+              href="/support/contact"
+              className="inline-flex items-center gap-3 border-4 border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-bold py-5 px-10 rounded-2xl transition"
+            >
+              Contact Us for Help
+            </Link>
           </div>
         </section>
 
-        {/* Contact & Updates */}
+        {/* Closing */}
         <section className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">
-            Questions?
-          </h2>
-          <p className="text-lg text-gray-600 mb-8">
-            If you have any concerns about our use of cookies, please contact us.
-          </p>
-          <Link
-            href="/support/contact"
-            className="inline-flex items-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-10 rounded-xl transition shadow-lg"
-          >
-            Contact Support
-          </Link>
+          <div className="bg-white rounded-3xl shadow-lg p-10">
+            <Shield className="w-16 h-16 text-indigo-600 mx-auto mb-6" />
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              Your Trust Is Our Priority
+            </h3>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              We only use cookies to make your experience better — never to invade your privacy.
+            </p>
+          </div>
 
           <p className="text-sm text-gray-500 mt-12">
-            We may update this policy from time to time. Continued use of BabaGaniOnline means you accept the latest version.
+            Questions? Reach out anytime at <Link href="mailto:support@babaganionline.com" className="text-indigo-600 hover:underline">support@babaganionline.com</Link>
           </p>
         </section>
       </div>
