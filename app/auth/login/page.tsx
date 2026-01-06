@@ -1,8 +1,6 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-// Remove this line completely:
-// export const revalidate = 60;
+
 
 import React from "react";
 import Logo from "@/components/forms/logo";

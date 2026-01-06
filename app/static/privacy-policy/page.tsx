@@ -4,11 +4,11 @@
 import Link from "next/link";
 import { Shield, Lock, CreditCard, Truck, Cookie, Mail } from "lucide-react";
 
-export const metadata = {
-  title: "Privacy Policy | Baba Gani Online",
-  description:
-    "Learn how Baba Gani Online collects, uses, and protects your personal information. We are committed to your privacy and data security.",
-};
+// export const metadata = {
+//   title: "Privacy Policy | Baba Gani Online",
+//   description:
+//     "Learn how Baba Gani Online collects, uses, and protects your personal information. We are committed to your privacy and data security.",
+// };
 
 // Fully static generation — policy pages don't change often
 export const revalidate = false;
