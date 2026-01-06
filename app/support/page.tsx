@@ -81,15 +81,7 @@ export default function SupportPage() {
             >
               <Link href={option.link}>
                 <div className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 h-full flex flex-col items-center text-center border border-gray-100 hover:border-blue-300 transform hover:-translate-y-3">
-                  <div className="relative w-64 h-64 mb-8 overflow-hidden rounded-2xl">
-                    <Image
-                      src={`/api/image-proxy?id=${option.imgId}`} // You'd need a proxy or use direct URLs in production
-                      alt={option.title}
-                      fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-500"
-                      unoptimized
-                    />
-                  </div>
+                 
                   <h3 className="text-2xl font-bold text-gray-900 mb-4">{option.title}</h3>
                   <p className="text-gray-600 leading-relaxed flex-grow">{option.description}</p>
                   <span className="mt-6 inline-flex items-center text-blue-600 font-semibold group-hover:text-blue-700">
