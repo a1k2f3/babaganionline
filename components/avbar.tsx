@@ -36,7 +36,7 @@ const Navbar = () => {
 
   const sidebarLinks = [
     { href: "/", label: "Home", icon: FiHome },
-    { href: "/shop", label: "Shop All", icon: FiGrid },
+    { href: "/shop/orders", label: "Orders", icon: FiGrid },
     { href: "/categories", label: "Categories", icon: FiPackage },
     { href: "/about", label: "About Us", icon: FiInfo },
     { href: "/contact", label: "Contact", icon: FiPhone },
@@ -58,7 +58,7 @@ const Navbar = () => {
 
         <div className="flex space-x-6">
           <Link href="/" className="text-gray-600 hover:text-gray-900">Home</Link>
-          <Link href="/shop/orders" className="text-gray-600 hover:text-gray-900">Shop</Link>
+          <Link href="/shop/orders" className="text-gray-600 hover:text-gray-900">Orders</Link>
           <Link href="/categories" className="text-gray-600 hover:text-gray-900">Categories</Link>
           <Link href="/about" className="text-gray-600 hover:text-gray-900">About</Link>
           <Link href="/contact" className="text-gray-600 hover:text-gray-900">Contact</Link>
@@ -107,9 +107,7 @@ const Navbar = () => {
 
           <Link href="/shop/cart" className="relative text-gray-700 hover:text-indigo-600 transition">
             <FiShoppingCart size={24} />
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-              3
-            </span>
+           
           </Link>
 
           <Link href="/profile" className="text-gray-700 hover:text-indigo-600 transition">

@@ -5,7 +5,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import useSWRInfinite from "swr/infinite";
-import ProductCard from "./ProductCard";
+import ProductCard from "../featureproducts/ProductCard";
 
 interface Image {
   url: string;
@@ -40,13 +40,14 @@ interface Product {
 
 const PRODUCTS_PER_PAGE = 20;
 
-const fetcher = (url: string) => fetch(url).then((res) => {
-  if (!res.ok) throw new Error("Failed to fetch");
-  return res.json();
-});
+const fetcher = (url: string) =>
+  fetch(url).then((res) => {
+    if (!res.ok) throw new Error("Failed to fetch products");
+    return res.json();
+  });
 
 export default function ProductsSection() {
-  const observerRef = useRef<HTMLParagraphElement | null>(null);
+  const observerRef = useRef<HTMLDivElement | null>(null);
 
   const {
     data,
@@ -63,12 +64,16 @@ export default function ProductsSection() {
       revalidateFirstPage: false,
       revalidateOnFocus: false,
       dedupingInterval: 60000,
+      fallbackData: [], // Prevents undefined issues
     }
   );
 
+  // Flatten all pages into one array
   const products: Product[] = data ? data.flatMap((page) => page.data || []) : [];
+
   const isLoadingMore = isValidating && data && data.length === size;
-  const hasMore = data ? data[data.length - 1]?.data?.length === PRODUCTS_PER_PAGE : true;
+  // Since it's /random, we can't reliably know if there's more — limit to reasonable amount
+  const hasMore = products.length < 100; // Prevent infinite loading forever
 
   // Intersection Observer for infinite scroll
   const handleObserver = useCallback(
@@ -84,7 +89,7 @@ export default function ProductsSection() {
   useEffect(() => {
     const observer = new IntersectionObserver(handleObserver, {
       root: null,
-      rootMargin: "200px",
+      rootMargin: "300px",
       threshold: 0.1,
     });
 
@@ -99,7 +104,7 @@ export default function ProductsSection() {
     };
   }, [handleObserver]);
 
-  // Initial loading
+  // Initial loading state
   if (isLoading && products.length === 0) {
     return (
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white">
@@ -120,13 +125,13 @@ export default function ProductsSection() {
         <div className="max-w-lg mx-auto">
           <p className="text-red-600 text-2xl font-semibold mb-4">Oops!</p>
           <p className="text-gray-700 text-lg mb-8">
-            Failed to load products. Please try again.
+            Something went wrong while loading products.
           </p>
           <button
             onClick={() => window.location.reload()}
             className="px-8 py-4 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition shadow-lg"
           >
-            Retry
+            Try Again
           </button>
         </div>
       </section>
@@ -161,7 +166,7 @@ export default function ProductsSection() {
         {products.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-gray-500 text-2xl font-medium">
-              No products available right now.
+              No products available at the moment.
             </p>
           </div>
         ) : (
@@ -169,7 +174,7 @@ export default function ProductsSection() {
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 sm:gap-8">
               {products.map((product, index) => (
                 <motion.div
-                  key={product._id}
+                  key={`${product._id}-${index}`} // ← Fixed: Unique key even if duplicates exist
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.03 }}
@@ -180,25 +185,25 @@ export default function ProductsSection() {
               ))}
             </div>
 
-            {/* Infinite Scroll Trigger */}
+            {/* Infinite Scroll Loader / Trigger */}
             {hasMore && (
               <div ref={observerRef} className="flex justify-center py-16">
                 {isLoadingMore ? (
                   <div className="flex items-center gap-4 text-indigo-600">
                     <Loader2 className="w-8 h-8 animate-spin" />
-                    <span className="text-lg font-medium">Loading more...</span>
+                    <span className="text-lg font-medium">Loading more products...</span>
                   </div>
                 ) : (
-                  <p className="text-gray-400 text-sm">Scroll down to load more</p>
+                  <p className="text-gray-400 text-sm">Scroll down for more</p>
                 )}
               </div>
             )}
 
-            {/* End of Catalog */}
+            {/* End of Catalog Message */}
             {!hasMore && products.length > 0 && (
               <div className="text-center py-16">
                 <p className="text-gray-500 text-lg font-medium">
-                  You've reached the end! ✨
+                  You've seen all our featured products! ✨
                 </p>
               </div>
             )}

@@ -57,12 +57,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Optional future sections */}
-      {/* 
-      <section className="py-16 bg-gradient-to-r from-orange-500 to-red-600 text-white">
-        <NewsletterSignup />
-      </section>
-      */}
+      
     </main>
   );
 }
