@@ -1,8 +1,4 @@
 'use client';
-
-
-
-import React from 'react';
 import { Shield, Lock, CreditCard, Truck, Mail, Cookie } from 'lucide-react';
 
 export default function PrivacyPolicyPage() {
