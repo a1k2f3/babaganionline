@@ -11,12 +11,12 @@ import ProductsSection from '@/components/featureproducts/ProductSection';      
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gray-50 ">
+    <main className="min-h-screen bg-white ">
       {/* 1. Hero Section */}
       <HeroSection />
 
       {/* 2. Flash Deals - High urgency, right after hero */}
-      <section className="py-8 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900">
+      <section className="py-8 px-4 sm:px-6 lg:px-8 bg-white ">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 text-gray-900 dark:text-white">
             🔥 Flash Deals - 70% Off Limited Time!
@@ -26,7 +26,7 @@ export default function Home() {
       </section>
 
       {/* 3. Explore Categories - Large image grid with overlays */}
-      <section className="py-12 bg-gray-100 dark:bg-gray-800">
+      <section className="py-12 bg-gray-100 ">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-10 text-gray-900 dark:text-white">
             Explore Categories
@@ -36,7 +36,7 @@ export default function Home() {
       </section>
 
       {/* 4. Trending / Hot Products */}
-      <section className="py-12 bg-gray-50 dark:bg-gray-950">
+      <section className="py-12 bg-gray-50 ">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-10 text-orange-600 dark:text-orange-400">
             Trending Now
