@@ -9,9 +9,9 @@ import TrendingProducts from '@/components/card/TrendingProducts';       // Caro
 import ProductsSection from '@/components/featureproducts/ProductSection';         // All/New Arrivals
 
 export const metadata = {
-  title: "Privacy Policy | Baba Gani Online",
+  title: "Home | Baba Gani Online",
   description:
-    "Learn how Baba Gani Online collects, uses, and protects your personal information. We are committed to your privacy and data security.",
+    "Baba Gani Online: Pakistan's reliable online shopping destination. Enjoy secure checkout, fast delivery across Pakistan, easy returns, and full protection of your personal data",
 };
 export default function Home() {
   return (
