@@ -68,9 +68,7 @@ const Navbar = () => {
         <div className="flex space-x-4">
           <Link href="/shop/cart" className="text-gray-600 hover:text-gray-900 relative">
             <FiShoppingCart size={24} />
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-              3
-            </span>
+           
           </Link>
           <Link href="/profile" className="text-gray-600 hover:text-gray-900">
             <FiUser size={24} />
