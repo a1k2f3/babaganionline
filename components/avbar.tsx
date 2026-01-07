@@ -21,6 +21,7 @@ import {
 } from "react-icons/fi";
 
 import NavSearch from "./Searchbar";
+import { Heart } from "lucide-react";
 
 const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -213,7 +214,10 @@ const Navbar = () => {
             )}
               <span className="text-xs mt-1">Cart</span>
           </Link>
-
+<Link href="/profile/wishlist" className="relative text-gray-700 hover:text-indigo-600 transition">
+            <Heart/>
+              <span className="text-xs mt-1">Wishlist</span>
+          </Link>
       </nav>
 
       {/* Content padding */}

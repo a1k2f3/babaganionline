@@ -15,15 +15,14 @@ import {
 export default function ProductActions({
   product,
   formId,
-  initialWishlisted = false, // Optional: pass from parent if pre-fetched
+  initialWishlisted = false,
 }: {
   product: any;
   formId?: string;
   initialWishlisted?: boolean;
 }) {
   const [quantity, setQuantity] = useState(1);
-  const [wishlisted, setWishlisted] = useState(initialWishlisted);
-  const [wishlistLoading, setWishlistLoading] = useState(false);
+  const [wishlisted, setWishlisted] = useState(false); // Controlled locally
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -31,12 +30,56 @@ export default function ProductActions({
 
   const router = useRouter();
 
-  // Safe access to window
   const currentUrl =
     typeof window !== "undefined" ? window.location.href : "";
   const shareText = `Check out "${product.name}" for just ${product.discountPrice || product.price} RS!`;
 
-  // Get selected size from form
+  // ========== LOCAL WISHLIST LOGIC (localStorage) ==========
+  useEffect(() => {
+    // Load wishlist from localStorage on mount
+    try {
+      const savedWishlist = localStorage.getItem("wishlist");
+      if (savedWishlist) {
+        const wishlistIds = JSON.parse(savedWishlist);
+        setWishlisted(wishlistIds.includes(product._id));
+      } else {
+        setWishlisted(initialWishlisted);
+      }
+    } catch (err) {
+      setWishlisted(initialWishlisted);
+    }
+  }, [product._id, initialWishlisted]);
+
+  const toggleWishlistLocal = () => {
+    try {
+      let wishlistIds: string[] = [];
+      const saved = localStorage.getItem("wishlist");
+
+      if (saved) {
+        wishlistIds = JSON.parse(saved);
+      }
+
+      if (wishlistIds.includes(product._id)) {
+        // Remove
+        wishlistIds = wishlistIds.filter((id) => id !== product._id);
+        setWishlisted(false);
+        setSuccess(true);
+        setTimeout(() => setSuccess(false), 2000);
+      } else {
+        // Add
+        wishlistIds.push(product._id);
+        setWishlisted(true);
+        setSuccess(true);
+        setTimeout(() => setSuccess(false), 2000);
+      }
+
+      localStorage.setItem("wishlist", JSON.stringify(wishlistIds));
+    } catch (err) {
+      setError("Failed to update wishlist locally");
+    }
+  };
+
+  // ========== ADD TO CART (unchanged) ==========
   const getSelectedSize = (): string | null => {
     if (!formId) return null;
     const form = document.getElementById(formId) as HTMLFormElement;
@@ -45,7 +88,6 @@ export default function ProductActions({
     return (formData.get("selectedSize") as string) || null;
   };
 
-  // ========== ADD TO CART ==========
   const handleAddToCart = async (buyNow = false) => {
     setLoading(true);
     setError(null);
@@ -62,7 +104,7 @@ export default function ProductActions({
 
     const token = localStorage.getItem("token");
     const userID = localStorage.getItem("UserId")?.replace(/"/g, "");
-console.log(userID);
+
     if (!token || !userID) {
       router.push("/auth/login?redirect=" + encodeURIComponent(currentUrl));
       setLoading(false);
@@ -104,48 +146,6 @@ console.log(userID);
       setLoading(false);
     }
   };
-
-  // ========== ADD/REMOVE FROM WISHLIST ==========
- const handleWishlist = async () => {
-    const token = localStorage.getItem("token");
-    const userID = localStorage.getItem("UserId")?.replace(/"/g, "");
-
-    if (!token) {
-      router.push("/auth/login?redirect=" + encodeURIComponent(currentUrl));
-      return;
-    }
-
-    setWishlistLoading(true);
-    setError(null);
-
-    try {
-      const method = wishlisted ? "DELETE" : "POST";
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/wishlist/${product._id}?id=${userID}`,
-        {
-          method,
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to update wishlist");
-      }
-
-      setWishlisted(!wishlisted);
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
-    } catch (err: any) {
-    setError(err.message || "Failed to update wishlist");
-  } finally {
-    setWishlistLoading(false);
-  }
-};
 
   // ========== SHARE FUNCTIONALITY ==========
   const handleShare = async () => {
@@ -200,7 +200,7 @@ console.log(userID);
         </div>
       </div>
 
-      {/* Main Action Buttons */}
+      {/* Action Buttons */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <button
           onClick={() => handleAddToCart(false)}
@@ -220,11 +220,11 @@ console.log(userID);
         </button>
       </div>
 
-      {/* Success / Error Messages */}
+      {/* Messages */}
       {success && (
         <div className="flex items-center gap-2 text-green-700 bg-green-50 px-5 py-3 rounded-lg font-medium">
           <CheckCircle className="w-5 h-5" />
-          {wishlisted ? "Added to wishlist!" : "Removed from wishlist successfully!"}
+          {wishlisted ? "Added to wishlist!" : "Removed from wishlist"}
         </div>
       )}
 
@@ -234,23 +234,18 @@ console.log(userID);
         </div>
       )}
 
-      {/* Wishlist & Share Row */}
+      {/* Wishlist & Share */}
       <div className="flex gap-4">
         <button
-          onClick={handleWishlist}
-          disabled={wishlistLoading}
+          onClick={toggleWishlistLocal}
           className={`flex-1 flex items-center justify-center gap-3 py-3.5 rounded-xl border-2 font-medium transition-all ${
             wishlisted
               ? "bg-red-50 border-red-500 text-red-600"
               : "border-gray-300 hover:border-red-400 text-gray-700 hover:bg-red-50"
-          } ${wishlistLoading ? "opacity-70 cursor-not-allowed" : ""}`}
+          }`}
         >
-          {wishlistLoading ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
-          ) : (
-            <Heart className={`w-5 h-5 ${wishlisted ? "fill-current" : ""}`} />
-          )}
-          {wishlistLoading ? "Updating..." : wishlisted ? "Wishlisted" : "Add to Wishlist"}
+          <Heart className={`w-5 h-5 ${wishlisted ? "fill-current" : ""}`} />
+          {wishlisted ? "Wishlisted" : "Add to Wishlist"}
         </button>
 
         <div className="relative">
@@ -262,7 +257,6 @@ console.log(userID);
             Share
           </button>
 
-          {/* Share Dropdown */}
           {shareOpen && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShareOpen(false)} />
