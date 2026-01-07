@@ -60,9 +60,9 @@ export default function ProductActions({
       return;
     }
 
-    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-    const userID = typeof window !== "undefined" ? localStorage.getItem("UserId")?.replace(/"/g, "") : null;
-
+    const token = localStorage.getItem("token");
+    const userID = localStorage.getItem("UserId")?.replace(/"/g, "");
+console.log(userID);
     if (!token || !userID) {
       router.push("/auth/login?redirect=" + encodeURIComponent(currentUrl));
       setLoading(false);
@@ -107,40 +107,40 @@ export default function ProductActions({
 
   // ========== ADD/REMOVE FROM WISHLIST ==========
  const handleWishlist = async () => {
-  const token = localStorage.getItem("token");
-  const userID = localStorage.getItem("UserId")?.replace(/"/g, "");
+    const token = localStorage.getItem("token");
+    const userID = localStorage.getItem("UserId")?.replace(/"/g, "");
 
-  if (!token) {
-    router.push("/auth/login?redirect=" + encodeURIComponent(currentUrl));
-    return;
-  }
-
-  setWishlistLoading(true);
-  setError(null);
-
-  try {
-    const method = wishlisted ? "DELETE" : "POST";
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/wishlist/${product._id}`,
-      {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to update wishlist");
+    if (!token) {
+      router.push("/auth/login?redirect=" + encodeURIComponent(currentUrl));
+      return;
     }
 
-    setWishlisted(!wishlisted);
-    setSuccess(true);
-    setTimeout(() => setSuccess(false), 3000);
-  } catch (err: any) {
+    setWishlistLoading(true);
+    setError(null);
+
+    try {
+      const method = wishlisted ? "DELETE" : "POST";
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/wishlist/${product._id}?id=${userID}`,
+        {
+          method,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to update wishlist");
+      }
+
+      setWishlisted(!wishlisted);
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (err: any) {
     setError(err.message || "Failed to update wishlist");
   } finally {
     setWishlistLoading(false);
@@ -224,7 +224,7 @@ export default function ProductActions({
       {success && (
         <div className="flex items-center gap-2 text-green-700 bg-green-50 px-5 py-3 rounded-lg font-medium">
           <CheckCircle className="w-5 h-5" />
-          {wishlisted ? "Added to wishlist!" : "Added to cart successfully!"}
+          {wishlisted ? "Added to wishlist!" : "Removed from wishlist successfully!"}
         </div>
       )}
 
