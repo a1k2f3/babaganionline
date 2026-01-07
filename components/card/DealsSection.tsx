@@ -18,16 +18,17 @@ interface Product {
 }
 
 export default function DealsSection() {
-  const [timeLeft, setTimeLeft] = useState<Record<string, number>>({});
+  // Use ref instead of state for countdowns — avoids re-renders on init
+  const timeLeftRef = useRef<Record<string, number>>({});
+  const [_, forceUpdate] = useState({}); // Dummy state to trigger re-render every second
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const initializedRef = useRef<string>("");
 
   const { data, isLoading, error } = useSWR(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/products?tags=70-off`,
     fetcher,
     {
       revalidateOnFocus: false,
-      dedupingInterval: 60000, // Prevent rapid refetches
+      dedupingInterval: 60000,
     }
   );
 
@@ -42,63 +43,57 @@ export default function DealsSection() {
     return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
   }, []);
 
-  // Initialize timers ONLY when products first load or change significantly
+  // Initialize countdowns ONCE when products first load
   useEffect(() => {
     if (!products.length) {
-      setTimeLeft({});
+      timeLeftRef.current = {};
       return;
     }
 
-    // Create a stable key from product IDs to detect real changes
-    const productIds = products.map(p => p._id).sort().join(",");
+    let shouldInitialize = false;
 
-    // Use a ref to avoid re-initializing on every minor re-render
-    if (initializedRef.current && initializedRef.current === productIds) {
-      return; // Same products — do nothing
-    }
-
-    initializedRef.current = productIds;
-
-    setTimeLeft(prev => {
-      const next: Record<string, number> = {};
-
-      products.forEach(product => {
-        // Keep existing countdown if product was already there
-        if (prev[product._id] > 0) {
-          next[product._id] = prev[product._id];
-        } else {
-          // New product → random 2h to 12h
-          next[product._id] = Math.floor(Math.random() * 36000) + 7200;
-        }
-      });
-
-      return next;
+    products.forEach((product) => {
+      if (!(product._id in timeLeftRef.current)) {
+        // New product → assign random time (2h to 12h)
+        timeLeftRef.current[product._id] = Math.floor(Math.random() * 36000) + 7200; // 7200–43200 seconds
+        shouldInitialize = true;
+      }
+      // Existing products keep their current countdown
     });
-  }, [products]);
 
-  // Single global countdown ticker — runs once
+    // Clean up removed products
+    Object.keys(timeLeftRef.current).forEach((id) => {
+      if (!products.some((p) => p._id === id)) {
+        delete timeLeftRef.current[id];
+      }
+    });
+
+    // Only force update if we added new timers
+    if (shouldInitialize) {
+      forceUpdate({});
+    }
+  }, [products]); // Safe now — we don't call setState that affects deps
+
+  // Global countdown ticker — runs every second
   useEffect(() => {
     intervalRef.current = setInterval(() => {
-      setTimeLeft(prev => {
-        const updated = { ...prev };
-        let hasActive = false;
+      let hasActive = false;
 
-        Object.keys(updated).forEach(id => {
-          if (updated[id] > 0) {
-            updated[id] -= 1;
-            hasActive = true;
-          } else {
-            updated[id] = 0;
-          }
-        });
-
-        if (!hasActive) {
-          clearInterval(intervalRef.current!);
-          intervalRef.current = null;
+      Object.keys(timeLeftRef.current).forEach((id) => {
+        if (timeLeftRef.current[id] > 0) {
+          timeLeftRef.current[id] -= 1;
+          hasActive = true;
+        } else {
+          timeLeftRef.current[id] = 0;
         }
-
-        return updated;
       });
+
+      if (hasActive) {
+        forceUpdate({}); // Trigger re-render
+      } else if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
     }, 1000);
 
     return () => {
@@ -107,9 +102,9 @@ export default function DealsSection() {
         intervalRef.current = null;
       }
     };
-  }, []); // Only once!
+  }, []); // Runs only once
 
-  // Error handling
+  // Error / Loading / Empty states
   if (error) {
     console.error("Deals fetch error:", error);
     return <div className="text-center py-20 text-red-500">Failed to load deals.</div>;
@@ -145,7 +140,7 @@ export default function DealsSection() {
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
       {products.map((product) => {
         const originalPrice = Math.round(product.price / 0.3);
-        const remainingSeconds = timeLeft[product._id] ?? 0;
+        const remainingSeconds = timeLeftRef.current[product._id] ?? 0;
 
         return (
           <Link
@@ -171,7 +166,7 @@ export default function DealsSection() {
                   <span className="w-2 h-2 bg-black rounded-full animate-ping" />
                   FLASH
                 </div>
-      </div>
+              </div>
 
               <div className="p-3">
                 <h3 className="text-sm font-medium text-gray-800 line-clamp-2 mb-2 group-hover:text-orange-600 transition-colors">
