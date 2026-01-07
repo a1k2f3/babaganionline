@@ -137,10 +137,10 @@ export default function Footer() {
           </p>
 
           <div className="flex items-center gap-6 mt-4 md:mt-0">
-            <Link href="/privacy" className="hover:text-white transition">
+            <Link href="/static/privacy" className="hover:text-white transition">
               Privacy Policy
             </Link>
-            <Link href="/terms" className="hover:text-white transition">
+            <Link href="/static/terms" className="hover:text-white transition">
               Terms of Service
             </Link>
             <Link href="/static/cookies" className="hover:text-white transition">
