@@ -1,24 +1,15 @@
-// app/products/[id]/page.tsx
-// SERVER COMPONENT
-
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Star, Truck, Shield, CheckCircle } from "lucide-react";
 
-
-// import ProductGallery from "@/components/card/ProductGallery";
 import ProductGallery from "@/components/card/ProductGallery";
 import ProductActions from "@/components/card/ProducActions";
 import ProductTabs from "@/components/card/ProductTabs";
-
-// import AddReviewForm from "@/components/card/AddReviewForm";
 import AddReviewForm from "@/components/card/AddReviewForm";
-// Lazy load heavy sections
+
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
 
-// Client components loaded only when needed
 const ReviewsSection = dynamic(() => import("@/components/card/ReviewsSection"), {
   loading: () => <ReviewSectionSkeleton />,
   ssr: true,
@@ -42,17 +33,24 @@ async function getProduct(id: string) {
   return await res.json();
 }
 
-// Skeletons for better UX during loading
 function ReviewSectionSkeleton() {
   return (
-    <div className="space-y-6 animate-pulse">
-      <div className="h-8 bg-gray-200 rounded w-48" />
-      <div className="space-y-4">
+    <div className="space-y-8 animate-pulse">
+      <div className="h-10 bg-gray-200 rounded w-64" />
+      <div className="space-y-6">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="bg-gray-100 rounded-xl p-6">
-            <div className="h-4 bg-gray-200 rounded w-32 mb-2" />
-            <div className="h-3 bg-gray-200 rounded w-full mb-2" />
-            <div className="h-3 bg-gray-200 rounded w-3/4" />
+          <div key={i} className="bg-gray-50 rounded-2xl p-6">
+            <div className="flex items-center gap-4 mb-3">
+              <div className="h-10 w-10 bg-gray-300 rounded-full" />
+              <div>
+                <div className="h-5 bg-gray-300 rounded w-32 mb-2" />
+                <div className="h-4 bg-gray-200 rounded w-48" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="h-4 bg-gray-200 rounded w-full" />
+              <div className="h-4 bg-gray-200 rounded w-3/4" />
+            </div>
           </div>
         ))}
       </div>
@@ -62,13 +60,13 @@ function ReviewSectionSkeleton() {
 
 function RelatedProductsSkeleton() {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-      {[1, 2, 3, 4].map((i) => (
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      {[1, 2, 3, 4, 5, 6].map((i) => (
         <div key={i} className="bg-white rounded-2xl shadow-sm overflow-hidden animate-pulse">
           <div className="aspect-square bg-gray-200" />
-          <div className="p-5 space-y-3">
+          <div className="p-4 space-y-3">
             <div className="h-4 bg-gray-200 rounded w-3/4" />
-            <div className="h-6 bg-gray-200 rounded w-1/2" />
+            <div className="h-6 bg-gray-300 rounded w-1/2" />
           </div>
         </div>
       ))}
@@ -106,155 +104,152 @@ export default async function ProductPage({
     : ["Premium quality material", "Comfortable fit", "Stylish design", "Durable and long-lasting"];
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20 pb-24"> {/* Safe padding for fixed navbar */}
+    <div className="min-h-screen bg-gray-50 pb-24 lg:pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumb */}
-        <nav className="text-sm mb-8 text-gray-600" aria-label="Breadcrumb">
-          <ol className="flex items-center space-x-3">
-            <li>
-              <Link href="/" className="hover:text-indigo-600 transition">Home</Link>
-            </li>
+
+        {/* Ultra-minimal Breadcrumb */}
+        <nav className="py-3 text-xs sm:text-sm text-gray-500">
+          <ol className="flex items-center space-x-2 flex-wrap">
+            <li><Link href="/" className="hover:text-indigo-600">Home</Link></li>
             <li className="text-gray-400">/</li>
             {product.category && (
               <>
-                <li>
-                  <Link href={`/category/${product.category.slug}`} className="hover:text-indigo-600 transition">
-                    {product.category.name}
-                  </Link>
-                </li>
+                <li><Link href={`/category/${product.category.slug}`} className="hover:text-indigo-600">{product.category.name}</Link></li>
                 <li className="text-gray-400">/</li>
               </>
             )}
-            <li className="font-medium text-gray-900 truncate max-w-xs">{product.name}</li>
+            <li className="text-gray-900 font-medium truncate max-w-[200px] sm:max-w-none">{product.name}</li>
           </ol>
         </nav>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
-          {/* Left: Gallery + Tabs (Mobile priority) */}
-          <div className="space-y-8">
+        {/* Main Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 mt-4 lg:mt-8">
+
+          {/* Gallery - Full width on mobile */}
+          <div className="order-1 lg:order-1">
             <ProductGallery images={images} productName={product.name} />
-
-            {/* Tabs: Description, Specs, Highlights */}
-            <ProductTabs
-              descriptionPoints={descriptionPoints}
-              specifications={product.specifications}
-              highlights={product.highlights}
-            />
-
-            {/* Reviews on Mobile */}
-            <div className="lg:hidden">
-              <Suspense fallback={<ReviewSectionSkeleton />}>
-                <ReviewsSection reviews={product.reviews || []} rating={product.rating || 0} />
-              </Suspense>
-            </div>
           </div>
 
-          {/* Right: Details + Actions */}
-          <div className="space-y-8">
+          {/* Product Details */}
+          <div className="space-y-6 lg:space-y-8 order-2 lg:order-2">
+
+            {/* Title & Rating */}
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 leading-tight">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
                 {product.name}
               </h1>
 
-              <div className="flex items-center gap-4 mt-4">
-                <div className="flex items-center">
+              <div className="flex flex-wrap items-center gap-4 mt-4">
+                <div className="flex items-center gap-1">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`w-5 h-5 ${
+                      className={`w-5 h-5 sm:w-6 sm:h-6 ${
                         i < Math.round(product.rating || 0)
-                          ? "fill-yellow-400 text-yellow-400"
+                          ? "fill-amber-400 text-amber-400"
                           : "text-gray-300"
                       }`}
                     />
                   ))}
+                  <span className="ml-2 text-sm sm:text-base text-gray-600">
+                    ({product.reviews?.length || 0} reviews)
+                  </span>
                 </div>
-                <span className="text-sm text-gray-600">
-                  {product.reviews?.length || 0} Reviews
-                </span>
 
                 {product.stock > 0 && product.stock < 10 && (
-                  <span className="ml-auto bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-medium">
-                    Only {product.stock} left in stock!
+                  <span className="bg-red-100 text-red-700 px-4 py-2 rounded-full text-sm font-semibold">
+                    Hurry! Only {product.stock} left
                   </span>
                 )}
               </div>
             </div>
 
             {/* Price */}
-            <div className="border-b pb-6">
-              <div className="flex items-end gap-2">
-                <span className="text-4xl md:text-5xl font-bold text-indigo-600">
+            <div className="py-6 border-y border-gray-200">
+              <div className="flex items-baseline gap-3">
+                <span className="text-4xl sm:text-5xl lg:text-6xl font-bold text-indigo-600">
                   {product.price.toLocaleString()}
                 </span>
-                <span className="text-xl text-gray-600 pb-1">{product.currency || "RS"}</span>
+                <span className="text-xl sm:text-2xl text-gray-600">{product.currency || "RS"}</span>
               </div>
             </div>
 
-            {/* Size Selector */}
-            <form id="product-form" className="space-y-6">
-              {availableSizes.length > 0 && (
-                <div>
-                  <h3 className="text-lg font-semibold mb-4">Choose Size</h3>
-                  <div className="flex flex-wrap gap-3">
-                    {availableSizes.map((size, idx) => (
-                      <label key={size} className="cursor-pointer">
-                        <input
-                          type="radio"
-                          name="selectedSize"
-                          value={size}
-                          className="sr-only peer"
-                          defaultChecked={idx === 0}
-                          required
-                        />
-                        <span className="block px-6 py-3 text-center rounded-lg border-2 border-gray-300 text-gray-700 font-medium peer-checked:border-indigo-600 peer-checked:bg-indigo-50 peer-checked:text-indigo-600 transition-all hover:border-indigo-400">
-                          {size}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
+            {/* Size Selection */}
+            {availableSizes.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900">Select Size</h3>
+                <div className="flex flex-wrap gap-3">
+                  {availableSizes.map((size, idx) => (
+                    <label key={size} className="cursor-pointer">
+                      <input
+                        type="radio"
+                        name="selectedSize"
+                        value={size}
+                        className="sr-only peer"
+                        defaultChecked={idx === 0}
+                        required
+                      />
+                      <span className="inline-block px-6 py-4 text-center rounded-xl border-2 border-gray-300 text-gray-800 font-medium text-lg peer-checked:border-indigo-600 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 transition-all hover:border-indigo-500">
+                        {size}
+                      </span>
+                    </label>
+                  ))}
                 </div>
-              )}
+              </div>
+            )}
 
-              {/* Add to Cart / Buy Now */}
+            {/* Actions - Sticky on mobile if supported */}
+            <div className="py-4">
               <ProductActions product={product} formId="product-form" />
-            </form>
+            </div>
 
             {/* Trust Badges */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t">
-              <div className="flex items-center gap-3 text-sm text-gray-600">
-                <Truck className="w-6 h-6 text-indigo-600" />
-                <span>Free Delivery over 5000 RS</span>
+            <div className="grid grid-cols-3 gap-4 py-8 border-t border-gray-200">
+              <div className="flex flex-col items-center text-center text-sm text-gray-600">
+                <Truck className="w-8 h-8 text-indigo-600 mb-2" />
+                <span>Free Delivery<br />over 5000 RS</span>
               </div>
-              <div className="flex items-center gap-3 text-sm text-gray-600">
-                <Shield className="w-6 h-6 text-indigo-600" />
-                <span>Secure Payment</span>
+              <div className="flex flex-col items-center text-center text-sm text-gray-600">
+                <Shield className="w-8 h-8 text-indigo-600 mb-2" />
+                <span>Secure<br />Payment</span>
               </div>
-              <div className="flex items-center gap-3 text-sm text-gray-600">
-                <CheckCircle className="w-6 h-6 text-indigo-600" />
-                <span>30-Day Easy Returns</span>
+              <div className="flex flex-col items-center text-center text-sm text-gray-600">
+                <CheckCircle className="w-8 h-8 text-indigo-600 mb-2" />
+                <span>30-Day<br />Easy Returns</span>
               </div>
-            </div>
-
-            {/* Write a Review */}
-            <section className="bg-white rounded-2xl shadow-md p-6 md:p-8 border">
-              <h2 className="text-2xl font-bold mb-6">Write a Review</h2>
-              <AddReviewForm productId={product._id} />
-            </section>
-
-            {/* Reviews on Desktop */}
-            <div className="hidden lg:block">
-              <Suspense fallback={<ReviewSectionSkeleton />}>
-                <ReviewsSection reviews={product.reviews || []} rating={product.rating || 0} />
-              </Suspense>
             </div>
           </div>
         </div>
 
-        {/* Related Products - Lazy Loaded */}
+        {/* Tabs: Description, Specs, etc. - Below gallery on mobile */}
+        <div className="mt-12 lg:mt-16">
+          <ProductTabs
+            descriptionPoints={descriptionPoints}
+            specifications={product.specifications}
+            highlights={product.highlights}
+          />
+        </div>
+
+        {/* Reviews Section */}
+        <section className="mt-16 lg:mt-20">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Customer Reviews</h2>
+          </div>
+          <Suspense fallback={<ReviewSectionSkeleton />}>
+            <ReviewsSection reviews={product.reviews || []} rating={product.rating || 0} />
+          </Suspense>
+        </section>
+
+        {/* Write a Review */}
+        <section className="mt-16 bg-white rounded-3xl shadow-lg p-6 sm:p-10 border">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-8 text-center">Share Your Experience</h2>
+          <AddReviewForm productId={product._id} />
+        </section>
+
+        {/* Related Products */}
         {relatedProducts?.length > 0 && (
-          <section className="mt-24">
-            <h2 className="text-3xl font-bold mb-10">You May Also Like</h2>
+          <section className="mt-20 lg:mt-28">
+            <h2 className="text-3xl sm:text-4xl font-bold text-center mb-10">You May Also Like</h2>
             <Suspense fallback={<RelatedProductsSkeleton />}>
               <RelatedProducts products={relatedProducts} />
             </Suspense>

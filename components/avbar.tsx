@@ -25,6 +25,7 @@ import NavSearch from "./Searchbar";
 const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [cartItemCount, setCartItemCount] = useState(0);
   const router = useRouter();
 
   const handleSearchSubmit = (query: string) => {
@@ -103,14 +104,9 @@ const Navbar = () => {
             <FiSearch size={24} />
           </button>
 
-          <Link href="/shop/cart" className="relative text-gray-700 hover:text-indigo-600 transition">
-            <FiShoppingCart size={24} />
-           
-          </Link>
+         
 
-          <Link href="/profile" className="text-gray-700 hover:text-indigo-600 transition">
-            <FiUser size={24} />
-          </Link>
+          
         </div>
       </div>
 
@@ -210,6 +206,16 @@ const Navbar = () => {
           <FiUser size={24} />
           <span className="text-xs mt-1">Profile</span>
         </Link>
+        <Link href="/shop/cart" className="relative text-gray-700 hover:text-indigo-600 transition">
+            <FiShoppingCart size={24} />
+            {cartItemCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                {cartItemCount}
+              </span>
+            )}
+              <span className="text-xs mt-1">Cart</span>
+          </Link>
+
       </nav>
 
       {/* Content padding */}
