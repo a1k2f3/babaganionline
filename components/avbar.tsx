@@ -52,11 +52,9 @@ const Navbar = () => {
           <Image src="/logo2.jpg" alt="logo" width={50} height={50} />
           BabaGaniOnline
         </Link>
-
         <div className="flex-1 max-w-xl mx-8">
           <NavSearch />
         </div>
-
         <div className="flex space-x-6">
           <Link href="/" className="text-gray-600 hover:text-gray-900">Home</Link>
           <Link href="/shop/orders" className="text-gray-600 hover:text-gray-900">Orders</Link>
@@ -219,7 +217,7 @@ const Navbar = () => {
       </nav>
 
       {/* Content padding */}
-      <div className="pt-20 md:pt-24 pb-20 md:pb-0" />
+      <div className="pt-0 md:pt-24 pb-10 md:pb-0" />
     </>
   );
 };

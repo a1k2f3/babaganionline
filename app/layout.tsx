@@ -27,7 +27,7 @@ export default function RootLayout({
     <html lang="en" className="scroll-smooth">
       <body className={`${inter.variable} font-sans antialiased bg-gray-50 text-gray-900`}>
         <Navbar />
-        <main className="min-h-screen pt-16 pb-20 lg:pb-0">
+        <main className="min-h-screen pt-6 md:pt-16 pb-20 lg:pb-0">
           {children}
         </main>
          <Footer />

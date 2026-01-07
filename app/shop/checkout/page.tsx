@@ -464,7 +464,7 @@ export default function CheckoutPage() {
                       <h4 className="font-medium line-clamp-2">{item.name}</h4>
                       {item.size && <p className="text-sm text-gray-600">Size: {item.size}</p>}
                       <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
-                      <p className="font-bold text-indigo-600 mt-1">₹{(item.price * item.quantity).toLocaleString()}</p>
+                      <p className="font-bold text-indigo-600 mt-1">RS{(item.price * item.quantity).toLocaleString()}</p>
                     </div>
                   </div>
                 ))}
@@ -473,17 +473,17 @@ export default function CheckoutPage() {
               <div className="border-t pt-6 space-y-3">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span className="font-medium">₹{subtotal.toLocaleString()}</span>
+                  <span className="font-medium">RS{subtotal.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Delivery</span>
                   <span className={delivery === 0 ? "text-green-600 font-bold" : ""}>
-                    {delivery === 0 ? "FREE" : `₹${delivery}`}
+                    {delivery === 0 ? "FREE" : `RS${delivery}`}
                   </span>
                 </div>
                 <div className="flex justify-between text-xl font-bold border-t pt-4">
                   <span>Total</span>
-                  <span className="text-indigo-600 text-2xl">₹{total.toLocaleString()}</span>
+                  <span className="text-indigo-600 text-2xl">RS{total.toLocaleString()}</span>
                 </div>
               </div>
 
