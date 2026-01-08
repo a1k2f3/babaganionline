@@ -3,7 +3,10 @@
 
 
 import React from 'react';
-
+export const metadata = {
+  title: "Customer Reviews & Feedback | Baba Gani Online",
+  description: "Read honest customer reviews and share your feedback on Baba Gani Online. Help others shop confidently with real experiences from Pakistan buyers.",
+};
 export default function Page() {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">

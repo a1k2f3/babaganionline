@@ -4,9 +4,8 @@ import Link from "next/link";
 import { FileText, Shield, Truck, CreditCard, Ban, Gavel, Mail } from "lucide-react";
 
 export const metadata = {
-  title: "Terms of Service | Baba Gani Online",
-  description:
-    "Read the Terms of Service for Baba Gani Online. Understand your rights and responsibilities as a buyer or seller on our trusted e-commerce marketplace.",
+  title: "Vendor Terms & Conditions | Baba Gani Online",
+  description: "Review the terms and conditions for selling on Baba Gani Online. Clear guidelines to become a successful vendor partner in Pakistan's growing marketplace.",
 };
 
 // Fully static page — no client interactivity needed

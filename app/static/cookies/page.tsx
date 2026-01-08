@@ -4,7 +4,11 @@ import Link from "next/link";
 import { Cookie, Shield, Settings, Globe, CheckCircle, Eye, EyeOff } from "lucide-react";
 
 // Optional: Add page-specific metadata (recommended for SEO)
-
+export const metadata = {
+  title: "Cookie Policy | Baba Gani Online",
+  description:
+    "Learn how Baba Gani Online uses cookies to enhance your shopping experience, provide essential features, personalize content, and analyze site performance. We prioritize your privacy and data protection.",
+};
 export default function CookiePolicyPage() {
   const lastUpdated = "January 07, 2026";
   return (

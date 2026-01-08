@@ -2,7 +2,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Rocket, Store, Zap, Shield, Mail, Sparkles, Crown } from "lucide-react";
-
+export const metadata = {
+  title: "Vendor Pricing | Baba Gani Online",
+  description: "Discover competitive pricing plans for vendors on Baba Gani Online. Start selling your products to millions of customers across Pakistan with low commissions.",
+};
 export default function VendorPricingComingSoon() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex items-center justify-center px-6 overflow-hidden relative">

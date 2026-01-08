@@ -3,7 +3,10 @@
 import Logo from '@/components/forms/logo'
 import SignupForm from '@/components/forms/Signupform'
 import React from 'react'
-
+export const metadata = {
+  title: "Sign Up | Baba Gani Online",
+  description: "Create your Baba Gani Online account today. Enjoy secure shopping, fast delivery, exclusive deals, and easy order tracking across Pakistan.",
+};
 function page() {
   return (
     <>
