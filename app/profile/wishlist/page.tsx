@@ -19,6 +19,7 @@ interface WishlistProduct {
 }
 
 export default function WishlistPage() {
+  // const router = useRouter();
   const [products, setProducts] = useState<WishlistProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,6 +37,7 @@ export default function WishlistPage() {
      
       if (!token) {
         setError("Please log in to view your wishlist");
+        router.push("/auth/login");
         setLoading(false);
         return;
       }
@@ -89,6 +91,7 @@ export default function WishlistPage() {
      
       if (!token) {
         alert("Please log in");
+router.push("/auth/login");
         return;
       }
 
@@ -144,7 +147,7 @@ export default function WishlistPage() {
         <h1 className="text-3xl font-bold mb-4">My Wishlist</h1>
         <p className="text-xl text-red-600 mb-8">{error}</p>
         <Link
-          href="/login"
+          href="/auth/login"
           className="inline-block px-8 py-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
         >
           Go to Login

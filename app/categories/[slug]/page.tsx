@@ -1,4 +1,4 @@
-// app/categories/[slug]/page.tsx  (or wherever your dynamic category route is)
+// app/categories/[slug]/page.tsx
 "use client";
 
 import { motion } from "framer-motion";
@@ -6,8 +6,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { use } from "react"; // Import React.use
-import { Package, ArrowLeft, Grid3X3, List, Loader2 } from "lucide-react";
+import { use } from "react";
+import { Package, ArrowLeft, Grid3X3, List, Loader2, Clock } from "lucide-react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -38,8 +38,6 @@ export default function CategoryPage({
   params: Promise<{ slug: string }>;
 }) {
   const router = useRouter();
-
-  // Properly unwrap the params Promise using React.use()
   const { slug } = use(params);
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -48,7 +46,6 @@ export default function CategoryPage({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch products when slug changes
   useEffect(() => {
     if (!slug) return;
 
@@ -59,9 +56,7 @@ export default function CategoryPage({
 
         const response = await fetch(
           `${API_BASE}/api/products/category/${encodeURIComponent(slug)}`,
-          {
-            cache: "no-store",
-          }
+          { cache: "no-store" }
         );
 
         if (!response.ok) {
@@ -91,12 +86,13 @@ export default function CategoryPage({
           .replace(/-/g, " ")
           .replace(/\b\w/g, (char) => char.toUpperCase());
 
+        // If no active products → show "Coming Soon"
         if (activeProducts.length === 0) {
           setProducts([]);
           setCategory({
             name: fallbackName,
             productCount: 0,
-            description: "No products available in this category right now.",
+            description: "We're working hard to bring you amazing products in this category.",
             imageUrl: "/images/fallback-category.jpg",
           });
           return;
@@ -150,23 +146,44 @@ export default function CategoryPage({
     );
   }
 
-  // Empty / Error State
-  if (error || !category || products.length === 0) {
-    const displayName =
-      category?.name ||
-      slug.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+  // "Coming Soon" or Error State (when no products)
+  if (!category || products.length === 0) {
+    const displayName = category?.name || slug.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
 
     return (
-      <div className="min-h-screen bg-gray-50 py-16">
-        <div className="max-w-7xl mx-auto px-6 text-center">
+      <div className="min-h-screen bg-gray-50">
+        {/* Hero Banner - still show category image with dark overlay */}
+        <div className="relative h-96 overflow-hidden">
+          <Image
+            src={category?.imageUrl || "/images/fallback-category.jpg"}
+            alt={displayName}
+            fill
+            className="object-cover brightness-50"
+            priority
+            unoptimized
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/30" />
+          <div className="relative max-w-7xl mx-auto px-6 h-full flex flex-col items-center justify-center text-center text-white">
+            <h1 className="text-5xl md:text-6xl font-bold capitalize mb-6">
+              {displayName}
+            </h1>
+            <div className="flex items-center gap-4 bg-white/10 backdrop-blur-sm px-8 py-4 rounded-full">
+              <Clock className="w-8 h-8" />
+              <p className="text-2xl font-medium">Coming Soon</p>
+            </div>
+            <p className="mt-10 text-xl max-w-2xl text-white/90">
+              {error
+                ? "Unable to load products right now. Please check back later."
+                : "Exciting products are on the way! Stay tuned."}
+            </p>
+          </div>
+        </div>
+
+        {/* Bottom section with call to action */}
+        <div className="max-w-7xl mx-auto px-6 py-20 text-center">
           <Package className="w-32 h-32 text-gray-300 mx-auto mb-8" />
-          <h1 className="text-5xl font-bold text-gray-900 mb-4 capitalize">
-            {displayName}
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-10">
-            {error ||
-              category?.description ||
-              "No products available in this category at the moment."}
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-12">
+            We're curating the best items for this category. Check back soon for new arrivals!
           </p>
           <Link
             href="/"
@@ -180,7 +197,7 @@ export default function CategoryPage({
     );
   }
 
-  // Main Content (unchanged from previous version)
+  // Main Content with products (unchanged)
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Banner */}
@@ -260,7 +277,6 @@ export default function CategoryPage({
                     className="object-cover group-hover:scale-110 transition-transform duration-500"
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   />
-                
                 </div>
 
                 <div className={`p-6 ${viewMode === "list" ? "flex-1" : ""}`}>
@@ -270,14 +286,9 @@ export default function CategoryPage({
 
                   <div className="flex items-end justify-between">
                     <div>
-                      
-                        
-                          
-                          <span className="text-xl font-bold text-gray-500 line-through">
-                            RS{product.price}
-                       
-                          </span>
-                      
+                      <span className="text-xl font-bold text-gray-500 line-through">
+                        RS{product.price}
+                      </span>
                     </div>
                   </div>
 
