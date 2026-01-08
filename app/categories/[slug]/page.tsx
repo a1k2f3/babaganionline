@@ -251,7 +251,7 @@ export default function CategoryPage({
               transition={{ duration: 0.4 }}
               className={`group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all overflow-hidden ${viewMode === "list" ? "flex" : ""}`}
             >
-              <Link href={`/product/${product.slug}`} className="block">
+              <Link href={`/product/${product._id}`} className="block">
                 <div className={`relative overflow-hidden ${viewMode === "grid" ? "aspect-square" : "w-72 h-72"}`}>
                   <Image
                     src={product.thumbnail || product.images[0]?.url || "/images/placeholder.jpg"}
@@ -260,11 +260,7 @@ export default function CategoryPage({
                     className="object-cover group-hover:scale-110 transition-transform duration-500"
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   />
-                  {product.discountPrice && (
-                    <div className="absolute top-4 left-4 bg-red-500 text-white text-sm font-bold px-4 py-1.5 rounded-full">
-                      SALE
-                    </div>
-                  )}
+                
                 </div>
 
                 <div className={`p-6 ${viewMode === "list" ? "flex-1" : ""}`}>
@@ -274,20 +270,14 @@ export default function CategoryPage({
 
                   <div className="flex items-end justify-between">
                     <div>
-                      {product.discountPrice ? (
-                        <div className="flex items-end gap-3">
-                          <span className="text-3xl font-bold text-indigo-600">
-                            RS{product.discountPrice}
-                          </span>
-                          <span className="text-xl text-gray-500 line-through">
+                      
+                        
+                          
+                          <span className="text-xl font-bold text-gray-500 line-through">
                             RS{product.price}
+                       
                           </span>
-                        </div>
-                      ) : (
-                        <span className="text-3xl font-bold text-indigo-600">
-                          {product.price}
-                        </span>
-                      )}
+                      
                     </div>
                   </div>
 
