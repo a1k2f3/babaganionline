@@ -206,20 +206,14 @@ export default function WishlistPage() {
 
               <div className="flex items-center justify-between mb-3">
                 <div>
-                  {product.discountPrice && product.discountPrice < product.price ? (
-                    <>
+                 
                       <span className="text-lg font-bold text-green-600">
-                        RS {product.discountPrice.toLocaleString()}
-                      </span>
-                      <span className="text-sm text-gray-500 line-through ml-2">
+                      
+                      
                         RS {product.price.toLocaleString()}
-                      </span>
-                    </>
-                  ) : (
-                    <span className="text-lg font-bold text-green-600">
-                      RS {product.price.toLocaleString()}
-                    </span>
-                  )}
+                      
+                   </span>
+                  
                 </div>
               </div>
 
