@@ -6,10 +6,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { FaUser, FaEnvelope, FaPhone, FaWhatsapp } from "react-icons/fa";
 // Contact Us / Support Page
-export const metadata = {
-  title: "Contact Us | Baba Gani Online",
-  description: "Get in touch with Baba Gani Online support team. We're here to help with orders, deliveries, returns, or any questions. Fast response across Pakistan.",
-};
+
 export default function ContactForm() {
   const [formData, setFormData] = useState({
     name: "",
