@@ -148,54 +148,52 @@ export default function CategoryPage({
 
   // "Coming Soon" or Error State (when no products)
   if (!category || products.length === 0) {
-    const displayName = category?.name || slug.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+  const displayName =
+    category?.name ||
+    slug.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
 
-    return (
-      <div className="min-h-screen bg-gray-50">
-        {/* Hero Banner - still show category image with dark overlay */}
-        <div className="relative h-96 overflow-hidden">
-          <Image
-            src={category?.imageUrl || "/images/fallback-category.jpg"}
-            alt={displayName}
-            fill
-            className="object-cover brightness-50"
-            priority
-            unoptimized
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/30" />
-          <div className="relative max-w-7xl mx-auto px-6 h-full flex flex-col items-center justify-center text-center text-white">
-            <h1 className="text-5xl md:text-6xl font-bold capitalize mb-6">
-              {displayName}
-            </h1>
-            <div className="flex items-center gap-4 bg-white/10 backdrop-blur-sm px-8 py-4 rounded-full">
-              <Clock className="w-8 h-8" />
-              <p className="text-2xl font-medium">Coming Soon</p>
-            </div>
-            <p className="mt-10 text-xl max-w-2xl text-white/90">
-              {error
-                ? "Unable to load products right now. Please check back later."
-                : "Exciting products are on the way! Stay tuned."}
-            </p>
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Full-screen Hero with Coming Soon */}
+      <div className="relative h-screen overflow-hidden flex items-center justify-center">
+        <Image
+          src={category?.imageUrl || "/images/fallback-category.jpg"}
+          alt={displayName}
+          fill
+          className="object-cover brightness-50"
+          priority
+          unoptimized
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
+
+        <div className="relative z-10 text-center text-white px-6">
+          <h1 className="text-5xl md:text-7xl font-bold capitalize mb-8">
+            {displayName}
+          </h1>
+
+          <div className="flex items-center justify-center gap-6 bg-white/10 backdrop-blur-md px-10 py-6 rounded-3xl shadow-2xl">
+            <Clock className="w-12 h-12" />
+            <p className="text-4xl md:text-5xl font-semibold">Coming Soon</p>
           </div>
-        </div>
 
-        {/* Bottom section with call to action */}
-        <div className="max-w-7xl mx-auto px-6 py-20 text-center">
-          <Package className="w-32 h-32 text-gray-300 mx-auto mb-8" />
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-12">
-            We're curating the best items for this category. Check back soon for new arrivals!
+          <p className="mt-12 text-xl md:text-2xl text-white/90 max-w-3xl mx-auto">
+            {error
+              ? "Unable to load this category right now. Please try again later."
+              : "We're preparing amazing products for you. Stay tuned!"}
           </p>
+
           <Link
             href="/"
-            className="inline-flex items-center gap-3 px-8 py-4 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition"
+            className="mt-12 inline-flex items-center gap-3 px-8 py-4 bg-indigo-600 text-white font-medium text-lg rounded-xl hover:bg-indigo-700 transition shadow-lg"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-6 h-6" />
             Back to Home
           </Link>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   // Main Content with products (unchanged)
   return (
