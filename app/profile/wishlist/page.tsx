@@ -5,77 +5,127 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Heart, ShoppingCart, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
-// Minimal product interface for localStorage
-interface WishlistItem {
+// Full product type from your backend
+interface WishlistProduct {
   _id: string;
   name: string;
   price: number;
   discountPrice?: number;
-  thumbnail?: string; // URL of the image
-  // You can add more fields if you store them
+  thumbnail?: string;
+  slug?: string;
+  // add more fields as needed
 }
 
 export default function WishlistPage() {
-  const [products, setProducts] = useState<WishlistItem[]>([]);
+  const [products, setProducts] = useState<WishlistProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+ const token = localStorage.getItem("token");
+    const UserId = localStorage.getItem("UserId")?.replace(/"/g, "");
+ 
 
-  // Load wishlist from localStorage when component mounts
-  useEffect(() => {
+  // Fetch wishlist from API
+  const fetchWishlist = async () => {
     try {
-      const savedWishlist = localStorage.getItem("wishlist");
-      if (savedWishlist) {
-        const wishlistItems: string[] = JSON.parse(savedWishlist);
-        // For this example we assume you only store product IDs
-        // In a real app you would probably store more data or fetch details
-        // Here we just show a placeholder for each ID
-        const wishlistProducts = wishlistItems.map((id) => ({
-          _id: id,
-          name: `Product ${id.slice(-6)}`, // placeholder name
-          price: 0, // placeholder
-          thumbnail: "/placeholder.jpg", // placeholder image
-        }));
-        setProducts(wishlistProducts);
-      } else {
-        setProducts([]);
+      setLoading(true);
+      setError(null);
+
+     
+      if (!token) {
+        setError("Please log in to view your wishlist");
+        setLoading(false);
+        return;
       }
-    } catch (err) {
-      console.error("Failed to load wishlist from localStorage:", err);
+
+      const res = await fetch("/api/wishlist", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: "include", // if using httpOnly cookies
+      });
+
+      if (!res.ok) {
+        if (res.status === 401) {
+          setError("Session expired. Please log in again.");
+          // Optional: redirect to login
+          // router.push("/login");
+        } else {
+          throw new Error("Failed to load wishlist");
+        }
+        setProducts([]);
+        return;
+      }
+
+      const data = await res.json();
+      // Adjust based on your API response structure
+      // Example: { success: true, wishlist: [{ product: { ... } }] }
+      const wishlistItems = Array.isArray(data)
+        ? data
+        : data.wishlist?.map((item: any) => item.product) || data.products || [];
+
+      setProducts(wishlistItems);
+    } catch (err: any) {
+      console.error("Wishlist fetch error:", err);
+      setError(err.message || "Failed to load wishlist");
       setProducts([]);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Load wishlist on mount
+  useEffect(() => {
+    fetchWishlist();
   }, []);
 
-  // Remove item from localStorage wishlist
-  const removeFromWishlist = (productId: string) => {
+  // Remove from wishlist
+  const removeFromWishlist = async (productId: string) => {
     try {
-      const saved = localStorage.getItem("wishlist");
-      if (!saved) return;
+     
+      if (!token) {
+        alert("Please log in");
+        return;
+      }
 
-      const wishlistIds: string[] = JSON.parse(saved);
-      const updated = wishlistIds.filter((id) => id !== productId);
+      const res = await fetch(`/api/wishlist/${UserId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          body: JSON.stringify({ productId }),  
+        },
+        credentials: "include",
+      });
 
-      localStorage.setItem("wishlist", JSON.stringify(updated));
+      if (!res.ok) {
+        throw new Error("Failed to remove item");
+      }
 
-      // Update UI
+      // Update UI optimistically
       setProducts((prev) => prev.filter((p) => p._id !== productId));
+
+      // Optional: show success toast
     } catch (err) {
-      console.error("Failed to remove item from wishlist:", err);
+      console.error("Remove wishlist error:", err);
+      alert("Failed to remove item from wishlist");
     }
   };
 
-  // Placeholder for add to cart
-  const addToCart = (productId: string) => {
-    alert(`Add to cart functionality for product ${productId} can be implemented here.`);
-  };
+  // Add to cart (you can expand this later)
+ 
 
+  // Loading state
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-16">
         <h1 className="text-3xl font-bold mb-8">My Wishlist</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(4)].map((_, i) => (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+          {[...Array(6)].map((_, i) => (
             <div key={i} className="bg-white rounded-lg shadow p-4 animate-pulse">
               <div className="bg-gray-200 aspect-square rounded mb-4" />
               <div className="h-4 bg-gray-200 rounded mb-2 w-3/4" />
@@ -87,6 +137,23 @@ export default function WishlistPage() {
     );
   }
 
+  // Error state
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-16 text-center">
+        <h1 className="text-3xl font-bold mb-4">My Wishlist</h1>
+        <p className="text-xl text-red-600 mb-8">{error}</p>
+        <Link
+          href="/login"
+          className="inline-block px-8 py-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+        >
+          Go to Login
+        </Link>
+      </div>
+    );
+  }
+
+  // Empty state
   if (products.length === 0) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
@@ -103,6 +170,7 @@ export default function WishlistPage() {
     );
   }
 
+  // Main wishlist view
   return (
     <div className="container mx-auto px-4 py-16">
       <h1 className="text-3xl font-bold mb-8 flex items-center gap-3">
@@ -110,13 +178,13 @@ export default function WishlistPage() {
         My Wishlist ({products.length})
       </h1>
 
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
         {products.map((product) => (
           <div
             key={product._id}
             className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-200"
           >
-            <Link href={`/product/${product._id}`}>
+            <Link href={`/product/${product.slug || product._id}`}>
               <div className="relative aspect-square bg-gray-100">
                 <Image
                   src={product.thumbnail || "/placeholder.jpg"}
@@ -124,12 +192,13 @@ export default function WishlistPage() {
                   fill
                   className="object-cover"
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                  priority={false}
                 />
               </div>
             </Link>
 
             <div className="p-3 sm:p-4">
-              <Link href={`/product/${product._id}`}>
+              <Link href={`/product/${product.slug || product._id}`}>
                 <h3 className="font-medium text-gray-800 text-sm sm:text-base line-clamp-2 mb-2 hover:text-indigo-600 transition-colors">
                   {product.name}
                 </h3>
@@ -137,11 +206,17 @@ export default function WishlistPage() {
 
               <div className="flex items-center justify-between mb-3">
                 <div>
-                  <span className="text-lg font-bold text-green-600">
-                    RS {product.price.toLocaleString()}
-                  </span>
-                  {product.discountPrice && product.discountPrice < product.price && (
-                    <span className="text-xs text-gray-500 line-through ml-2">
+                  {product.discountPrice && product.discountPrice < product.price ? (
+                    <>
+                      <span className="text-lg font-bold text-green-600">
+                        RS {product.discountPrice.toLocaleString()}
+                      </span>
+                      <span className="text-sm text-gray-500 line-through ml-2">
+                        RS {product.price.toLocaleString()}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-lg font-bold text-green-600">
                       RS {product.price.toLocaleString()}
                     </span>
                   )}
@@ -149,13 +224,7 @@ export default function WishlistPage() {
               </div>
 
               <div className="flex gap-2">
-                <button
-                  onClick={() => addToCart(product._id)}
-                  className="flex-1 flex items-center justify-center gap-2 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition-colors"
-                >
-                  <ShoppingCart className="w-4 h-4" />
-                  Add to Cart
-                </button>
+               
 
                 <button
                   onClick={() => removeFromWishlist(product._id)}
