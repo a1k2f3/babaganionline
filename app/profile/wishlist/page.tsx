@@ -40,7 +40,7 @@ export default function WishlistPage() {
         return;
       }
 
-      const res = await fetch("/api/wishlist", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/wishlist/${UserId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -92,7 +92,7 @@ export default function WishlistPage() {
         return;
       }
 
-      const res = await fetch(`/api/wishlist/${UserId}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/wishlist/${UserId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
