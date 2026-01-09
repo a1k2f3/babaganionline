@@ -167,7 +167,7 @@ export default function ProductActions({
     const userID = localStorage.getItem("UserId")?.replace(/"/g, "");
 
     if (!token || !userID) {
-      router.push("/auth/login?redirect=" + encodeURIComponent(currentUrl));
+      router.push(`/auth/login`);
       setCartLoading(false);
       return;
     }
