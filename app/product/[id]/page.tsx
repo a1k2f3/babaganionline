@@ -24,7 +24,7 @@ async function getProduct(id: string) {
   const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
   if (!apiUrl) throw new Error("API URL not set!");
 
-  const res = await fetch(`${apiUrl}/api/products/${id}`, {
+  const res = await fetch(`${apiUrl}/api/product/${id}`, {
     cache: "no-store",
     next: { revalidate: 60 },
   });
