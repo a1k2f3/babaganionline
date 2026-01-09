@@ -249,7 +249,7 @@ export default async function ProductPage({
               {relatedProducts.map((item: any) => (
                 <Link
                   key={item._id}
-                  href={`/products/${item._id}`}
+                  href={`/product/${item._id}`}
                   className="group block bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all"
                 >
                   <div className="relative aspect-square bg-gray-100 overflow-hidden">
