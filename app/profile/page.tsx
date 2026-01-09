@@ -70,13 +70,7 @@ router.push('/auth/login');
         {/* User Info */}
         <div className="flex flex-col items-center">
           <div className="relative w-32 h-32 mb-4">
-            {user && (
-              <img
-                src={user.image}
-                alt={user.name}
-                className="rounded-full object-cover border-4 border-blue-500 shadow-md w-32 h-32"
-              />
-            )}
+           
           </div>
 
           <h2 className="text-2xl font-semibold text-gray-800">
