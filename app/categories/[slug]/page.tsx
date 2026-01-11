@@ -60,10 +60,7 @@ export default function CategoryPage({
         );
 
         if (!response.ok) {
-          if (response.status === 404) {
-            router.replace("/404");
-            return;
-          }
+          
           throw new Error(`Failed to load products (${response.status})`);
         }
 
