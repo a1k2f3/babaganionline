@@ -255,20 +255,7 @@ export default function CategoriesSection() {
         viewport={{ once: true }}
         className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto text-center"
       >
-        <div className="p-6 bg-white/70 backdrop-blur rounded-2xl shadow-md">
-          <div className="text-4xl font-bold text-blue-600">{categories.length}+</div>
-          <div className="text-gray-700 mt-2">Categories</div>
-        </div>
-        <div className="p-6 bg-white/70 backdrop-blur rounded-2xl shadow-md">
-          <div className="text-4xl font-bold text-purple-600">
-            {categories.reduce((sum, c) => sum + c.productCount, 0)}+
-          </div>
-          <div className="text-gray-700 mt-2">Products</div>
-        </div>
-        <div className="p-6 bg-white/70 backdrop-blur rounded-2xl shadow-md">
-          <div className="text-4xl font-bold text-green-600">24/7</div>
-          <div className="text-gray-700 mt-2">Support</div>
-        </div>
+  
       </motion.div>
     </section>
   );

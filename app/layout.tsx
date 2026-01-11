@@ -52,15 +52,7 @@ export const metadata: Metadata = {
     locale: "en_PK",
     type: "website",
   },
-  twitter: {
-    card: "summary_large_image",
-    title: "Baba Gani Online - Shop Smarter in Pakistan",
-    description:
-      "Secure online shopping with fast delivery and easy returns across Pakistan.",
-    images: ["/og-image.jpg"],
-    // creator: "@yourtwitterhandle", // Optional: add if you have Twitter
-    // site: "@yourtwitterhandle",
-  },
+  
   robots: {
     index: true,
     follow: true,
