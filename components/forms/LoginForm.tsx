@@ -110,8 +110,8 @@ const router =useRouter();
                     Register
                 </Link>
             </p>
-            <SocialLoginButton provider="google" onClick={() => console.log("Google login")} title="Login with Google"  />
-            <SocialLoginButton provider="facebook" onClick={() => console.log("Facebook login")} title="Login with Facebook" />
+            {/* <SocialLoginButton provider="google" onClick={() => console.log("Google login")} title="Login with Google"  />
+            <SocialLoginButton provider="facebook" onClick={() => console.log("Facebook login")} title="Login with Facebook" /> */}
         </form>
     );
 };

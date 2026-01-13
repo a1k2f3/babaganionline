@@ -148,7 +148,7 @@ const SignupForm: React.FC = () => {
         </Link>
       </p>
 
-      <SocialLoginButton
+      {/* <SocialLoginButton
         provider="google"
         onClick={() => console.log("Google login")}
         title="Signup with Google"
@@ -157,7 +157,7 @@ const SignupForm: React.FC = () => {
         provider="facebook"
         onClick={() => console.log("Facebook login")}
         title="Signup with Facebook"
-      />
+      /> */}
     </form>
   );
 };
