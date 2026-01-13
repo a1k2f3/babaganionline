@@ -192,7 +192,7 @@ export default function ProductActions({
       setMessage({ type: "success", text: "Added to cart successfully!" });
 
       if (buyNow) {
-        router.push("/cart");
+        router.push("/shop/cart");
       }
     } catch (err: any) {
       setMessage({ type: "error", text: err.message || "Failed to add to cart" });

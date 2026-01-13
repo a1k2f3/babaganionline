@@ -4,15 +4,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Trash2, Plus, Minus, Tag, Truck, Shield } from "lucide-react";
+import { Trash2, Plus, Minus, Tag, Truck, Shield, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-// useRouter
-// Define CartItem interface for type safety
+
 interface CartItem {
   id: string;
   name: string;
   price: number;
-  size?:string;
+  size?: string;
   quantity: number;
   image: string;
   inStock: boolean;
@@ -21,62 +20,50 @@ interface CartItem {
 export default function CartPage() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [coupon, setCoupon] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false); // Not used, but keeping for potential future use
-const router=useRouter()
+
+  const router = useRouter();
+
   const fetchCart = async () => {
     setLoading(true);
     setError(null);
-    setSuccess(false);
 
     const token = localStorage.getItem("token");
-    const userID = localStorage.getItem("UserId")?.replace(/"/g, ""); // Token from login
-    console.log("Using token:", token);
-    console.log("Using UserID:", userID);
+    const userID = localStorage.getItem("UserId")?.replace(/"/g, "");
 
     if (!token || !userID) {
-      router.push('/auth/login')
-      setError("Please login to view your cart");
-      setLoading(false);
+      router.push("/auth/login?redirect=/cart");
       return;
     }
 
     try {
-      const response = await fetch(
+      const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/cart?userId=${userID}`,
         {
           headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Send token here
+            Authorization: `Bearer ${token}`,
           },
         }
       );
-      if (!response.ok) {
-        throw new Error("Failed to fetch cart");
-      }
 
-      const data = await response.json();
-      setSuccess(true);
-      console.log(data);
+      if (!res.ok) throw new Error("Failed to load cart");
 
-      // Assuming backend returns { cart: { items: [{ productId: { _id, name, price, image, inStock }, quantity }] } }
-      // Map to frontend CartItem format
-      const populatedItems: CartItem[] = data.items.map((item: any) => ({
+      const data = await res.json();
+
+      const cartItems: CartItem[] = data.items?.map((item: any) => ({
         id: item.productId._id.toString(),
-        size:item.size,
         name: item.productId.name,
         price: item.productId.price,
+        size: item.size,
         quantity: item.quantity,
-        image: item.productId.thumbnail || "/api/placeholder/400/400",
+        image: item.productId.thumbnail || "/placeholder-product.jpg",
         inStock: item.productId.inStock ?? true,
-      }));
-      console.log()
+      })) || [];
 
-      setItems(populatedItems);
+      setItems(cartItems);
     } catch (err: any) {
-      setError(err.message);
-      console.error(err);
+      setError(err.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -84,59 +71,42 @@ const router=useRouter()
 
   useEffect(() => {
     fetchCart();
-  }, []); // Fixed dependency array
+  }, []);
 
   const updateQuantity = async (id: string, change: number) => {
     const token = localStorage.getItem("token");
     const userID = localStorage.getItem("UserId")?.replace(/"/g, "");
 
-    if (!token || !userID) {
-      setError("Please login to update cart");
-      return;
-    }
-
-    // Find the item and calculate new quantity
-    const item = items.find((item) => item.id === id);
+    const item = items.find((i) => i.id === id);
     if (!item) return;
 
-    const newQuantity = Math.max(1, item.quantity + change);
+    const newQty = Math.max(1, item.quantity + change);
 
-    // Optimistic update: Update local state first for smooth UX
-    const prevItems = [...items];
-    setItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id ? { ...item, quantity: newQuantity } : item
-      )
+    // Optimistic update
+    setItems((prev) =>
+      prev.map((i) => (i.id === id ? { ...i, quantity: newQty } : i))
     );
 
     try {
-      const response = await fetch(
+      const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/cart/update?userId=${userID}`,
         {
-          method: "PUT", // Assuming POST for update
+          method: "PUT",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({
-            productId: id,
-            quantity: newQuantity,
-          }),
+          body: JSON.stringify({ productId: id, quantity: newQty }),
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to update cart item");
-      }
-
-      const data = await response.json();
-  
-    
-    } catch (err: any) {
+      if (!res.ok) throw new Error("Failed to update quantity");
+    } catch (err) {
       console.error(err);
-      setError(err.message);
-      // Rollback optimistic update on failure
-      setItems(prevItems);
+      // Rollback on error
+      setItems((prev) =>
+        prev.map((i) => (i.id === id ? { ...i, quantity: item.quantity } : i))
+      );
     }
   };
 
@@ -144,55 +114,40 @@ const router=useRouter()
     const token = localStorage.getItem("token");
     const userID = localStorage.getItem("UserId")?.replace(/"/g, "");
 
-    if (!token || !userID) {
-      setError("Please login to update cart");
-      return;
-    }
-
-    // Optimistic update: Remove from local state first
+    // Optimistic remove
     const prevItems = [...items];
-    setItems((prevItems) => prevItems.filter((item) => item.id !== id));
+    setItems((prev) => prev.filter((i) => i.id !== id));
 
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/cart/remove/${id}?userId=${userID}`, // Assuming a remove endpoint
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/cart/remove/${id}?userId=${userID}`,
         {
-          method: "DELETE", // Or DELETE, depending on your backend
+          method: "DELETE",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({
-            productId: id,
-          }),
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to remove cart item");
-      }
-
-      const data = await response.json();
-    
-      // Optionally, refetch cart
-      // await fetchCart();
-    } catch (err: any) {
+      if (!res.ok) throw new Error("Failed to remove item");
+    } catch (err) {
       console.error(err);
-      setError(err.message);
-      // Rollback on failure
-      setItems(prevItems);
+      setItems(prevItems); // rollback
+      setError("Failed to remove item");
     }
   };
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const discount = coupon === "SAVE10" ? subtotal * 0.1 : 0;
+  const discount = coupon === "SAVE10" ? Math.round(subtotal * 0.1) : 0;
   const total = subtotal - discount;
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
-        <div className="max-w-3xl mx-auto text-center px-6">
-          <p className="text-xl text-gray-600">Loading your cart...</p>
+      <div className="min-h-[70vh] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading your cart...</p>
         </div>
       </div>
     );
@@ -200,10 +155,15 @@ const router=useRouter()
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
-        <div className="max-w-3xl mx-auto text-center px-6">
-          <Link href="/login" className="mt-4 block text-indigo-600 hover:text-indigo-700 font-medium">
-            Go to Login
+      <div className="min-h-[70vh] flex items-center justify-center px-4">
+        <div className="text-center max-w-md">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Oops!</h2>
+          <p className="text-gray-600 mb-6">{error}</p>
+          <Link
+            href="/auth/login"
+            className="inline-block bg-indigo-600 text-white px-8 py-3 rounded-xl font-medium hover:bg-indigo-700 transition"
+          >
+            Login to view cart
           </Link>
         </div>
       </div>
@@ -212,12 +172,19 @@ const router=useRouter()
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
-        <div className="max-w-3xl mx-auto text-center px-6">
-          <div className="bg-gray-200 border-2 border-dashed rounded-xl w-32 h-32 mx-auto mb-8" />
+      <div className="min-h-[70vh] flex items-center justify-center px-4 py-16">
+        <div className="text-center max-w-md">
+          <div className="w-24 h-24 mx-auto mb-8 bg-gray-100 rounded-full flex items-center justify-center">
+            <Trash2 className="w-10 h-10 text-gray-400" />
+          </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Your cart is empty</h1>
-          <p className="text-gray-600 mb-8">Looks like you haven't added anything to your cart yet</p>
-          <Link href="/" className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-8 rounded-xl text-lg transition">
+          <p className="text-gray-600 mb-8">
+            Looks like you haven't added anything yet. Start shopping now!
+          </p>
+          <Link
+            href="/"
+            className="inline-block bg-indigo-600 text-white px-10 py-4 rounded-xl font-medium text-lg hover:bg-indigo-700 transition shadow-md hover:shadow-lg"
+          >
             Continue Shopping
           </Link>
         </div>
@@ -226,64 +193,88 @@ const router=useRouter()
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50/60 py-6 sm:py-8 lg:py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-8">Shopping Cart</h1>
+        <div className="flex items-center gap-3 mb-6 sm:mb-8">
+          <Link
+            href="/"
+            className="text-gray-600 hover:text-indigo-600 transition p-2 -ml-2"
+          >
+            <ArrowLeft className="w-6 h-6" />
+          </Link>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+            Shopping Cart
+          </h1>
+        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Cart Items */}
-          <div className="lg:col-span-2 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+          {/* Cart Items - takes most space */}
+          <div className="lg:col-span-8 space-y-4 sm:space-y-6">
             {items.map((item) => (
-              <div key={item.id} className="bg-white rounded-2xl shadow-md p-6 flex gap-6 hover:shadow-lg transition">
-                <div className="relative w-28 h-28 flex-shrink-0">
+              <div
+                key={item.id}
+                className="bg-white rounded-xl sm:rounded-2xl shadow-sm hover:shadow-md transition p-4 sm:p-5 flex flex-col sm:flex-row gap-4 sm:gap-6"
+              >
+                {/* Image */}
+                <div className="relative w-full sm:w-32 h-40 sm:h-32 flex-shrink-0 rounded-xl overflow-hidden">
                   <Image
                     src={item.image}
                     alt={item.name}
                     fill
-                    className="object-cover rounded-xl"
+                    className="object-cover"
                   />
                   {!item.inStock && (
-                    <div className="absolute inset-0 bg-black/60 rounded-xl flex items-center justify-center">
-                      <span className="text-white font-bold">Out of Stock</span>
+                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                      <span className="text-white text-sm font-medium px-3 py-1 bg-red-600/80 rounded">
+                        Out of Stock
+                      </span>
                     </div>
                   )}
                 </div>
 
-                <div className="flex-1">
-                  <h3 className="font-semibold text-lg text-gray-900 line-clamp-2">
+                {/* Info */}
+                <div className="flex-1 flex flex-col">
+                  <h3 className="font-medium text-base sm:text-lg text-gray-900 line-clamp-2">
                     {item.name}
                   </h3>
-                  <p className="text-2xl font-bold text-indigo-600 mt-2">
-                    RS{item.price.toLocaleString("en-IN")}
-                  </p>
+
                   {item.size && (
-                    <p className="text-gray-600 mt-1">Size: {item.size}</p>
+                    <p className="text-sm text-gray-600 mt-1">Size: {item.size}</p>
                   )}
-                  <div className="flex items-center gap-4 mt-4">
-                    <div className="flex items-center border border-gray-300 rounded-lg">
+
+                  <div className="mt-auto pt-3 sm:pt-4">
+                    <p className="text-xl sm:text-2xl font-bold text-indigo-600">
+                      Rs{item.price.toLocaleString("en-IN")}
+                    </p>
+
+                    <div className="flex items-center gap-4 mt-3 sm:mt-4">
+                      <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                        <button
+                          onClick={() => updateQuantity(item.id, -1)}
+                          className="px-3 py-2 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                          disabled={item.quantity <= 1}
+                        >
+                          <Minus size={16} />
+                        </button>
+                        <span className="px-4 py-2 font-medium min-w-[3rem] text-center">
+                          {item.quantity}
+                        </span>
+                        <button
+                          onClick={() => updateQuantity(item.id, 1)}
+                          className="px-3 py-2 hover:bg-gray-100"
+                        >
+                          <Plus size={16} />
+                        </button>
+                      </div>
+
                       <button
-                        onClick={() => updateQuantity(item.id, -1)}
-                        className="p-2 hover:bg-gray-100 transition"
-                        disabled={item.quantity === 1}
+                        onClick={() => removeItem(item.id)}
+                        className="text-red-600 hover:text-red-700 text-sm font-medium flex items-center gap-1.5 transition"
                       >
-                        <Minus className="w-4 h-4" />
-                      </button>
-                      <span className="px-4 font-medium">{item.quantity}</span>
-                      <button
-                        onClick={() => updateQuantity(item.id, 1)}
-                        className="p-2 hover:bg-gray-100 transition"
-                      >
-                        <Plus className="w-4 h-4" />
+                        <Trash2 size={18} />
+                        Remove
                       </button>
                     </div>
-
-                    <button
-                      onClick={() => removeItem(item.id)}
-                      className="text-red-600 hover:text-red-700 flex items-center gap-2 transition"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                      Remove
-                    </button>
                   </div>
                 </div>
               </div>
@@ -291,67 +282,52 @@ const router=useRouter()
           </div>
 
           {/* Order Summary */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-24">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Order Summary</h2>
+          <div className="lg:col-span-4">
+            <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm p-5 sm:p-6 lg:sticky lg:top-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-5 sm:mb-6">
+                Order Summary
+              </h2>
 
-              <div className="space-y-4">
-                <div className="flex justify-between text-gray-600">
+              <div className="space-y-3 sm:space-y-4 text-sm sm:text-base">
+                <div className="flex justify-between text-gray-700">
                   <span>Subtotal ({items.length} items)</span>
-                  <span className="font-semibold">₹{subtotal.toLocaleString("en-IN")}</span>
+                  <span className="font-medium">
+                    Rs{subtotal.toLocaleString("en-IN")}
+                  </span>
                 </div>
 
-                <div className="flex justify-between text-green-600 font-bold">
-                  <span>Discount {coupon === "SAVE10" ? "(SAVE10)" : ""}</span>
-                  <span>-RS{discount.toLocaleString("en-IN")}</span>
-                </div>
+                {discount > 0 && (
+                  <div className="flex justify-between text-green-600 font-medium">
+                    <span>Discount (SAVE10)</span>
+                    <span>-Rs{discount.toLocaleString("en-IN")}</span>
+                  </div>
+                )}
 
-                <div className="flex justify-between text-lg font-bold text-gray-900 border-t pt-4">
+                <div className="flex justify-between pt-3 sm:pt-4 border-t text-base sm:text-lg font-bold">
                   <span>Total</span>
-                  <span className="text-2xl text-indigo-600">RS{total.toLocaleString("en-IN")}</span>
+                  <span className="text-indigo-600 text-xl sm:text-2xl">
+                    Rs{total.toLocaleString("en-IN")}
+                  </span>
                 </div>
+              </div>
 
-                {/* Coupon */}
-                <div className="pt-4 border-t">
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={coupon}
-                      onChange={(e) => setCoupon(e.target.value.toUpperCase())}
-                      placeholder="Enter coupon code"
-                      className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
-                    />
-                    <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-medium transition flex items-center gap-2">
-                      <Tag className="w-5 h-5" />
-                      Apply
-                    </button>
-                  </div>
-                  {coupon === "SAVE10" && (
-                    <p className="text-green-600 text-sm mt-2">10% discount applied!</p>
-                  )}
+              
+              {/* Action */}
+              <Link href="/shop/checkout" className="block mt-6">
+                <button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 sm:py-5 rounded-xl transition shadow-md hover:shadow-xl text-base sm:text-lg">
+                  Proceed to Checkout
+                </button>
+              </Link>
+
+              <div className="mt-6 flex flex-wrap justify-center gap-6 sm:gap-8 text-xs sm:text-sm text-gray-600">
+                <div className="flex items-center gap-2">
+                  <Truck className="w-5 h-5 text-green-600" />
+                  <span>Free Delivery</span>
                 </div>
-
-                {/* Trust Badges */}
-                <div className="flex justify-center gap-6 py-6 border-t mt-6 text-sm text-gray-600">
-                  <div className="flex items-center gap-2">
-                    <Truck className="w-5 h-5 text-green-600" />
-                    <span>Free Delivery</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Shield className="w-5 h-5 text-green-600" />
-                    <span>100% Secure</span>
-                  </div>
+                <div className="flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-green-600" />
+                  <span>Secure Payment</span>
                 </div>
-
-                <Link href="/shop/checkout">
-                  <button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xl py-5 rounded-xl shadow-lg hover:shadow-xl transition transform hover:scale-105">
-                    Proceed to Checkout
-                  </button>
-                </Link>
-
-                <Link href="/" className="block text-center text-indigo-600 hover:text-indigo-700 font-medium mt-4">
-                  ← Continue Shopping
-                </Link>
               </div>
             </div>
           </div>

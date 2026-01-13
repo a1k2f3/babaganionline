@@ -2,7 +2,6 @@
 "use client"
 
 import type React from "react"
-
 import Image from "next/image"
 import { useState } from "react"
 
@@ -19,7 +18,7 @@ export default function ProductGallery({
   productName: string
 }) {
   const [activeIndex, setActiveIndex] = useState(0)
-  const activeImage = images[activeIndex]
+  const activeImage = images[activeIndex] ?? images[0]
 
   // For zoom effect on desktop
   const [isZoomed, setIsZoomed] = useState(false)
@@ -44,22 +43,28 @@ export default function ProductGallery({
         }}
         onMouseMove={handleMouseMove}
       >
-        <Image
-          src={activeImage.url || "/placeholder.svg"}
-          alt={productName}
-          fill
-          sizes="(max-width: 640px) 90vw, (max-width: 1024px) 60vw, 50vw"
-          priority={activeIndex === 0}
-          quality={75}
-          className="object-contain transition-transform duration-500 ease-out will-change-transform"
-          style={{
-            transform: isZoomed ? "scale(2)" : "scale(1)",
-            transformOrigin: `${mousePosition.x}% ${mousePosition.y}%`,
-          }}
-        />
+       <Image
+  src={activeImage.url}
+  alt={productName}
+  fill
+  sizes="(max-width: 540px) 90vw, (max-width: 1024px) 70vw, 50vw"
+  priority={activeIndex === 0}
+  quality={95}           // ← bump to 95–100 for better source material
+  className={`
+    object-contain
+    transition-transform duration-200 ease-out
+    will-change-transform           // helps browser prepare for scale
+    backface-hidden                 // fixes many pixelation glitches in Chrome
+    image-rendering-auto            // or try -crisp-edges / pixelated depending on your images
+  `}
+  style={{
+    transform: isZoomed ? "scale(2.4)" : "scale(1)",
+    transformOrigin: `${mousePosition.x}% ${mousePosition.y}%`,
+  }}
+/>
 
         {/* Zoom Hint - Only on desktop */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white text-xs px-4 py-2 rounded-full opacity-0 pointer-events-none md:opacity-100 md:group-hover:opacity-100 transition-opacity">
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white text-xs px-4 py-2 rounded-full opacity-0 pointer-events-none md:opacity-100 transition-opacity duration-300">
           Hover to zoom
         </div>
       </div>
@@ -72,7 +77,7 @@ export default function ProductGallery({
               key={img.id}
               onClick={() => {
                 setActiveIndex(index)
-                setIsZoomed(false) // Reset zoom on change
+                setIsZoomed(false)
               }}
               aria-label={`View image ${index + 1} of ${images.length}`}
               className={`
@@ -89,12 +94,15 @@ export default function ProductGallery({
                 src={img.url || "/placeholder.svg"}
                 alt={`${productName} - View ${index + 1}`}
                 fill
-                sizes="(max-width: 640px) 18vw, (max-width: 1024px) 12vw, 10vw"
+                sizes="(max-width: 640px) 20vw, (max-width: 1024px) 15vw, 10vw"
+                quality={85} // Slightly lower than main image is fine
                 className="object-cover"
               />
 
               {/* Active Indicator Overlay */}
-              {activeIndex === index && <div className="absolute inset-0 bg-indigo-600/20 pointer-events-none" />}
+              {activeIndex === index && (
+                <div className="absolute inset-0 bg-indigo-600/20 pointer-events-none" />
+              )}
             </button>
           ))}
         </div>

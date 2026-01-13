@@ -10,37 +10,16 @@ import ProductGallery from "@/components/card/ProductGallery";
 import ReviewsSection from "@/components/card/ReviewsSection";
 import ProductTabs from "@/components/card/ProductTabs";
 import AddReviewForm from "@/components/card/AddReviewForm";
-// import ProductActions from "@/components/card/ProductActions"; // ← corrected typo
 import ProductActions from "@/components/card/ProducActions";
 
 async function getProduct(id: string) {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-
-  // Fallback for local development
-  const apiBase = baseUrl ;
-
-  const url = `${apiBase}/api/products/${id}`;
-
-  console.log("[getProduct] Fetching:", url);
+  const url = `${baseUrl}/api/products/${id}`;
 
   try {
-    const res = await fetch(url, {
-      cache: "no-store",
-      // next: { revalidate: 60 }, // ← comment out while debugging
-    });
-
-    console.log("[getProduct] Status:", res.status);
-
-    if (!res.ok) {
-      console.log("[getProduct] Failed with status:", res.status);
-      const errorText = await res.text().catch(() => "No error message");
-      console.log("[getProduct] Error response:", errorText);
-      return null;
-    }
-
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) return null;
     const data = await res.json();
-    console.log("[getProduct] Success - data keys:", Object.keys(data));
-
     return data;
   } catch (error) {
     console.error("[getProduct] Fetch error:", error);
@@ -54,20 +33,9 @@ export default async function ProductPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-
-  console.log("[ProductPage] Requested product ID:", id);
-
   const productData = await getProduct(id);
 
-  // Debug output
-  if (!productData) {
-    console.log("[ProductPage] Product data is null/undefined");
-  } else if (!productData.success) {
-    console.log("[ProductPage] API returned success: false", productData);
-  }
-
   if (!productData || !productData.success || !productData.data) {
-    console.log("[ProductPage] Triggering notFound()");
     notFound();
   }
 
@@ -93,43 +61,39 @@ export default async function ProductPage({
     : ["Quality fabric", "Comfortable fit", "Modern design"];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10 md:py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumb */}
-        <nav className="text-sm mb-6 md:mb-8" aria-label="Breadcrumb">
-          <ol className="flex items-center space-x-2 text-gray-600">
+    <div className="min-h-screen bg-gray-50/40 py-6 sm:py-8 lg:py-12">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Breadcrumb - improved readability */}
+        <nav className="mb-6 sm:mb-8" aria-label="Breadcrumb">
+          <ol className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-sm text-gray-600">
             <li>
-              <Link href="/" className="hover:text-indigo-600">
+              <Link href="/" className="hover:text-indigo-600 transition-colors">
                 Home
               </Link>
             </li>
-            <li>
-              <span className="mx-2 text-gray-400">/</span>
-            </li>
+            <span className="text-gray-400">/</span>
             {product.category && (
               <>
                 <li>
                   <Link
-                    href={`/category/${product.category.slug}`}
-                    className="hover:text-indigo-600"
+                    href={`/categories/${product.category.slug}`}
+                    className="hover:text-indigo-600 transition-colors"
                   >
                     {product.category.name}
                   </Link>
                 </li>
-                <li>
-                  <span className="mx-2 text-gray-400">/</span>
-                </li>
+                <span className="text-gray-400">/</span>
               </>
             )}
-            <li className="font-medium text-gray-900 truncate max-w-[180px] md:max-w-none">
+            <li className="font-medium text-gray-900 truncate max-w-[180px] xs:max-w-[260px] sm:max-w-none">
               {product.name}
             </li>
           </ol>
         </nav>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 xl:gap-20">
-          {/* Gallery + Tabs (mobile) */}
-          <div className="space-y-8 lg:space-y-10">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-10 xl:gap-16">
+          {/* LEFT COLUMN */}
+          <div className="mx-auto w-full max-w-xl lg:max-w-none lg:mx-0 space-y-8 sm:space-y-10 lg:space-y-12">
             <ProductGallery images={images} productName={product.name} />
 
             <ProductTabs
@@ -138,24 +102,24 @@ export default async function ProductPage({
               highlights={product.highlights}
             />
 
-            <div className="lg:hidden mt-10">
-              <ReviewsSection reviews={product.reviews || []} rating={product.rating || 0} />
+            <div className="lg:hidden">
+              <ReviewsSection productId={product._id} />
             </div>
           </div>
 
-          {/* Product Info */}
-          <div className="space-y-8 lg:space-y-10">
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
+          {/* RIGHT COLUMN - improved mobile centering */}
+          <div className="mx-auto w-full max-w-xl lg:max-w-none lg:mx-0 space-y-8 sm:space-y-10 lg:space-y-12">
+            <div className="text-center lg:text-left">
+              <h1 className="text-3xl sm:text-3.5xl md:text-4xl lg:text-4.5xl font-bold text-gray-900 tracking-tight">
                 {product.name}
               </h1>
 
-              <div className="mt-4 flex flex-wrap items-center gap-4">
-                <div className="flex">
+              <div className="mt-4 flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-3">
+                <div className="flex items-center gap-1">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`w-5 h-5 ${
+                      className={`h-5 w-5 sm:h-6 sm:w-6 ${
                         i < Math.round(product.rating || 0)
                           ? "fill-yellow-400 text-yellow-400"
                           : "text-gray-300"
@@ -163,45 +127,47 @@ export default async function ProductPage({
                     />
                   ))}
                 </div>
-                <span className="text-sm text-gray-600">
+                <span className="text-sm sm:text-base text-gray-600 font-medium">
                   {product.reviews?.length || 0} reviews
                 </span>
 
                 {product.stock > 0 && product.stock <= 10 && (
-                  <span className="text-sm font-medium text-red-600 bg-red-50 px-3 py-1 rounded-full">
+                  <span className="rounded-full bg-red-50 px-3.5 py-1 text-sm font-medium text-red-700 border border-red-200">
                     Only {product.stock} left!
                   </span>
                 )}
               </div>
             </div>
 
-            <div className="pb-6 border-b border-gray-200">
-              <div className="flex items-baseline gap-3">
-                <span className="text-4xl md:text-5xl font-bold text-indigo-600">
+            <div className="border-b border-gray-200 pb-7">
+              <div className="flex items-baseline justify-center lg:justify-start gap-3">
+                <span className="text-4xl sm:text-5xl font-extrabold text-indigo-600 tracking-tight">
                   {product.price.toLocaleString()}
                 </span>
-                <span className="text-xl md:text-2xl font-medium text-gray-600">
+                <span className="text-2xl font-medium text-gray-600">
                   {product.currency || "PKR"}
                 </span>
               </div>
             </div>
 
-            <form id="product-form" className="space-y-8">
+            <form id="product-form" className="space-y-9">
               {availableSizes.length > 0 && (
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Select Size</h3>
-                  <div className="flex flex-wrap gap-3">
+                  <h3 className="text-center lg:text-left text-lg font-semibold text-gray-800">
+                    Select Size
+                  </h3>
+                  <div className="flex flex-wrap justify-center lg:justify-start gap-3 sm:gap-4">
                     {availableSizes.map((size, index) => (
                       <label key={size} className="cursor-pointer">
                         <input
                           type="radio"
                           name="selectedSize"
                           value={size}
-                          className="sr-only peer"
+                          className="peer sr-only"
                           defaultChecked={index === 0}
                           required
                         />
-                        <div className="px-5 py-2.5 border-2 border-gray-300 rounded-lg text-sm font-medium text-gray-700 transition-all peer-checked:border-indigo-600 peer-checked:text-indigo-600 peer-checked:bg-indigo-50 hover:border-indigo-400">
+                        <div className="min-w-[3.5rem] rounded-xl border-2 border-gray-300 px-4 py-2.5 text-base font-medium text-gray-700 transition-all hover:border-indigo-400 peer-checked:border-indigo-600 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 peer-checked:shadow-sm">
                           {size}
                         </div>
                       </label>
@@ -210,61 +176,66 @@ export default async function ProductPage({
                 </div>
               )}
 
-              <ProductActions product={product} formId="product-form" />
+              <div className="flex justify-center lg:justify-start pt-2">
+                <ProductActions product={product} formId="product-form" />
+              </div>
             </form>
 
-            <div className="flex flex-wrap gap-6 pt-6 border-t border-gray-200 text-sm text-gray-600">
-              <div className="flex items-center gap-2">
-                <Truck className="w-5 h-5 text-indigo-600" />
+            <div className="flex flex-wrap justify-center lg:justify-start gap-6 sm:gap-8 pt-4 text-sm sm:text-base text-gray-700">
+              <div className="flex items-center gap-2.5">
+                <Truck className="h-5 w-5 text-indigo-600" />
                 <span>Free delivery over 5000 PKR</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Shield className="w-5 h-5 text-indigo-600" />
+              <div className="flex items-center gap-2.5">
+                <Shield className="h-5 w-5 text-indigo-600" />
                 <span>Secure payment</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-5 h-5 text-indigo-600" />
-                <span>30-day returns</span>
+              <div className="flex items-center gap-2.5">
+                <Check className="h-5 w-5 text-indigo-600" />
+                <span>7-day returns</span>
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-200">
-              <h2 className="text-xl md:text-2xl font-bold mb-6">Write a Review</h2>
+            <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
+              <h2 className="mb-6 text-center lg:text-left text-xl sm:text-2xl font-bold text-gray-900">
+                Write a Review
+              </h2>
               <AddReviewForm productId={product._id} />
             </div>
 
-            <div className="hidden lg:block mt-12">
-              <ReviewsSection reviews={product.reviews || []} rating={product.rating || 0} />
+            <div className="hidden lg:block lg:mt-8">
+              <ReviewsSection productId={product._id} />
             </div>
           </div>
         </div>
 
-        {/* Related Products */}
+        {/* Related Products - improved card design */}
         {relatedProducts?.length > 0 && (
-          <section className="mt-20 md:mt-28">
-            <h2 className="text-2xl md:text-3xl font-bold mb-8 md:mb-12">
+          <section className="mt-16 sm:mt-20 lg:mt-24 pb-8 sm:pb-12">
+            <h2 className="mb-8 text-center lg:text-left text-2xl sm:text-3xl font-bold text-gray-900">
               You May Also Like
             </h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 md:gap-8">
+            <div className="grid grid-cols-2 gap-4 xs:gap-5 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4 lg:gap-7">
               {relatedProducts.map((item: any) => (
                 <Link
                   key={item._id}
                   href={`/product/${item._id}`}
-                  className="group block bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all"
+                  className="group block overflow-hidden rounded-xl bg-white shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
                 >
-                  <div className="relative aspect-square bg-gray-100 overflow-hidden">
+                  <div className="relative aspect-square bg-gray-50 overflow-hidden">
                     <Image
                       src={item.thumbnail}
                       alt={item.name}
                       fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-700"
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                     />
                   </div>
-                  <div className="p-4 md:p-5">
-                    <h3 className="font-medium text-gray-800 line-clamp-2 group-hover:text-indigo-600 text-sm md:text-base">
+                  <div className="p-4 sm:p-5">
+                    <h3 className="line-clamp-2 text-sm sm:text-base font-medium text-gray-800 group-hover:text-indigo-600 transition-colors min-h-[2.8em]">
                       {item.name}
                     </h3>
-                    <p className="mt-2 text-indigo-600 font-bold text-base md:text-lg">
+                    <p className="mt-2.5 font-bold text-indigo-600 text-base sm:text-lg">
                       {item.price.toLocaleString()} {item.currency || "PKR"}
                     </p>
                   </div>

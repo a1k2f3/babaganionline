@@ -1,288 +1,214 @@
-// components/card/AddReviewForm.tsx
 "use client";
+import { useState, FormEvent } from 'react';
 
-import { useState, useRef } from "react";
-import { Star, Loader2, Upload, X, Image as ImageIcon } from "lucide-react";
-
-interface Props {
+interface ReviewFormProps {
   productId: string;
+  onReviewSubmitted?: () => void;
 }
 
-export default function AddReviewForm({ productId }: Props) {
-  const [rating, setRating] = useState(0);
-  const [hoverRating, setHoverRating] = useState(0);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [comment, setComment] = useState("");
-  const [image, setImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
+const ReviewForm = ({ productId, onReviewSubmitted }: ReviewFormProps) => {
+  const [rating, setRating] = useState<number>(0);
+  const [hoverRating, setHoverRating] = useState<number>(0);
+  const [comment, setComment] = useState<string>('');
+  const [error, setError] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const dropZoneRef = useRef<HTMLDivElement>(null);
-
-  const handleImageChange = (file: File | null) => {
-    if (!file) {
-      setImage(null);
-      setImagePreview(null);
-      return;
-    }
-
-    // Validate file type
-    if (!file.type.startsWith("image/")) {
-      setError("Please upload a valid image file");
-      return;
-    }
-
-    // Optional: limit file size (e.g., 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      setError("Image size must be less than 5MB");
-      return;
-    }
-
-    setImage(file);
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagePreview(reader.result as string);
-    };
-    reader.readAsDataURL(file);
-    setError("");
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    dropZoneRef.current?.classList.add("border-indigo-500", "bg-indigo-50");
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    dropZoneRef.current?.classList.remove("border-indigo-500", "bg-indigo-50");
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    dropZoneRef.current?.classList.remove("border-indigo-500", "bg-indigo-50");
-
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-      handleImageChange(files[0]);
-    }
-  };
-
-  const removeImage = () => {
-    setImage(null);
-    setImagePreview(null);
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Get userId safely
+  const userId = typeof window !== 'undefined'
+    ? localStorage.getItem('UserId')
+      ? JSON.parse(localStorage.getItem('UserId') as string)
+      : null
+    : null;
+ const token = typeof window !== 'undefined'
+    ? localStorage.getItem('token')
+      ? JSON.parse(localStorage.getItem('UserId') as string)
+      : null
+    : null;
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    setError('');
+
+    // Validation
     if (rating === 0) {
-      setError("Please select a star rating");
-      return;
-    }
-    if (!name || !email || !comment) {
-      setError("Name, email, and review are required");
+      setError('Please select a rating');
       return;
     }
 
-    setLoading(true);
-    setError("");
-    setSuccess(false);
+    if (!userId) {
+      setError('Please login to submit a review');
+      return;
+    }
+
+    if (!productId) {
+      setError('Product information is missing');
+      return;
+    }
+
+    // Basic format check for MongoDB ObjectIds
+    const isValidId = (id: string) => /^[0-9a-fA-F]{24}$/.test(id);
+
+    if (!isValidId(userId) || !isValidId(productId)) {
+      setError('Invalid session or product data. Please try logging in again.');
+      return;
+    }
+
+    setIsSubmitting(true);
 
     try {
-      const formData = new FormData();
-      formData.append("productId", productId);
-      formData.append("rating", rating.toString());
-      formData.append("name", name);
-      formData.append("email", email);
-      formData.append("comment", comment);
-      if (image) {
-        formData.append("image", image);
-      }
-
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/reviews`, {
-        method: "POST",
-        body: formData, // No Content-Type header — let browser set it with boundary
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/reviews`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Add authorization header if you use JWT/token later
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          product: productId,
+          user: userId,
+          rating: rating,
+          comment: comment.trim() || undefined,
+        }),
       });
 
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.message || "Failed to submit review");
+      const responseData = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(
+          responseData.message ||
+          `Failed to submit review (${response.status})`
+        );
       }
 
-      setSuccess(true);
-      // Reset form
+      // Success
       setRating(0);
-      setName("");
-      setEmail("");
-      setComment("");
-      setImage(null);
-      setImagePreview(null);
+      setComment('');
+      setHoverRating(0);
+      onReviewSubmitted?.();
 
-      setTimeout(() => setSuccess(false), 6000);
+      alert('Thank you! Your review has been submitted.');
+
     } catch (err: any) {
-      setError(err.message || "Something went wrong. Please try again.");
+      setError(err.message || 'Failed to submit review. Please try again.');
+      console.error('Review submission error:', err);
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Star Rating */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Your Rating <span className="text-red-500">*</span>
-        </label>
-        <div className="flex gap-2">
-          {[1, 2, 3, 4, 5].map((star) => (
-            <button
-              key={star}
-              type="button"
-              onClick={() => setRating(star)}
-              onMouseEnter={() => setHoverRating(star)}
-              onMouseLeave={() => setHoverRating(0)}
-              className="transition-transform hover:scale-110"
-            >
-              <Star
-                className={`w-8 h-8 ${
-                  star <= (hoverRating || rating)
-                    ? "fill-yellow-400 text-yellow-400"
-                    : "text-gray-300"
-                }`}
-              />
-            </button>
-          ))}
-        </div>
-      </div>
+    <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-sm border border-gray-200 p-6 mt-8">
+      <h3 className="text-xl font-semibold text-gray-800 mb-6">
+        Share Your Experience
+      </h3>
 
-      {/* Name & Email */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Name <span className="text-red-500">*</span>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Rating */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-gray-700">
+            Rate this product <span className="text-red-500">*</span>
           </label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Email <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            required
-          />
-        </div>
-      </div>
 
-      {/* Review Text */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Your Review <span className="text-red-500">*</span>
-        </label>
-        <textarea
-          rows={5}
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none"
-          placeholder="Share your experience with this product..."
-          required
-        />
-      </div>
-
-      {/* Image Upload - Drag & Drop */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Add a Photo (Optional)
-        </label>
-
-        <div
-          ref={dropZoneRef}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          onClick={() => fileInputRef.current?.click()}
-          className="relative border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer transition-all hover:border-gray-400 bg-gray-50 hover:bg-gray-100"
-        >
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={(e) => e.target.files?.[0] && handleImageChange(e.target.files[0])}
-            className="hidden"
-          />
-
-          {!imagePreview ? (
-            <div className="space-y-3">
-              <Upload className="w-12 h-12 mx-auto text-gray-400" />
-              <div>
-                <p className="text-gray-600 font-medium">Drag & drop an image here</p>
-                <p className="text-sm text-gray-500 mt-1">or click to browse</p>
-              </div>
-              <p className="text-xs text-gray-400">JPG, PNG up to 5MB</p>
-            </div>
-          ) : (
-            <div className="relative inline-block">
-              <img
-                src={imagePreview}
-                alt="Review preview"
-                className="max-w-full max-h-64 rounded-lg object-cover shadow-md"
-              />
+          <div className="flex items-center gap-1">
+            {[1, 2, 3, 4, 5].map((star) => (
               <button
+                key={star}
                 type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  removeImage();
-                }}
-                className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition"
+                onClick={() => setRating(star)}
+                onMouseEnter={() => setHoverRating(star)}
+                onMouseLeave={() => setHoverRating(0)}
+                className="focus:outline-none transition-transform hover:scale-110 active:scale-95"
               >
-                <X className="w-4 h-4" />
+                <span
+                  className={`text-4xl transition-all duration-200 ${
+                    star <= (hoverRating || rating)
+                      ? 'text-amber-400 drop-shadow'
+                      : 'text-gray-300'
+                  }`}
+                >
+                  ★
+                </span>
               </button>
-            </div>
+            ))}
+          </div>
+
+          {rating > 0 && (
+            <p className="text-sm text-gray-600 mt-1">
+              {rating === 1 ? 'Very poor' :
+               rating === 2 ? 'Poor' :
+               rating === 3 ? 'Average' :
+               rating === 4 ? 'Good' : 'Excellent'}
+            </p>
           )}
         </div>
 
-        {image && (
-          <p className="text-sm text-gray-600 mt-2 flex items-center gap-1">
-            <ImageIcon className="w-4 h-4" />
-            {image.name}
-          </p>
+        {/* Review Text */}
+        <div className="space-y-2">
+          <label htmlFor="comment" className="block text-sm font-medium text-gray-700">
+            Your review (optional)
+          </label>
+          <textarea
+            id="comment"
+            rows={5}
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            placeholder="What did you like or dislike? Your honest feedback helps others..."
+            maxLength={500}
+            className="
+              w-full px-4 py-3 border border-gray-300 rounded-lg
+              focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+              resize-y min-h-[110px] transition-all
+              placeholder:text-gray-400
+            "
+          />
+          <div className="text-xs text-gray-500 text-right">
+            {comment.length}/500 characters
+          </div>
+        </div>
+
+        {/* Messages */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+            {error}
+          </div>
         )}
-      </div>
 
-      {/* Messages */}
-      {error && <p className="text-red-600 text-sm font-medium">{error}</p>}
-      {success && (
-        <p className="text-green-600 text-sm font-medium">
-          Thank you! Your review has been submitted and is pending approval.
-        </p>
-      )}
+        {/* Submit */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 pt-2">
+          <button
+            type="submit"
+            disabled={isSubmitting || !userId || rating === 0}
+            className={`
+              px-8 py-3 rounded-lg font-medium text-white flex-1 sm:flex-none
+              transition-all duration-200
+              ${
+                isSubmitting || !userId || rating === 0
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 shadow-sm hover:shadow'
+              }
+            `}
+          >
+            {isSubmitting ? (
+              <span className="flex items-center justify-center gap-2">
+                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                </svg>
+                Submitting...
+              </span>
+            ) : (
+              'Submit Review'
+            )}
+          </button>
 
-      {/* Submit Button */}
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full md:w-auto px-8 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-70 disabled:cursor-not-allowed transition flex items-center justify-center gap-2"
-      >
-        {loading && <Loader2 className="w-5 h-5 animate-spin" />}
-        {loading ? "Submitting..." : "Submit Review"}
-      </button>
-    </form>
+          {!userId && (
+            <p className="text-sm text-amber-700 bg-amber-50 px-4 py-2 rounded-lg">
+              You need to be logged in to write a review
+            </p>
+          )}
+        </div>
+      </form>
+    </div>
   );
-}
+};
+
+export default ReviewForm;
