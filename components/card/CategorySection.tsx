@@ -1,7 +1,7 @@
 // components/sections/CategoriesSection.tsx
 "use client";
 
-import CategoryCard from "./CateGoryCard"; // Fixed path case
+import CategoryCard from "./CateGoryCard"; // Make sure path & case is correct
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useEffect, useState, useRef, useCallback } from "react";
@@ -71,7 +71,6 @@ export default function CategoriesSection() {
     updateScrollButtons();
     carousel.addEventListener("scroll", updateScrollButtons);
 
-    // Initial check
     const checkOnResize = () => updateScrollButtons();
     window.addEventListener("resize", checkOnResize);
 
@@ -85,10 +84,11 @@ export default function CategoriesSection() {
   const scroll = useCallback((direction: "left" | "right") => {
     if (!carouselRef.current) return;
 
-    const scrollAmount = carouselRef.current.clientWidth * 0.8; // Scroll 80% of viewport
-    const newScroll = direction === "left"
-      ? carouselRef.current.scrollLeft - scrollAmount
-      : carouselRef.current.scrollLeft + scrollAmount;
+    const scrollAmount = carouselRef.current.clientWidth * 0.8;
+    const newScroll =
+      direction === "left"
+        ? carouselRef.current.scrollLeft - scrollAmount
+        : carouselRef.current.scrollLeft + scrollAmount;
 
     carouselRef.current.scrollTo({
       left: newScroll,
@@ -96,7 +96,7 @@ export default function CategoriesSection() {
     });
   }, []);
 
-  // Auto-scroll (with cleanup - NO MEMORY LEAK)
+  // Auto-scroll
   useEffect(() => {
     if (categories.length <= 6 || loading) return;
 
@@ -113,7 +113,7 @@ export default function CategoriesSection() {
       }
     }, 8000);
 
-    return () => clearInterval(interval); // Cleanup on unmount/change
+    return () => clearInterval(interval);
   }, [categories.length, loading, scroll]);
 
   // Loading Skeleton
@@ -182,9 +182,9 @@ export default function CategoriesSection() {
         </p>
       </div>
 
-      {/* Horizontal Carousel - Works on ALL devices */}
+      {/* Horizontal Carousel */}
       <div className="relative max-w-7xl mx-auto">
-        {/* Left Arrow - Hidden on very small screens if not needed */}
+        {/* Left Arrow */}
         {canScrollLeft && (
           <button
             onClick={() => scroll("left")}
@@ -206,15 +206,15 @@ export default function CategoriesSection() {
           </button>
         )}
 
-        {/* Carousel Container */}
+        {/* Carousel Items */}
         <div
           ref={carouselRef}
-          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth px-4 md:px-8 py-4 snap-x snap-mandatory"
+          className="flex gap-4 sm:gap-6 overflow-x-auto scrollbar-hide scroll-smooth px-4 sm:px-8 py-4 snap-x snap-mandatory"
         >
           {categories.map((cat, index) => (
             <motion.div
               key={cat._id}
-              className="flex-shrink-0 w-64 snap-start"
+              className="flex-shrink-0 w-[215px] xs:w-[240px] sm:w-64 md:w-72 snap-start"
               initial={{ opacity: 0, x: 80 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
@@ -248,14 +248,14 @@ export default function CategoriesSection() {
         </div>
       )}
 
-      {/* Stats */}
+      {/* Stats - currently empty */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto text-center"
       >
-  
+        {/* You can add stats here later */}
       </motion.div>
     </section>
   );
