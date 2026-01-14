@@ -4,10 +4,9 @@ import React, { useState } from "react";
 import InputField from "./InputField";
 import Link from "next/link";
 import Button from "./Button";
-import SocialLoginButton from "./SocialLoginbutton";
+// import SocialLoginButton from "./SocialLoginbutton";
 
 const SignupForm: React.FC = () => {
-  // All fields are strings – exactly what the API expects
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
@@ -20,7 +19,6 @@ const SignupForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // ---- Basic client-side validation ----
     if (!name || !email || !phone || !password) {
       setError("All fields are required.");
       return;
@@ -38,19 +36,10 @@ const SignupForm: React.FC = () => {
     setError(null);
     setSuccess(null);
 
-    const userData = {
-      name,
-      email,
-      phone,       // stays a string
-      password,
-    };
+    const userData = { name, email, phone, password };
 
     try {
-      // -------------------------------------------------
-      // CHANGE THIS LINE FOR LOCAL TESTING:
-      // -------------------------------------------------
-      const API_URL =
-        process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5000";
+      const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5000";
 
       const response = await fetch(`${API_URL}/api/users/register`, {
         method: "POST",
@@ -63,12 +52,10 @@ const SignupForm: React.FC = () => {
       const result = await response.json();
 
       if (!response.ok) {
-        // API returns { message: "…" } on validation errors
         throw new Error(result.message || "Registration failed.");
       }
 
       setSuccess("Registration successful! Redirecting to login…");
-      // Clear form
       setName("");
       setEmail("");
       setPhone("");
@@ -102,7 +89,6 @@ const SignupForm: React.FC = () => {
         value={name}
         placeholder="Kamran Ali"
         onChange={(e) => setName(e.target.value)}
-     
       />
 
       <InputField
@@ -112,7 +98,6 @@ const SignupForm: React.FC = () => {
         value={email}
         placeholder="kamran@example.com"
         onChange={(e) => setEmail(e.target.value)}
-        
       />
 
       <InputField
@@ -122,7 +107,6 @@ const SignupForm: React.FC = () => {
         value={phone}
         placeholder="03001234567"
         onChange={(e) => setPhone(e.target.value)}
-      
       />
 
       <InputField
@@ -132,23 +116,49 @@ const SignupForm: React.FC = () => {
         value={password}
         placeholder="Enter your password"
         onChange={(e) => setPassword(e.target.value)}
-        
       />
 
       <Button
         type="submit"
         label={isLoading ? "Signing up…" : "Signup"}
-        
+        disabled={isLoading}
       />
 
-      <p className="text-center text-sm text-gray-600 mt-5">
-        Already have an account?{" "}
-        <Link href="/auth/login" className="text-blue-600 hover:underline font-medium">
-          Login
-        </Link>
-      </p>
+      {/* Privacy Policy + Login link section */}
+      <div className="text-center text-sm text-gray-600 mt-4 space-y-2">
+        <p>
+          By signing up, you agree to our{" "}
+          <Link
+            href="/static/privacy-policy"
+            className="text-blue-600 hover:underline font-medium"
+          >
+            Privacy Policy
+          </Link>
+        </p>
 
-      {/* <SocialLoginButton
+        <p>
+          Already have an account?{" "}
+          <Link
+            href="/auth/login"
+            className="text-blue-600 hover:underline font-medium"
+          >
+            Login
+          </Link>
+        </p>
+      </div>
+
+      {/* Uncomment when you implement social auth */}
+      {/* 
+      <div className="relative my-6">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-gray-300"></div>
+        </div>
+        <div className="relative flex justify-center text-sm">
+          <span className="bg-white px-4 text-gray-500">Or continue with</span>
+        </div>
+      </div>
+
+      <SocialLoginButton
         provider="google"
         onClick={() => console.log("Google login")}
         title="Signup with Google"
