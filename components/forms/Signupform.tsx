@@ -121,7 +121,7 @@ const SignupForm: React.FC = () => {
       <Button
         type="submit"
         label={isLoading ? "Signing up…" : "Signup"}
-        disabled={isLoading}
+        // disabled={isLoading}
       />
 
       {/* Privacy Policy + Login link section */}
