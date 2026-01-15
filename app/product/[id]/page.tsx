@@ -14,7 +14,6 @@ import ProductActions from "@/components/card/ProducActions";
 async function getProduct(id: string) {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
   const url = `${baseUrl}/api/products/${id}`;
-
   try {
     const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) return null;
@@ -48,8 +47,8 @@ export default async function ProductPage({
   const availableSizes: string[] = Array.isArray(product.size)
     ? product.size
     : product.size
-      ? [product.size]
-      : [];
+    ? [product.size]
+    : [];
 
   const descriptionPoints = product.description
     ? product.description
@@ -66,7 +65,6 @@ export default async function ProductPage({
   const discountPercentage = hasDiscount
     ? Math.round(((originalPrice - salePrice) / originalPrice) * 100)
     : 0;
-
   const displayPrice = hasDiscount ? salePrice : originalPrice;
 
   return (
@@ -104,25 +102,36 @@ export default async function ProductPage({
           {/* LEFT COLUMN - Gallery + Tabs + Mobile Reviews */}
           <div className="mx-auto w-full max-w-xl lg:max-w-none lg:mx-0 space-y-8 sm:space-y-10 lg:space-y-12">
             <ProductGallery images={images} productName={product.name} />
-
             <ProductTabs
               descriptionPoints={descriptionPoints}
               specifications={product.specifications}
               highlights={product.highlights}
             />
-
             <div className="lg:hidden">
               <ReviewsSection productId={product._id} />
             </div>
           </div>
 
           {/* RIGHT COLUMN - Product Info */}
-          <div className="mx-auto w-full max-w-xl lg:max-w-none lg:mx-0 space-y-8 sm:space-y-10 lg:space-y-12">
+          <div className="mx-auto w-full max-w-xl lg:max-w-none lg:mx-0 space-y-7 sm:space-y-9 lg:space-y-12">
             <div className="text-center lg:text-left">
-              <h1 className="text-xl sm:text-3.5xl md:text-4xl lg:text-4.5xl font-bold text-gray-900 tracking-tight">
-                {product.name}
-              </h1>
-
+     <h1 
+  className="
+    text-2xl sm:text-3xl md:text-4xl lg:text-4.5xl xl:text-5xl 
+    font-bold 
+    text-gray-900 
+    tracking-tight 
+    leading-[1.15]           /* slightly more relaxed line height */
+    max-w-[95%] md:max-w-[90%] lg:max-w-[85%]  /* prevents too wide lines */
+    mx-auto lg:mx-0
+    text-center lg:text-left
+    break-words
+    hyphens-auto
+  "
+>
+  {product.name}
+</h1>
+{/* 
               <div className="mt-4 flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-3">
                 <div className="flex items-center gap-1">
                   {[...Array(5)].map((_, i) => (
@@ -139,36 +148,34 @@ export default async function ProductPage({
                 <span className="text-sm sm:text-base text-gray-600 font-medium">
                   {product.reviews?.length || 0} reviews
                 </span>
-
                 {product.stock > 0 && product.stock <= 10 && (
                   <span className="rounded-full bg-red-50 px-3.5 py-1 text-sm font-medium text-red-700 border border-red-200">
                     Only {product.stock} left!
                   </span>
                 )}
-              </div>
+              </div> */}
             </div>
 
             {/* ── PRICE SECTION WITH DISCOUNT ── */}
             <div className="border-b border-gray-200 pb-7">
-              <div className="flex flex-col items-center lg:items-start gap-1.5">
-                <div className="flex items-end gap-3 flex-wrap justify-center lg:justify-start">
-                  <span className="text-5xl sm:text-6xl font-black tracking-tight text-red-600">
+              <div className="flex flex-col items-center lg:items-start gap-2">
+                <div className="flex flex-wrap items-end justify-center lg:justify-start gap-3 sm:gap-4">
+                  <span className="text-5xl sm:text-6xl md:text-7xl font-black tracking-tight text-red-600">
                     {displayPrice.toLocaleString("en-IN")}
                   </span>
-
-                  <span className="text-2xl sm:text-3xl font-medium text-gray-500 mb-1">
+                  <span className="text-2xl sm:text-3xl font-medium text-gray-600 mb-1.5">
                     {product.currency || "PKR"}
                   </span>
 
                   {hasDiscount && discountPercentage > 5 && (
-                    <span className="ml-4 mb-2 inline-flex items-center px-4 py-1.5 bg-gradient-to-r from-red-600 to-rose-600 text-white text-base sm:text-lg font-bold rounded-full shadow-lg">
+                    <span className="ml-3 sm:ml-4 mb-1.5 inline-flex items-center px-4 py-1.5 bg-gradient-to-r from-red-600 to-rose-600 text-white text-base sm:text-lg font-bold rounded-full shadow-lg">
                       Save {discountPercentage}%
                     </span>
                   )}
                 </div>
 
                 {hasDiscount && (
-                  <div className="text-base sm:text-lg text-gray-500 line-through opacity-80">
+                  <div className="text-base sm:text-lg text-gray-500 line-through opacity-80 mt-1">
                     Original: {originalPrice.toLocaleString("en-IN")}{" "}
                     {product.currency || "PKR"}
                   </div>
@@ -246,7 +253,6 @@ export default async function ProductPage({
                 const itemHasDiscount =
                   item.discountPrice &&
                   Number(item.discountPrice) < Number(item.price);
-
                 return (
                   <Link
                     key={item._id}
@@ -261,7 +267,6 @@ export default async function ProductPage({
                         className="object-cover transition-transform duration-700 group-hover:scale-110"
                         sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                       />
-
                       {itemHasDiscount && (
                         <div className="absolute top-2 right-2 z-10">
                           <span className="inline-flex items-center px-2.5 py-1 bg-red-600 text-white text-xs font-bold rounded-full shadow-md">
@@ -279,14 +284,15 @@ export default async function ProductPage({
                       <h3 className="line-clamp-2 text-sm sm:text-base font-medium text-gray-800 group-hover:text-indigo-600 transition-colors min-h-[2.8em]">
                         {item.name}
                       </h3>
+                      
                       <div className="mt-2 flex items-baseline gap-2">
-                        <p className="font-bold text-indigo-600 text-base sm:text-lg">
+                        <p className="font-bold text-red-600 text-base sm:text-lg">
                           {itemHasDiscount
                             ? Number(item.discountPrice).toLocaleString("en-IN")
                             : Number(item.price).toLocaleString("en-IN")}
                         </p>
-                        {itemHasDiscount && (
-                          <p className="text-xs sm:text-sm text-gray-500 line-through">
+                        {item.price && (
+                          <p className="text-xs sm:text-sm text-grey-500 line-through">
                             {Number(item.price).toLocaleString("en-IN")}
                           </p>
                         )}
