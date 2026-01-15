@@ -1,4 +1,3 @@
-// components/products/ProductsSection.tsx
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -31,6 +30,7 @@ interface Product {
   _id: string;
   name: string;
   price: number;
+  discountPrice?: number;     // ← final discounted price (e.g. 2499 instead of percentage)
   thumbnail: string;
   images: Image[];
   category: Category;
@@ -64,18 +64,15 @@ export default function ProductsSection() {
       revalidateFirstPage: false,
       revalidateOnFocus: false,
       dedupingInterval: 60000,
-      fallbackData: [], // Prevents undefined issues
+      fallbackData: [],
     }
   );
 
-  // Flatten all pages into one array
   const products: Product[] = data ? data.flatMap((page) => page.data || []) : [];
 
   const isLoadingMore = isValidating && data && data.length === size;
-  // Since it's /random, we can't reliably know if there's more — limit to reasonable amount
-  const hasMore = products.length < 100; // Prevent infinite loading forever
+  const hasMore = products.length < 100; // reasonable cap for random endpoint
 
-  // Intersection Observer for infinite scroll
   const handleObserver = useCallback(
     (entries: IntersectionObserverEntry[]) => {
       const target = entries[0];
@@ -104,7 +101,6 @@ export default function ProductsSection() {
     };
   }, [handleObserver]);
 
-  // Initial loading state
   if (isLoading && products.length === 0) {
     return (
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white">
@@ -118,7 +114,6 @@ export default function ProductsSection() {
     );
   }
 
-  // Error state
   if (error) {
     return (
       <section className="py-20 px-4 sm:px-6 lg:px-8 text-center">
@@ -171,10 +166,10 @@ export default function ProductsSection() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 sm:gap-8">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 sm:gap-8">
               {products.map((product, index) => (
                 <motion.div
-                  key={`${product._id}-${index}`} // ← Fixed: Unique key even if duplicates exist
+                  key={`${product._id}-${index}`}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.03 }}
@@ -185,7 +180,7 @@ export default function ProductsSection() {
               ))}
             </div>
 
-            {/* Infinite Scroll Loader / Trigger */}
+            {/* Infinite Scroll Loader */}
             {hasMore && (
               <div ref={observerRef} className="flex justify-center py-16">
                 {isLoadingMore ? (
@@ -199,7 +194,7 @@ export default function ProductsSection() {
               </div>
             )}
 
-            {/* End of Catalog Message */}
+            {/* End message */}
             {!hasMore && products.length > 0 && (
               <div className="text-center py-16">
                 <p className="text-gray-500 text-lg font-medium">

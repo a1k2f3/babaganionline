@@ -19,7 +19,8 @@ type Step = "address" | "payment" | "review";
 interface CartItem {
   id: string;
   name: string;
-  price: number;
+  price: number;           // original price
+  discountPrice?: number;  // discounted price (if any)
   quantity: number;
   size?: string;
   image: string;
@@ -48,7 +49,6 @@ export default function CheckoutPage() {
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [selectedAddressIdx, setSelectedAddressIdx] = useState<number | null>(null);
   const [paymentMethod] = useState<"cod">("cod"); // Only COD for now
-  const [coupon] = useState(""); // You can make this dynamic later
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -78,7 +78,7 @@ export default function CheckoutPage() {
     return { token, userId };
   };
 
-  // Fetch Cart
+  // Fetch Cart (now includes discountPrice)
   const fetchCart = async () => {
     const { token, userId } = getAuth();
     if (!token || !userId) {
@@ -89,6 +89,7 @@ export default function CheckoutPage() {
     try {
       const res = await fetch(`${API_BASE}/api/cart?userId=${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
+        cache: "no-store",
       });
 
       if (!res.ok) throw new Error("Failed to load cart");
@@ -97,7 +98,10 @@ export default function CheckoutPage() {
       const cartItems: CartItem[] = (data.items || []).map((item: any) => ({
         id: item.productId._id,
         name: item.productId.name,
-        price: item.productId.price,
+        price: Number(item.productId.price) || 0,
+        discountPrice: item.productId.discountPrice
+          ? Number(item.productId.discountPrice)
+          : undefined,
         quantity: item.quantity,
         size: item.size,
         image: item.productId.thumbnail || "/placeholder.jpg",
@@ -121,7 +125,6 @@ export default function CheckoutPage() {
       });
 
       if (!res.ok) {
-        // Silently fallback to empty list on error
         setAddresses([]);
         return;
       }
@@ -145,7 +148,6 @@ export default function CheckoutPage() {
 
       setAddresses(formatted);
 
-      // Auto-select default or first
       const defaultIdx = formatted.findIndex((a) => a.isDefault);
       setSelectedAddressIdx(defaultIdx !== -1 ? defaultIdx : formatted.length > 0 ? 0 : null);
     } catch (err) {
@@ -154,7 +156,7 @@ export default function CheckoutPage() {
     }
   };
 
-  // Add New Address
+  // Add New Address (unchanged)
   const addAddress = async () => {
     const { token, userId } = getAuth();
     if (!token || !userId) return;
@@ -203,7 +205,7 @@ export default function CheckoutPage() {
     }
   };
 
-  // Place Order
+  // Place Order (unchanged)
   const placeOrder = async () => {
     if (selectedAddressIdx === null) {
       setError("Please select a delivery address");
@@ -260,7 +262,15 @@ export default function CheckoutPage() {
     loadData();
   }, []);
 
-  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  // Calculate prices using discountPrice when available
+  const subtotal = items.reduce((sum, item) => {
+    const effectivePrice =
+      item.discountPrice && item.discountPrice < item.price
+        ? item.discountPrice
+        : item.price;
+    return sum + effectivePrice * item.quantity;
+  }, 0);
+
   const delivery = subtotal >= 1000 ? 0 : 99;
   const total = subtotal + delivery;
 
@@ -455,35 +465,63 @@ export default function CheckoutPage() {
               <h2 className="text-2xl font-bold mb-6">Order Summary</h2>
 
               <div className="space-y-4 max-h-96 overflow-y-auto pb-4">
-                {items.map((item) => (
-                  <div key={item.id} className="flex gap-4 py-4 border-b last:border-0">
-                    <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                      <Image src={item.image} alt={item.name} fill sizes="80px" className="object-cover" />
+                {items.map((item) => {
+                  const hasDiscount =
+                    item.discountPrice !== undefined &&
+                    item.discountPrice > 0 &&
+                    item.discountPrice < item.price;
+
+                  const displayPrice = hasDiscount ? item.discountPrice! : item.price;
+                  const itemTotal = displayPrice * item.quantity;
+
+                  return (
+                    <div key={item.id} className="flex gap-4 py-4 border-b last:border-0">
+                      <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                        <Image src={item.image} alt={item.name} fill sizes="80px" className="object-cover" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-medium line-clamp-2">{item.name}</h4>
+                        {item.size && <p className="text-sm text-gray-600">Size: {item.size}</p>}
+                        <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
+
+                        <div className="flex items-center gap-2 mt-1">
+                          <p className="font-bold text-indigo-600">
+                            RS{itemTotal.toLocaleString("en-IN")}
+                          </p>
+
+                          {hasDiscount && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm text-gray-500 line-through">
+                                RS{(item.price * item.quantity).toLocaleString("en-IN")}
+                              </span>
+                              <span className="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded">
+                                {Math.round(((item.price - item.discountPrice!) / item.price) * 100)}% OFF
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <h4 className="font-medium line-clamp-2">{item.name}</h4>
-                      {item.size && <p className="text-sm text-gray-600">Size: {item.size}</p>}
-                      <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
-                      <p className="font-bold text-indigo-600 mt-1">RS{(item.price * item.quantity).toLocaleString()}</p>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               <div className="border-t pt-6 space-y-3">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span className="font-medium">RS{subtotal.toLocaleString()}</span>
+                  <span className="font-medium">RS{subtotal.toLocaleString("en-IN")}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Delivery</span>
                   <span className={delivery === 0 ? "text-green-600 font-bold" : ""}>
-                    {delivery === 0 ? "FREE" : `RS${delivery}`}
+                    {delivery === 0 ? "FREE" : `RS${delivery.toLocaleString("en-IN")}`}
                   </span>
                 </div>
                 <div className="flex justify-between text-xl font-bold border-t pt-4">
                   <span>Total</span>
-                  <span className="text-indigo-600 text-2xl">RS{total.toLocaleString()}</span>
+                  <span className="text-indigo-600 text-2xl">
+                    RS{total.toLocaleString("en-IN")}
+                  </span>
                 </div>
               </div>
 
