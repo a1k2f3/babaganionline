@@ -13,17 +13,10 @@ const ReviewForm = ({ productId, onReviewSubmitted }: ReviewFormProps) => {
   const [error, setError] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  // Get userId safely
-  const userId = typeof window !== 'undefined'
-    ? localStorage.getItem('UserId')
-      ? JSON.parse(localStorage.getItem('UserId') as string)
-      : null
-    : null;
- const token = typeof window !== 'undefined'
-    ? localStorage.getItem('token')
-      ? JSON.parse(localStorage.getItem('UserId') as string)
-      : null
-    : null;
+  // Read from localStorage as plain strings (no JSON.parse needed)
+  const userId = typeof window !== 'undefined' ? localStorage.getItem('UserId') : null;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -60,8 +53,7 @@ const ReviewForm = ({ productId, onReviewSubmitted }: ReviewFormProps) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // Add authorization header if you use JWT/token later
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token || ''}`,
         },
         body: JSON.stringify({
           product: productId,
@@ -76,7 +68,7 @@ const ReviewForm = ({ productId, onReviewSubmitted }: ReviewFormProps) => {
       if (!response.ok) {
         throw new Error(
           responseData.message ||
-          `Failed to submit review (${response.status})`
+            `Failed to submit review (${response.status})`
         );
       }
 
@@ -145,7 +137,7 @@ const ReviewForm = ({ productId, onReviewSubmitted }: ReviewFormProps) => {
         {/* Review Text */}
         <div className="space-y-2">
           <label htmlFor="comment" className="block text-sm font-medium text-gray-700">
-            Your review (optional)
+            Your review 
           </label>
           <textarea
             id="comment"

@@ -131,7 +131,7 @@ export default async function ProductPage({
 >
   {product.name}
 </h1>
-{/* 
+
               <div className="mt-4 flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-3">
                 <div className="flex items-center gap-1">
                   {[...Array(5)].map((_, i) => (
@@ -153,7 +153,7 @@ export default async function ProductPage({
                     Only {product.stock} left!
                   </span>
                 )}
-              </div> */}
+              </div>
             </div>
 
             {/* ── PRICE SECTION WITH DISCOUNT ── */}
@@ -248,60 +248,56 @@ export default async function ProductPage({
             <h2 className="mb-8 text-center lg:text-left text-2xl sm:text-3xl font-bold text-gray-900">
               You May Also Like
             </h2>
-            <div className="grid grid-cols-2 gap-4 xs:gap-5 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4 lg:gap-7">
-              {relatedProducts.map((item: any) => {
-                const itemHasDiscount =
-                  item.discountPrice &&
-                  Number(item.discountPrice) < Number(item.price);
-                return (
-                  <Link
-                    key={item._id}
-                    href={`/product/${item._id}`}
-                    className="group block overflow-hidden rounded-xl bg-white shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
-                  >
-                    <div className="relative aspect-square bg-gray-50 overflow-hidden">
-                      <Image
-                        src={item.thumbnail}
-                        alt={item.name}
-                        fill
-                        className="object-cover transition-transform duration-700 group-hover:scale-110"
-                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                      />
-                      {itemHasDiscount && (
-                        <div className="absolute top-2 right-2 z-10">
-                          <span className="inline-flex items-center px-2.5 py-1 bg-red-600 text-white text-xs font-bold rounded-full shadow-md">
-                            {Math.round(
-                              ((Number(item.price) - Number(item.discountPrice)) /
-                                Number(item.price)) *
-                                100
-                            )}
-                            %
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-4 sm:p-5">
-                      <h3 className="line-clamp-2 text-sm sm:text-base font-medium text-gray-800 group-hover:text-indigo-600 transition-colors min-h-[2.8em]">
-                        {item.name}
-                      </h3>
-                      
-                      <div className="mt-2 flex items-baseline gap-2">
-                        <p className="font-bold text-red-600 text-base sm:text-lg">
-                          {itemHasDiscount
-                            ? Number(item.discountPrice).toLocaleString("en-IN")
-                            : Number(item.price).toLocaleString("en-IN")}
-                        </p>
-                        {item.price && (
-                          <p className="text-xs sm:text-sm text-grey-500 line-through">
-                            {Number(item.price).toLocaleString("en-IN")}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
+          <div className="grid grid-cols-2 gap-3 xs:gap-4 sm:grid-cols-3 sm:gap-5 lg:grid-cols-5 lg:gap-6">
+  {relatedProducts.map((item: any) => {
+    const itemHasDiscount =
+      item.discountPrice && Number(item.discountPrice) < Number(item.price);
+    const displayPrice = itemHasDiscount ? Number(item.discountPrice) : Number(item.price);
+
+    return (
+      <Link
+        key={item._id}
+        href={`/products/${item._id}`} // ← corrected route (assuming your product pages are /products/[id])
+        className="group block overflow-hidden rounded-lg bg-white shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1"
+      >
+        {/* Smaller image area */}
+        <div className="relative aspect-square bg-gray-50 overflow-hidden">
+          <Image
+            src={item.thumbnail}
+            alt={item.name || 'Product'}
+            fill
+            className="object-cover transition-transform duration-700 group-hover:scale-105"
+            sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 20vw"
+          />
+          {itemHasDiscount && (
+            <div className="absolute top-1.5 right-1.5 z-10">
+              <span className="inline-flex items-center px-2 py-0.5 text-[10px] sm:text-xs font-bold bg-red-600 text-white rounded-full shadow">
+                {Math.round(((Number(item.price) - Number(item.discountPrice)) / Number(item.price)) * 100)}%
+              </span>
             </div>
+          )}
+        </div>
+
+        <div className="p-3 sm:p-4">
+          <h3 className="line-clamp-2 text-xs sm:text-sm font-medium text-gray-800 group-hover:text-indigo-600 transition-colors min-h-[2.4em]">
+            {item.name}
+          </h3>
+
+          <div className="mt-1.5 flex items-baseline gap-2">
+            <p className="font-bold text-red-600 text-sm sm:text-base">
+              {displayPrice.toLocaleString('en-IN')}
+            </p>
+            {itemHasDiscount && (
+              <p className="text-xs text-gray-500 line-through opacity-75">
+                {Number(item.price).toLocaleString('en-IN')}
+              </p>
+            )}
+          </div>
+        </div>
+      </Link>
+    );
+  })}
+</div>
           </section>
         )}
       </div>

@@ -103,7 +103,7 @@ export default function ProductsSection() {
 
   if (isLoading && products.length === 0) {
     return (
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white">
+      <section className="py-20 px-4 gap-10 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white">
         <div className="flex flex-col items-center justify-center min-h-[60vh]">
           <Loader2 className="w-16 h-16 animate-spin text-indigo-600" />
           <p className="mt-6 text-xl font-medium text-gray-700">

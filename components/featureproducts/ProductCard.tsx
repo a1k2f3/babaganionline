@@ -75,7 +75,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       className="group w-full max-w-[280px] sm:max-w-sm mx-auto"
     >
       <Link href={`/product/${product._id}`} className="block h-full">
-        <div className="h-full flex flex-col bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg hover:border-gray-300 transition-all duration-300">
+        <div className="h-75 w-45 flex flex-col bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg hover:border-gray-300 transition-all duration-300">
           {/* Image Container */}
           <div className="relative aspect-square flex-shrink-0">
             <Image
@@ -106,20 +106,12 @@ export default function ProductCard({ product }: ProductCardProps) {
               </div>
             )}
 
-            {/* Quick Action */}
-            <div className="absolute inset-x-0 bottom-0 flex justify-center pb-4 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-              <button className="flex items-center gap-2 bg-white/95 backdrop-blur-sm text-gray-900 px-5 py-2.5 rounded-full shadow-lg font-medium text-sm hover:bg-white border border-gray-200/80 transition-colors">
-                <ShoppingCart size={17} />
-                Add to Cart
-              </button>
-            </div>
+            
           </div>
 
           {/* Content */}
           <div className="flex flex-col flex-grow p-4 pt-4 space-y-2.5">
-            <div className="text-xs text-gray-500 uppercase tracking-wide">
-              {safeCategory} • {safeBrand}
-            </div>
+            
 
             <h3 className="font-medium text-base sm:text-lg text-gray-900 line-clamp-2 min-h-[2.75rem] sm:min-h-[3.25rem]">
               {product.name}
@@ -145,12 +137,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               </div>
 
               {/* Rating */}
-              <div className="flex items-center gap-1 bg-yellow-50/80 px-2 py-1 rounded text-sm">
-                <Star size={14} className="fill-yellow-500 text-yellow-500" />
-                <span className="font-medium text-gray-700">
-                  {displayRating.toFixed(1)}
-                </span>
-              </div>
+              
             </div>
           </div>
         </div>

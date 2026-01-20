@@ -4,7 +4,6 @@
 import HeroSection from '@/components/hero/Herosection';
 import DealsSection from '@/components/card/DealsSection';
 import CategoriesSection from '@/components/card/CategorySection';     // Your large image grid
-
 import TrendingProducts from '@/components/card/TrendingProducts';       // Carousel or grid
 import ProductsSection from '@/components/featureproducts/ProductSection';         // All/New Arrivals
 
@@ -18,7 +17,6 @@ export default function Home() {
     <main className="min-h-screen bg-white ">
       {/* 1. Hero Section */}
       <HeroSection />
-
       {/* 2. Flash Deals - High urgency, right after hero */}
       <section className="py-8 px-4 sm:px-6 lg:px-8 bg-white ">
         <div className="max-w-7xl mx-auto">
