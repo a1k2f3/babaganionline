@@ -75,7 +75,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       className="group w-full max-w-[280px] sm:max-w-sm mx-auto"
     >
       <Link href={`/product/${product._id}`} className="block h-full">
-        <div className="h-75 w-45 flex flex-col bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg hover:border-gray-300 transition-all duration-300">
+        <div className="h-75 w-40 flex flex-col bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg hover:border-gray-300 transition-all duration-300">
           {/* Image Container */}
           <div className="relative aspect-square flex-shrink-0">
             <Image

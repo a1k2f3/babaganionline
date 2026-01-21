@@ -107,7 +107,7 @@ function SearchResultsContent() {
 
     if (currentPage - delta > 2) {
       pages.push(1, "...");
-    } else {
+    } else if (totalPages >= 1) {
       pages.push(1);
     }
 
@@ -117,7 +117,7 @@ function SearchResultsContent() {
 
     if (currentPage + delta < totalPages - 1) {
       pages.push("...", totalPages);
-    } else if (totalPages > 1) {
+    } else if (totalPages > end) {
       pages.push(totalPages);
     }
 
@@ -125,45 +125,41 @@ function SearchResultsContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12">
-      <div className="max-w-7xl mx-auto px-6">
-        {/* Hero Header */}
-        <div className="text-center mb-12">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-10 md:py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="text-center mb-10 md:mb-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-4 bg-white rounded-full px-8 py-4 shadow-lg mb-6"
+            className="inline-flex items-center gap-3 sm:gap-4 bg-white rounded-full px-6 sm:px-8 py-3 sm:py-4 shadow-lg mb-5 sm:mb-6"
           >
-            <Search className="w-8 h-8 text-indigo-600" />
-            <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900">
+            <Search className="w-7 h-7 sm:w-8 sm:h-8 text-indigo-600" />
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900">
               Results for: <span className="text-indigo-600">"{query}"</span>
             </h1>
           </motion.div>
-          <p className="text-xl text-gray-600">
+          <p className="text-lg sm:text-xl text-gray-600">
             {loading ? "Searching..." : `${totalResults} product${totalResults !== 1 ? "s" : ""} found`}
           </p>
         </div>
 
-        {/* Loading */}
+        {/* Loading State */}
         {loading && (
-          <div className="flex flex-col items-center justify-center py-32">
-            <Loader2 className="w-16 h-16 animate-spin text-indigo-600 mb-6" />
-            <p className="text-xl text-gray-700">Finding the best matches...</p>
+          <div className="flex flex-col items-center justify-center py-24 sm:py-32">
+            <Loader2 className="w-14 h-14 sm:w-16 sm:h-16 animate-spin text-indigo-600 mb-5 sm:mb-6" />
+            <p className="text-lg sm:text-xl text-gray-700">Finding the best matches...</p>
           </div>
         )}
 
-        {/* Results */}
+        {/* Results Grid */}
         {!loading && results.length > 0 && (
           <>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 md:gap-8">
+            <div className="grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 sm:gap-6 md:gap-7 lg:gap-8">
               {results.map((product, index) => {
                 const price = Number(product.price) || 0;
                 const discountPrice = Number(product.discountPrice) || 0;
-
-                const hasDiscount =
-                  discountPrice > 0 &&
-                  discountPrice < price;
-
+                const hasDiscount = discountPrice > 0 && discountPrice < price;
                 const displayPrice = hasDiscount ? discountPrice : price;
                 const discountPercent = hasDiscount
                   ? Math.round(((price - discountPrice) / price) * 100)
@@ -172,83 +168,83 @@ function SearchResultsContent() {
                 return (
                   <motion.div
                     key={product._id}
-                    initial={{ opacity: 0, y: 30 }}
+                    initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    className="group"
+                    transition={{ delay: index * 0.04, duration: 0.5 }}
+                    className="group flex flex-col h-full"
                   >
-                    <Link href={`/product/${product._id}`}>
-                      <div className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 hover:border-indigo-200">
-                        <div className="relative aspect-square overflow-hidden bg-gray-50">
+                    <Link href={`/product/${product._id}`} className="flex flex-col h-full">
+                      <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-200 hover:border-indigo-200 overflow-hidden flex-1 flex flex-col">
+                        {/* Image */}
+                        <div className="relative pt-[100%] overflow-hidden bg-gray-50">
                           <Image
                             src={product.thumbnail || "/images/placeholder.jpg"}
                             alt={product.name}
                             fill
-                            sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                            className="object-cover group-hover:scale-110 transition-transform duration-700"
-                            priority={index < 10}
+                            sizes="(max-width: 475px) 45vw, (max-width: 640px) 42vw, (max-width: 768px) 30vw, (max-width: 1024px) 23vw, 18vw"
+                            className="object-cover group-hover:scale-105 transition-transform duration-700"
+                            priority={index < 8}
                           />
 
                           {product.stock === 0 && (
-                            <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
-                              <span className="text-white text-lg font-bold">Sold Out</span>
-                            </div>
-                          )}
-                          {product.stock > 0 && product.stock <= 5 && (
-                            <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-                              Only {product.stock} left!
+                            <div className="absolute inset-0 bg-black/65 flex items-center justify-center">
+                              <span className="text-white text-base sm:text-lg font-bold tracking-wide">Sold Out</span>
                             </div>
                           )}
 
-                          {hasDiscount && discountPercent > 5 && (
-                            <div className="absolute top-3 right-3 bg-gradient-to-r from-red-600 to-rose-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg z-10">
+                          {product.stock > 0 && product.stock <= 5 && (
+                            <div className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-red-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md">
+                              Only {product.stock} left
+                            </div>
+                          )}
+
+                          {hasDiscount && discountPercent >= 5 && (
+                            <div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-gradient-to-r from-red-600 to-rose-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md z-10">
                               {discountPercent}% OFF
                             </div>
                           )}
                         </div>
 
-                        <div className="p-5">
-                          <h3 className="font-bold text-lg text-gray-900 line-clamp-2 mb-2 group-hover:text-indigo-600 transition-colors">
+                        {/* Content */}
+                        <div className="p-4 sm:p-5 flex flex-col flex-1">
+                          <h3 className="font-semibold text-base sm:text-lg text-gray-900 line-clamp-2 mb-1.5 group-hover:text-indigo-700 transition-colors">
                             {product.name}
                           </h3>
 
-                          {(product.brand || product.category) && (
-                            <p className="text-sm text-gray-500 mb-2">
+                          {(product.brand?.name || product.category?.name) && (
+                            <p className="text-xs sm:text-sm text-gray-500 mb-2 line-clamp-1">
                               {product.brand?.name}
-                              {product.brand && product.category && " • "}
+                              {product.brand?.name && product.category?.name && " • "}
                               {product.category?.name}
                             </p>
                           )}
 
-                          {/* Safe Price Display */}
-                          <div className="flex items-baseline gap-3 mt-3 flex-wrap">
-                            <span className="text-2xl font-extrabold text-red-600">
-                              {product.currency || "PKR"}{" "}
-                              {displayPrice.toLocaleString("en-IN")}
+                          <div className="mt-auto flex items-baseline gap-2.5 flex-wrap">
+                            <span className="text-xl sm:text-2xl font-bold text-red-600 tracking-tight">
+                              {product.currency || "PKR"} {displayPrice.toLocaleString("en-IN")}
                             </span>
 
                             {hasDiscount && (
-                              <span className="text-lg text-gray-500 line-through opacity-80">
-                                {product.currency || "PKR"}{" "}
-                                {price.toLocaleString("en-IN")}
+                              <span className="text-sm sm:text-lg text-gray-500 line-through opacity-75">
+                                {product.currency || "PKR"} {price.toLocaleString("en-IN")}
                               </span>
                             )}
                           </div>
 
                           {product.tags?.length > 0 && (
-                            <div className="flex flex-wrap gap-1.5 mt-4">
-                              {product.tags.slice(0, 2).map((tag, i) => (
+                            <div className="flex flex-wrap gap-1.5 mt-3">
+                              {product.tags.slice(0, 3).map((tag, i) => (
                                 <span
                                   key={i}
-                                  className="text-xs px-2.5 py-1 rounded-full font-medium text-white"
+                                  className="text-xs px-2.5 py-0.5 rounded-full font-medium text-white"
                                   style={{ backgroundColor: tag.color || "#6366f1" }}
                                 >
                                   {tag.name}
                                 </span>
                               ))}
-                              {product.tags.length > 2 && (
+                              {product.tags.length > 3 && (
                                 <span className="text-xs text-gray-500 self-center">
-                                  +{product.tags.length - 2}
+                                  +{product.tags.length - 3}
                                 </span>
                               )}
                             </div>
@@ -263,30 +259,38 @@ function SearchResultsContent() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-3 mt-16 flex-wrap">
+              <div className="mt-12 sm:mt-16 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
+                <button
+                  onClick={() => goToPage(1)}
+                  disabled={currentPage === 1}
+                  className="hidden sm:flex items-center gap-2 px-5 py-2.5 rounded-lg bg-white border border-gray-300 disabled:opacity-40 disabled:hover:bg-white hover:bg-gray-50 transition text-sm font-medium shadow-sm"
+                >
+                  <ChevronLeft className="w-4 h-4" /> First
+                </button>
+
                 <button
                   onClick={() => goToPage(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="flex items-center gap-2 px-6 py-3 rounded-xl bg-white border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition shadow-md"
+                  className="flex items-center gap-2 px-6 py-3 rounded-xl bg-white border border-gray-300 disabled:opacity-50 hover:bg-gray-50 transition shadow-sm font-medium"
                 >
                   <ChevronLeft className="w-5 h-5" />
-                  Previous
+                  Prev
                 </button>
 
-                <div className="flex gap-2 flex-wrap justify-center">
-                  {visiblePages().map((page, i) =>
+                <div className="flex gap-2 sm:gap-2.5 flex-wrap justify-center">
+                  {visiblePages().map((page, idx) =>
                     page === "..." ? (
-                      <span key={i} className="px-4 py-3 text-gray-500">
-                        ...
+                      <span key={`ellipsis-${idx}`} className="px-4 py-3 text-gray-400 font-medium">
+                        …
                       </span>
                     ) : (
                       <button
                         key={page}
                         onClick={() => goToPage(page as number)}
-                        className={`px-5 py-3 rounded-xl font-medium transition min-w-[44px] ${
+                        className={`min-w-[42px] sm:min-w-[48px] py-3 rounded-xl font-medium transition-colors ${
                           currentPage === page
-                            ? "bg-indigo-600 text-white shadow-lg"
-                            : "bg-white border border-gray-300 hover:bg-indigo-50"
+                            ? "bg-indigo-600 text-white shadow-md"
+                            : "bg-white border border-gray-300 hover:bg-indigo-50 hover:border-indigo-300"
                         }`}
                       >
                         {page}
@@ -298,32 +302,41 @@ function SearchResultsContent() {
                 <button
                   onClick={() => goToPage(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className="flex items-center gap-2 px-6 py-3 rounded-xl bg-white border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition shadow-md"
+                  className="flex items-center gap-2 px-6 py-3 rounded-xl bg-white border border-gray-300 disabled:opacity-50 hover:bg-gray-50 transition shadow-sm font-medium"
                 >
                   Next
                   <ChevronRight className="w-5 h-5" />
+                </button>
+
+                <button
+                  onClick={() => goToPage(totalPages)}
+                  disabled={currentPage === totalPages}
+                  className="hidden sm:flex items-center gap-2 px-5 py-2.5 rounded-lg bg-white border border-gray-300 disabled:opacity-40 disabled:hover:bg-white hover:bg-gray-50 transition text-sm font-medium shadow-sm"
+                >
+                  Last <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
             )}
           </>
         )}
 
-        {/* Empty States */}
+        {/* No query */}
         {!loading && !query && (
-          <div className="text-center py-32">
-            <Search className="w-24 h-24 text-gray-300 mx-auto mb-8" />
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">Start Searching</h2>
-            <p className="text-xl text-gray-600">Type something in the search bar to find products.</p>
+          <div className="text-center py-24 sm:py-32">
+            <Search className="w-20 h-20 sm:w-24 sm:h-24 text-gray-300 mx-auto mb-6 sm:mb-8" />
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">Start Searching</h2>
+            <p className="text-lg sm:text-xl text-gray-600">Type something in the search bar to find products.</p>
           </div>
         )}
 
+        {/* No results */}
         {!loading && query && results.length === 0 && (
-          <div className="text-center py-32">
-            <Package className="w-24 h-24 text-gray-300 mx-auto mb-8" />
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">
+          <div className="text-center py-24 sm:py-32">
+            <Package className="w-20 h-20 sm:w-24 sm:h-24 text-gray-300 mx-auto mb-6 sm:mb-8" />
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">
               No results for "{query}"
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg sm:text-xl text-gray-600 max-w-xl mx-auto">
               Try different keywords, check spelling, or browse our categories.
             </p>
             <Link
@@ -345,8 +358,8 @@ export default function SearchResultsClient() {
       fallback={
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center">
           <div className="text-center">
-            <Loader2 className="w-20 h-20 animate-spin text-indigo-600 mb-8" />
-            <p className="text-2xl text-gray-700">Loading search results...</p>
+            <Loader2 className="w-16 h-16 sm:w-20 sm:h-20 animate-spin text-indigo-600 mb-6 sm:mb-8" />
+            <p className="text-xl sm:text-2xl text-gray-700">Loading search results...</p>
           </div>
         </div>
       }
