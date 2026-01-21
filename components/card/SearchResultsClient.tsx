@@ -130,15 +130,21 @@ function SearchResultsContent() {
         {/* Header */}
         <div className="text-center mb-10 md:mb-12">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-3 sm:gap-4 bg-white rounded-full px-6 sm:px-8 py-3 sm:py-4 shadow-lg mb-5 sm:mb-6"
-          >
-            <Search className="w-7 h-7 sm:w-8 sm:h-8 text-indigo-600" />
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900">
-              Results for: <span className="text-indigo-600">"{query}"</span>
-            </h1>
-          </motion.div>
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.5 }}
+  className="inline-flex items-center gap-3 sm:gap-4 
+    bg-white/80 backdrop-blur-sm border border-gray-200/70 
+    rounded-full px-5 sm:px-7 py-3 sm:py-3.5 
+    shadow-md hover:shadow-lg transition-shadow duration-300"
+>
+  <Search className="w-6 h-6 sm:w-7 sm:h-7 text-indigo-600 flex-shrink-0" />
+  
+  <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-gray-900 tracking-tight">
+    Results for:{" "}
+    <span className="text-indigo-600 break-words">"{query}"</span>
+  </h1>
+</motion.div>
           <p className="text-lg sm:text-xl text-gray-600">
             {loading ? "Searching..." : `${totalResults} product${totalResults !== 1 ? "s" : ""} found`}
           </p>
