@@ -257,7 +257,7 @@ export default async function ProductPage({
     return (
       <Link
         key={item._id}
-        href={`/products/${item._id}`} // ← corrected route (assuming your product pages are /products/[id])
+        href={`/product/${item._id}`} // ← corrected route (assuming your product pages are /products/[id])
         className="group block overflow-hidden rounded-lg bg-white shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1"
       >
         {/* Smaller image area */}
