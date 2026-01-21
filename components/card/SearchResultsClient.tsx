@@ -237,24 +237,7 @@ function SearchResultsContent() {
                             )}
                           </div>
 
-                          {product.tags?.length > 0 && (
-                            <div className="flex flex-wrap gap-1.5 mt-3">
-                              {product.tags.slice(0, 3).map((tag, i) => (
-                                <span
-                                  key={i}
-                                  className="text-xs px-2.5 py-0.5 rounded-full font-medium text-white"
-                                  style={{ backgroundColor: tag.color || "#6366f1" }}
-                                >
-                                  {tag.name}
-                                </span>
-                              ))}
-                              {product.tags.length > 3 && (
-                                <span className="text-xs text-gray-500 self-center">
-                                  +{product.tags.length - 3}
-                                </span>
-                              )}
-                            </div>
-                          )}
+                          
                         </div>
                       </div>
                     </Link>
