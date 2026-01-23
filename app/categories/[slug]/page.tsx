@@ -60,7 +60,6 @@ export default function CategoryPage({
         );
 
         if (!response.ok) {
-          
           throw new Error(`Failed to load products (${response.status})`);
         }
 
@@ -83,7 +82,6 @@ export default function CategoryPage({
           .replace(/-/g, " ")
           .replace(/\b\w/g, (char) => char.toUpperCase());
 
-        // If no active products → show "Coming Soon"
         if (activeProducts.length === 0) {
           setProducts([]);
           setCategory({
@@ -131,7 +129,6 @@ export default function CategoryPage({
     fetchCategoryProducts();
   }, [slug, router]);
 
-  // Loading State
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -143,56 +140,54 @@ export default function CategoryPage({
     );
   }
 
-  // "Coming Soon" or Error State (when no products)
   if (!category || products.length === 0) {
-  const displayName =
-    category?.name ||
-    slug.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+    const displayName =
+      category?.name ||
+      slug.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Full-screen Hero with Coming Soon */}
-      <div className="relative h-screen overflow-hidden flex items-center justify-center">
-        <Image
-          src={category?.imageUrl || "/images/fallback-category.jpg"}
-          alt={displayName}
-          fill
-          className="object-cover brightness-50"
-          priority
-          unoptimized
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="relative h-screen overflow-hidden flex items-center justify-center">
+          <Image
+            src={category?.imageUrl || "/images/fallback-category.jpg"}
+            alt={displayName}
+            fill
+            className="object-cover brightness-50"
+            priority
+            unoptimized
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
 
-        <div className="relative z-10 text-center text-white px-6">
-          <h1 className="text-5xl md:text-7xl font-bold capitalize mb-8">
-            {displayName}
-          </h1>
+          <div className="relative z-10 text-center text-white px-6">
+            <h1 className="text-5xl md:text-7xl font-bold capitalize mb-8">
+              {displayName}
+            </h1>
 
-          <div className="flex items-center justify-center gap-6 bg-white/10 backdrop-blur-md px-10 py-6 rounded-3xl shadow-2xl">
-            <Clock className="w-12 h-12" />
-            <p className="text-4xl md:text-5xl font-semibold">Coming Soon</p>
+            <div className="flex items-center justify-center gap-6 bg-white/10 backdrop-blur-md px-10 py-6 rounded-3xl shadow-2xl">
+              <Clock className="w-12 h-12" />
+              <p className="text-4xl md:text-5xl font-semibold">Coming Soon</p>
+            </div>
+
+            <p className="mt-12 text-xl md:text-2xl text-white/90 max-w-3xl mx-auto">
+              {error
+                ? "Unable to load this category right now. Please try again later."
+                : "We're preparing amazing products for you. Stay tuned!"}
+            </p>
+
+            <Link
+              href="/"
+              className="mt-12 inline-flex items-center gap-3 px-8 py-4 bg-indigo-600 text-white font-medium text-lg rounded-xl hover:bg-indigo-700 transition shadow-lg"
+            >
+              <ArrowLeft className="w-6 h-6" />
+              Back to Home
+            </Link>
           </div>
-
-          <p className="mt-12 text-xl md:text-2xl text-white/90 max-w-3xl mx-auto">
-            {error
-              ? "Unable to load this category right now. Please try again later."
-              : "We're preparing amazing products for you. Stay tuned!"}
-          </p>
-
-          <Link
-            href="/"
-            className="mt-12 inline-flex items-center gap-3 px-8 py-4 bg-indigo-600 text-white font-medium text-lg rounded-xl hover:bg-indigo-700 transition shadow-lg"
-          >
-            <ArrowLeft className="w-6 h-6" />
-            Back to Home
-          </Link>
         </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
-  // Main Content with products (unchanged)
+  // ── MAIN CONTENT ───────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Banner */}
@@ -219,8 +214,8 @@ export default function CategoryPage({
       </div>
 
       {/* Products Section */}
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
           <p className="text-lg text-gray-700 mb-4 sm:mb-0">
             Showing <span className="font-semibold">{products.length}</span> products
           </p>
@@ -250,53 +245,67 @@ export default function CategoryPage({
           layout
           className={
             viewMode === "grid"
-              ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
-              : "space-y-6"
+              ? "grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6"
+              : "space-y-5"
           }
         >
-          {products.map((product) => (
-            <motion.div
-              key={product._id}
-              layout
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-              className={`group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all overflow-hidden ${viewMode === "list" ? "flex" : ""}`}
-            >
-              <Link href={`/product/${product._id}`} className="block">
-                <div className={`relative overflow-hidden ${viewMode === "grid" ? "aspect-square" : "w-72 h-72"}`}>
-                  <Image
-                    src={product.thumbnail || product.images[0]?.url || "/images/placeholder.jpg"}
-                    alt={product.name}
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-500"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                  />
-                </div>
+          {products.map((product) => {
+            const hasDiscount = product.discountPrice && product.discountPrice < product.price;
+            const displayPrice = hasDiscount ? product.discountPrice : product.price;
 
-                <div className={`p-6 ${viewMode === "list" ? "flex-1" : ""}`}>
-                  <h3 className="font-semibold text-xl text-gray-900 line-clamp-2 mb-3">
-                    {product.name}
-                  </h3>
-
-                  <div className="flex items-end justify-between">
-                    <div>
-                      <span className="text-xl font-bold text-gray-500 line-through">
-                        RS{product.price}
-                      </span>
-                    </div>
+            return (
+              <motion.div
+                key={product._id}
+                layout
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+                className={`group bg-white rounded-xl shadow hover:shadow-lg transition-all overflow-hidden ${
+                  viewMode === "list" ? "flex flex-row items-center gap-4 p-4" : ""
+                }`}
+              >
+                <Link href={`/product/${product._id || product.slug}`} className="block w-full">
+                  <div
+                    className={`relative overflow-hidden ${
+                      viewMode === "grid" ? "aspect-square" : "w-32 h-32 sm:w-40 sm:h-40 flex-shrink-0"
+                    }`}
+                  >
+                    <Image
+                      src={product.thumbnail || product.images[0]?.url || "/images/placeholder.jpg"}
+                      alt={product.name}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                    />
                   </div>
 
-                  {product.rating !== undefined && product.rating > 0 && (
-                    <p className="mt-3 text-sm text-gray-600 flex items-center gap-1">
-                      ⭐ <span className="font-medium">{product.rating.toFixed(1)}</span>
-                      <span className="text-gray-500">rating</span>
-                    </p>
-                  )}
-                </div>
-              </Link>
-            </motion.div>
-          ))}
+                  <div className={`p-3 sm:p-4 ${viewMode === "list" ? "flex-1" : ""}`}>
+                    <h3 className="font-medium text-sm sm:text-base text-gray-900 line-clamp-2 mb-2 group-hover:text-indigo-700 transition-colors">
+                      {product.name}
+                    </h3>
+
+                    <div className="flex items-baseline gap-2 flex-wrap">
+                      <span className="text-base sm:text-lg font-bold text-green-700">
+                        RS {displayPrice.toLocaleString()}
+                      </span>
+
+                      {hasDiscount && (
+                        <span className="text-xs sm:text-sm text-gray-500 line-through">
+                          RS {product.price.toLocaleString()}
+                        </span>
+                      )}
+                    </div>
+
+                    {product.rating !== undefined && product.rating > 0 && (
+                      <p className="mt-1.5 text-xs sm:text-sm text-gray-600 flex items-center gap-1">
+                        ⭐ <span className="font-medium">{product.rating.toFixed(1)}</span>
+                      </p>
+                    )}
+                  </div>
+                </Link>
+              </motion.div>
+            );
+          })}
         </motion.div>
       </div>
     </div>

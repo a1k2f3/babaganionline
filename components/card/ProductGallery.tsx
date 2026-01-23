@@ -20,7 +20,7 @@ export default function ProductGallery({
   const [activeIndex, setActiveIndex] = useState(0)
   const activeImage = images[activeIndex] ?? images[0]
 
-  // For zoom effect on desktop
+  // Zoom state
   const [isZoomed, setIsZoomed] = useState(false)
   const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 })
 
@@ -32,10 +32,18 @@ export default function ProductGallery({
   }
 
   return (
-    <div className="space-y-5">
-      {/* Main Image with Smooth Lens Zoom */}
+    <div className="space-y-5 md:space-y-6">
+      {/* ── MAIN IMAGE ──────────────────────────────────────────────── */}
       <div
-        className="relative aspect-square rounded-2xl overflow-hidden bg-gray-100 shadow-xl cursor-zoom-in"
+        className={`
+          relative 
+          aspect-[4/4] md:aspect-[5/4] lg:aspect-square 
+          rounded-2xl md:rounded-3xl 
+          overflow-hidden 
+          bg-gray-50 
+          shadow-xl 
+          cursor-zoom-in
+        `}
         onMouseEnter={() => setIsZoomed(true)}
         onMouseLeave={() => {
           setIsZoomed(false)
@@ -43,35 +51,43 @@ export default function ProductGallery({
         }}
         onMouseMove={handleMouseMove}
       >
-       <Image
-  src={activeImage.url}
-  alt={productName}
-  fill
-  sizes="(max-width: 540px) 90vw, (max-width: 1024px) 70vw, 50vw"
-  priority={activeIndex === 0}
-  quality={95}           // ← bump to 95–100 for better source material
-  className={`
-    object-contain
-    transition-transform duration-200 ease-out
-    will-change-transform           // helps browser prepare for scale
-    backface-hidden                 // fixes many pixelation glitches in Chrome
-    image-rendering-auto            // or try -crisp-edges / pixelated depending on your images
-  `}
-  style={{
-    transform: isZoomed ? "scale(2.4)" : "scale(1)",
-    transformOrigin: `${mousePosition.x}% ${mousePosition.y}%`,
-  }}
-/>
+        <Image
+          src={activeImage.url}
+          alt={`${productName} - main view`}
+          fill
+          // ── Critical for responsive & correct srcset generation ──
+          sizes={`
+            (max-width: 540px) 90vw,
+            (max-width: 768px) 80vw,
+            (max-width: 1024px) 60vw,
+            (max-width: 1280px) 50vw,
+            45vw
+          `}
+          // ── Quality settings for HD/sharp look ────────────────────
+          quality={92}           // 90–95 is sweet spot for product photos (sharp but not 3MB+)
+          priority={activeIndex === 0}  // Only first image gets priority
+          // ── Improves perceived sharpness during zoom ──────────────
+          className={`
+            object-contain           // ← changed: better for product photos (no forced crop)
+            transition-transform duration-300 ease-out
+            will-change-transform
+            backface-hidden
+          `}
+          style={{
+            transform: isZoomed ? "scale(2.2)" : "scale(1)",   // 2.2–2.5 feels natural
+            transformOrigin: `${mousePosition.x}% ${mousePosition.y}%`,
+          }}
+        />
 
-        {/* Zoom Hint - Only on desktop */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white text-xs px-4 py-2 rounded-full opacity-0 pointer-events-none md:opacity-100 transition-opacity duration-300">
-          Hover to zoom
+        {/* Zoom hint (desktop only) */}
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white text-xs md:text-sm px-4 py-2 rounded-full opacity-0 md:opacity-80 pointer-events-none transition-opacity duration-300">
+          Hover to zoom • Drag to explore
         </div>
       </div>
 
-      {/* Thumbnails - Only show if more than 1 image */}
+      {/* ── THUMBNAILS ──────────────────────────────────────────────── */}
       {images.length > 1 && (
-        <div className="grid grid-cols-5 gap-3 md:gap-4">
+        <div className="grid grid-cols-5 gap-2.5 sm:gap-3 md:gap-4">
           {images.map((img, index) => (
             <button
               key={img.id}
@@ -79,29 +95,27 @@ export default function ProductGallery({
                 setActiveIndex(index)
                 setIsZoomed(false)
               }}
-              aria-label={`View image ${index + 1} of ${images.length}`}
+              aria-label={`Select image ${index + 1} of ${images.length}`}
               className={`
-                relative aspect-square rounded-xl overflow-hidden transition-all duration-300
-                ${
-                  activeIndex === index
-                    ? "ring-4 ring-indigo-500 ring-offset-2 shadow-lg scale-105"
-                    : "hover:scale-105 hover:ring-2 hover:ring-indigo-400 hover:shadow-md"
+                relative aspect-square rounded-xl overflow-hidden 
+                transition-all duration-300 ease-in-out
+                ${activeIndex === index
+                  ? "ring-3 md:ring-4 ring-indigo-600 ring-offset-2 shadow-lg scale-[1.04]"
+                  : "hover:scale-105 hover:ring-2 hover:ring-indigo-400 hover:shadow-md"
                 }
                 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500
               `}
             >
               <Image
-                src={img.url || "/placeholder.svg"}
-                alt={`${productName} - View ${index + 1}`}
+                src={img.url}
+                alt={`${productName} - thumbnail ${index + 1}`}
                 fill
                 sizes="(max-width: 640px) 20vw, (max-width: 1024px) 15vw, 10vw"
-                quality={85} // Slightly lower than main image is fine
+                quality={80}
                 className="object-cover"
               />
-
-              {/* Active Indicator Overlay */}
               {activeIndex === index && (
-                <div className="absolute inset-0 bg-indigo-600/20 pointer-events-none" />
+                <div className="absolute inset-0 bg-indigo-600/15 pointer-events-none" />
               )}
             </button>
           ))}

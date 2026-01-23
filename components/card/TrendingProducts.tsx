@@ -22,7 +22,7 @@ interface TrendingProductsProps {
 
 export default function TrendingProducts({ limit = 12 }: TrendingProductsProps) {
   const { data, error, isLoading } = useSWR(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/products?tags=trending-now&limit=${limit}`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/products/random`,
     fetcher,
     {
       revalidateOnFocus: false,

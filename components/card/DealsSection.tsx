@@ -1,4 +1,3 @@
-// components/card/DealsSection.tsx
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -10,21 +9,24 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 interface Product {
   _id: string;
-  slug?: string;
   name: string;
   price: number;
+  discountPrice?: number;
+  currency: string;
+  stock: number;
   thumbnail?: string;
   images?: { url: string }[];
+  slug?: string;
+  createdAt: string;
 }
 
 export default function DealsSection() {
-  // Use ref instead of state for countdowns — avoids re-renders on init
   const timeLeftRef = useRef<Record<string, number>>({});
-  const [_, forceUpdate] = useState({}); // Dummy state to trigger re-render every second
+  const [_, forceUpdate] = useState({});
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const { data, isLoading, error } = useSWR(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/products?tags=70-off`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/products/new/arrival`,
     fetcher,
     {
       revalidateOnFocus: false,
@@ -32,9 +34,8 @@ export default function DealsSection() {
     }
   );
 
-  const products: Product[] = data?.data || [];
+  const products: Product[] = data?.products || [];
 
-  // Stable format function
   const formatTime = useCallback((seconds: number): string => {
     if (seconds <= 0) return "00:00:00";
     const h = Math.floor(seconds / 3600);
@@ -43,38 +44,30 @@ export default function DealsSection() {
     return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
   }, []);
 
-  // Initialize countdowns ONCE when products first load
   useEffect(() => {
     if (!products.length) {
       timeLeftRef.current = {};
       return;
     }
 
-    let shouldInitialize = false;
+    let shouldUpdate = false;
 
     products.forEach((product) => {
       if (!(product._id in timeLeftRef.current)) {
-        // New product → assign random time (2h to 12h)
-        timeLeftRef.current[product._id] = Math.floor(Math.random() * 36000) + 7200; // 7200–43200 seconds
-        shouldInitialize = true;
+        timeLeftRef.current[product._id] = Math.floor(Math.random() * 36000) + 7200;
+        shouldUpdate = true;
       }
-      // Existing products keep their current countdown
     });
 
-    // Clean up removed products
     Object.keys(timeLeftRef.current).forEach((id) => {
       if (!products.some((p) => p._id === id)) {
         delete timeLeftRef.current[id];
       }
     });
 
-    // Only force update if we added new timers
-    if (shouldInitialize) {
-      forceUpdate({});
-    }
-  }, [products]); // Safe now — we don't call setState that affects deps
+    if (shouldUpdate) forceUpdate({});
+  }, [products]);
 
-  // Global countdown ticker — runs every second
   useEffect(() => {
     intervalRef.current = setInterval(() => {
       let hasActive = false;
@@ -88,23 +81,18 @@ export default function DealsSection() {
         }
       });
 
-      if (hasActive) {
-        forceUpdate({}); // Trigger re-render
-      } else if (intervalRef.current) {
+      if (hasActive) forceUpdate({});
+      else if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
     }, 1000);
 
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
+      if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, []); // Runs only once
+  }, []);
 
-  // Error / Loading / Empty states
   if (error) {
     console.error("Deals fetch error:", error);
     return <div className="text-center py-20 text-red-500">Failed to load deals.</div>;
@@ -139,7 +127,12 @@ export default function DealsSection() {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
       {products.map((product) => {
-        const originalPrice = Math.round(product.price / 0.3);
+        const hasDiscount = product.discountPrice && product.discountPrice < product.price;
+        const displayPrice = hasDiscount ? product.discountPrice : product.price;
+        const discountPercent = hasDiscount
+          ? Math.round(((product.price - product.discountPrice!) / product.price) * 100)
+          : 0;
+
         const remainingSeconds = timeLeftRef.current[product._id] ?? 0;
 
         return (
@@ -158,9 +151,11 @@ export default function DealsSection() {
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
                 />
 
-                <div className="absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-                  -70%
-                </div>
+                {hasDiscount && (
+                  <div className="absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                    -{discountPercent}%
+                  </div>
+                )}
 
                 <div className="absolute top-2 right-2 bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
                   <span className="w-2 h-2 bg-black rounded-full animate-ping" />
@@ -174,13 +169,16 @@ export default function DealsSection() {
                 </h3>
 
                 <div className="flex items-end justify-between">
-                  <div>
+                  <div className="flex items-baseline gap-2">
                     <span className="text-lg font-bold text-green-600">
-                      RS {product.price.toLocaleString()}
+                      {product.currency} {displayPrice.toLocaleString()}
                     </span>
-                    <span className="text-xs text-gray-500 line-through ml-2">
-                      RS {originalPrice.toLocaleString()}
-                    </span>
+
+                    {hasDiscount && (
+                      <span className="text-xs text-gray-500 line-through">
+                        {product.currency} {product.price.toLocaleString()}
+                      </span>
+                    )}
                   </div>
                 </div>
 

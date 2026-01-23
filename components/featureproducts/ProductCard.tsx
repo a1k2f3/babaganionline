@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { ShoppingCart, Star } from "lucide-react";
+import { Star } from "lucide-react";
 
 interface Tag {
   name: string;
@@ -37,34 +37,34 @@ interface Product {
   brand?: Brand | null;
   tags?: Tag[];
   rating?: number;
+  // If you later want to add flash-deal timer per product, you can add:
+  // isFlash?: boolean;
 }
 
 interface ProductCardProps {
   product: Product;
+  showFlashBadge?: boolean; // optional prop — show "FLASH" badge like in deals
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
-  // Safe defaults
+export default function ProductCard({
+  product,
+  showFlashBadge = false, // default: false → normal product card
+}: ProductCardProps) {
+  // Safe fallbacks
   const safeImage = product.thumbnail || product.images?.[0]?.url || "/placeholder.jpg";
-  const safeCategory = product.category?.name || "Uncategorized";
-  const safeBrand = product.brand?.name || "Brand";
-  const firstTag = product.tags?.[0];
-  const displayRating = product.rating ?? 4.5;
+  const currency = product.currency || "Rs";
 
-  // Force numbers (protect against string values from API)
   const originalPrice = Number(product.price) || 0;
   const salePrice = product.discountPrice !== undefined ? Number(product.discountPrice) : undefined;
 
-  // Determine final price and discount status
-  const hasDiscount =
-    salePrice !== undefined &&
-    salePrice > 0 &&
-    salePrice < originalPrice;
-
+  const hasDiscount = salePrice !== undefined && salePrice > 0 && salePrice < originalPrice;
   const finalPrice = hasDiscount ? salePrice : originalPrice;
-  const discountPercentage = hasDiscount
+
+  const discountPercent = hasDiscount
     ? Math.round(((originalPrice - salePrice) / originalPrice) * 100)
     : 0;
+
+  const displayRating = product.rating ?? 4.5;
 
   return (
     <motion.div
@@ -72,72 +72,61 @@ export default function ProductCard({ product }: ProductCardProps) {
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       viewport={{ once: true }}
-      className="group w-full max-w-[280px] sm:max-w-sm mx-auto"
+      className="group block"
     >
       <Link href={`/product/${product._id}`} className="block h-full">
-        <div className="h-80 w-40 flex flex-col bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg hover:border-gray-300 transition-all duration-300">
-          {/* Image Container */}
-          <div className="relative aspect-square flex-shrink-0">
+        <div className="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+          {/* Image + Badges */}
+          <div className="relative aspect-square">
             <Image
               src={safeImage}
               alt={product.name}
               fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
               className="object-cover group-hover:scale-105 transition-transform duration-500"
-              priority={false}
             />
 
-            {/* Top-left Tag */}
-            {firstTag && (
-              <span
-                className="absolute top-3 left-3 px-3 py-1 text-xs font-semibold text-white shadow-md rounded-full z-10"
-                style={{ backgroundColor: firstTag.color || "#6366f1" }}
-              >
-                {firstTag.name.toUpperCase()}
-              </span>
-            )}
-
-            {/* Top-right Discount Badge */}
-            {hasDiscount && discountPercentage > 5 && (  // hide very small discounts
-              <div className="absolute top-3 right-3 z-10">
-                <span className="inline-flex items-center px-3 py-1.5 bg-red-600 text-white text-xs font-bold rounded-full shadow-md">
-                  {discountPercentage}% OFF
-                </span>
+            {/* Discount badge - top left - red like DealsSection */}
+            {hasDiscount && discountPercent > 5 && (
+              <div className="absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg z-10">
+                -{discountPercent}%
               </div>
             )}
 
-            
+            {/* Flash / urgency badge - top right */}
+            {showFlashBadge && (
+              <div className="absolute top-2 right-2 bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded flex items-center gap-1 shadow z-10">
+                <span className="w-2 h-2 bg-black rounded-full animate-ping" />
+                FLASH
+              </div>
+            )}
           </div>
 
-          {/* Content */}
-          <div className="flex flex-col flex-grow p-4 pt-4 space-y-2.5">
-            
-
-            <h3 className="font-medium text-base sm:text-lg text-gray-900 line-clamp-2 min-h-[2.75rem] sm:min-h-[3.25rem]">
+          {/* Content area */}
+          <div className="p-3">
+            <h3 className="text-sm font-medium text-gray-800 line-clamp-2 mb-2 group-hover:text-orange-600 transition-colors min-h-[2.75rem]">
               {product.name}
             </h3>
 
-            {/* Price & Rating */}
-            <div className="flex items-center justify-between mt-auto pt-2">
-              {/* Price */}
-              <div className="flex items-baseline gap-2.5">
-                <span
-                  className={`text-lg sm:text-xl font-bold ${
-                    hasDiscount ? "text-red-600" : "text-gray-900"
-                  }`}
-                >
-                  Rs {finalPrice.toLocaleString("en-IN")}
+            {/* Price row */}
+            <div className="flex items-end justify-between">
+              <div className="flex items-baseline gap-2">
+                <span className="text-lg font-bold text-green-600">
+                  {currency} {finalPrice.toLocaleString("en-IN")}
                 </span>
 
                 {hasDiscount && (
-                  <span className="text-sm text-gray-500 line-through">
-                    Rs {originalPrice.toLocaleString("en-IN")}
+                  <span className="text-xs text-gray-500 line-through ml-1">
+                    {currency} {originalPrice.toLocaleString("en-IN")}
                   </span>
                 )}
               </div>
 
-              {/* Rating */}
-              
+              {/* Optional small rating - can remove if not needed */}
+              {/* <div className="flex items-center text-xs text-amber-500">
+                <Star size={14} className="fill-current" />
+                <span className="ml-1">{displayRating.toFixed(1)}</span>
+              </div> */}
             </div>
           </div>
         </div>
