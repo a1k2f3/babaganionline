@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/avbar";
 import Footer from "@/components/footer/Footer";
+import Whatsaapbutton from "@/components/card/Whatsaapbutton.tsx"
 // import BottomNavbar from "@/components/ui/BottomNavbar";
 
 // Use Inter – 100% stable, looks almost exactly like Geist
@@ -161,7 +162,9 @@ export default function RootLayout({
         <Navbar />
         <main className="min-h-screen pt-6 md:pt-16 pb-20 lg:pb-0">
           {children}
+          <Whatsaapbutton/>
         </main>
+
         <Footer />
         {/* <BottomNavbar /> */}
       </body>
