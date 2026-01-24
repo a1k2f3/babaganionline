@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import InputField from "./InputField";
 import Link from "next/link";
 import Button from "./Button";
+import GoogleLoginButton from "./Googleloginbutton";
 // import SocialLoginButton from "./SocialLoginbutton";
 
 const SignupForm: React.FC = () => {
@@ -145,6 +146,7 @@ const SignupForm: React.FC = () => {
             Login
           </Link>
         </p>
+        <GoogleLoginButton/>
       </div>
 
       {/* Uncomment when you implement social auth */}

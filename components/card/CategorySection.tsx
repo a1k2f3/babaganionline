@@ -212,6 +212,7 @@ export default function CategoriesSection() {
           className="flex gap-4 sm:gap-6 overflow-x-auto scrollbar-hide scroll-smooth px-4 sm:px-8 py-4 snap-x snap-mandatory"
         >
           {categories.map((cat, index) => (
+            
             <motion.div
               key={cat._id}
               className="flex-shrink-0 w-[215px] xs:w-[240px] sm:w-64 md:w-72 snap-start"

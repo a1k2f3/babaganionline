@@ -6,7 +6,7 @@ import Navbar from "@/components/avbar";
 import Footer from "@/components/footer/Footer";
 import Whatsaapbutton from "@/components/card/Whatsaapbutton"
 // import BottomNavbar from "@/components/ui/BottomNavbar";
-
+import { GoogleOAuthProvider } from "@react-oauth/google";
 // Use Inter – 100% stable, looks almost exactly like Geist
 const inter = Inter({
   subsets: ["latin"],
@@ -161,7 +161,11 @@ export default function RootLayout({
       <body className={`${inter.variable} font-sans antialiased bg-gray-50 text-gray-900`}>
         <Navbar />
         <main className="min-h-screen pt-6 md:pt-16 pb-20 lg:pb-0">
-          {children}
+          <GoogleOAuthProvider
+  clientId={"951319721836-ugom4e2tv9n462jjndnl4abjjpvi96f1.apps.googleusercontent.com"}
+>
+  {children}
+</GoogleOAuthProvider>
           <Whatsaapbutton/>
         </main>
 
