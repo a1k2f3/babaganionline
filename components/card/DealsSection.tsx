@@ -4,9 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import useSWR from "swr";
-
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
-
 interface Product {
   _id: string;
   name: string;
@@ -19,7 +17,6 @@ interface Product {
   slug?: string;
   createdAt: string;
 }
-
 export default function DealsSection() {
   const timeLeftRef = useRef<Record<string, number>>({});
   const [_, forceUpdate] = useState({});
@@ -97,7 +94,6 @@ export default function DealsSection() {
     console.error("Deals fetch error:", error);
     return <div className="text-center py-20 text-red-500">Failed to load deals.</div>;
   }
-
   if (isLoading) {
     return (
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
@@ -138,7 +134,7 @@ export default function DealsSection() {
         return (
           <Link
             key={product._id}
-            href={`/product/${ product._id}`}
+            href={`/product/${product._id}`}
             className="group block"
           >
             <div className="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
@@ -176,7 +172,7 @@ export default function DealsSection() {
 
                     {hasDiscount && (
                       <span className="text-xs text-gray-500 line-through">
-                        {product.currency} {product.price}
+                        {product.currency} {product.price.toLocaleString()}
                       </span>
                     )}
                   </div>
