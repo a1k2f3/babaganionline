@@ -26,6 +26,8 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
       className="group relative overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer"
     >
       {/* Image Container */}
+        <Link href={`/categories/${slug}`} className="block">
+          
       <div className="relative w-full h-48 md:h-56 overflow-hidden">
         <Image
           src={imageUrl}
@@ -53,11 +55,10 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
 
       {/* Content */}
       <div className="p-4 md:p-6">
-        <Link href={`/categories/${slug}`} className="block">
           <motion.h3
             whileHover={{ color: "#3B82F6" }}
             className="text-lg md:text-xl font-bold text-gray-900 mb-2 leading-tight line-clamp-2 group-hover:text-blue-600 transition-colors"
-          >
+            >
             {name}
           </motion.h3>
           
@@ -65,12 +66,13 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
             initial={{ x: 10, opacity: 0 }}
             whileHover={{ x: 0, opacity: 1 }}
             className="flex items-center text-gray-600 text-sm font-medium"
-          >
+            >
             <span>Explore Collection</span>
             <ArrowRight size={16} className="ml-1 group-hover:translate-x-1 transition-transform" />
           </motion.div>
-        </Link>
+        
       </div>
+            </Link>
 
       {/* Hover Effect Ring */}
       <motion.div
