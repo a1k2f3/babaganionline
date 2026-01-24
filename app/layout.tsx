@@ -4,7 +4,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/avbar";
 import Footer from "@/components/footer/Footer";
-import Whatsaapbutton from "@/components/card/Whatsaapbutton.tsx"
+import Whatsaapbutton from "@/components/card/Whatsaapbutton"
 // import BottomNavbar from "@/components/ui/BottomNavbar";
 
 // Use Inter – 100% stable, looks almost exactly like Geist

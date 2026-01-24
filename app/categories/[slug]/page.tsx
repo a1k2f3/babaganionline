@@ -250,8 +250,15 @@ export default function CategoryPage({
           }
         >
           {products.map((product) => {
-            const hasDiscount = product.discountPrice && product.discountPrice < product.price;
-            const displayPrice = hasDiscount ? product.discountPrice : product.price;
+           // Right above the map:
+const hasDiscount = product.discountPrice != null && product.discountPrice < product.price;
+
+// Then inside the map:
+const displayPrice = hasDiscount 
+  ? product.discountPrice    // TS now knows it's number
+  : product.price;
+
+
 
             return (
               <motion.div
@@ -286,7 +293,7 @@ export default function CategoryPage({
 
                     <div className="flex items-baseline gap-2 flex-wrap">
                       <span className="text-base sm:text-lg font-bold text-green-700">
-                        RS {displayPrice.toLocaleString()}
+                        RS {displayPrice}
                       </span>
 
                       {hasDiscount && (

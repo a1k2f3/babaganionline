@@ -171,12 +171,12 @@ export default function DealsSection() {
                 <div className="flex items-end justify-between">
                   <div className="flex items-baseline gap-2">
                     <span className="text-lg font-bold text-green-600">
-                      {product.currency} {displayPrice.toLocaleString()}
+                      {product.currency} {displayPrice}
                     </span>
 
                     {hasDiscount && (
                       <span className="text-xs text-gray-500 line-through">
-                        {product.currency} {product.price.toLocaleString()}
+                        {product.currency} {product.price}
                       </span>
                     )}
                   </div>
