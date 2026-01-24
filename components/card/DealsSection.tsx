@@ -138,7 +138,7 @@ export default function DealsSection() {
         return (
           <Link
             key={product._id}
-            href={`/product/${product.slug || product._id}`}
+            href={`/product/${ product._id}`}
             className="group block"
           >
             <div className="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
