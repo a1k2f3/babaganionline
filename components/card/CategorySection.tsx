@@ -173,9 +173,7 @@ export default function CategoriesSection() {
           viewport={{ once: true }}
           className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4"
         >
-          <span className="bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-            Shop by Category
-          </span>
+          
         </motion.h2>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
           Explore our handpicked collections
