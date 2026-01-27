@@ -265,7 +265,7 @@ console.log("Fetch user response status:", response.status);
 
             <button
               type="button"
-              onClick={() => router.push("/addresses")} // Or open a modal to add/edit
+              onClick={() => router.push("/profile/addresses")} // Or open a modal to add/edit
               className="mt-6 text-indigo-600 font-medium hover:underline"
             >
               Manage Addresses →
