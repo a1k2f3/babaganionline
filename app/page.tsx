@@ -1,5 +1,3 @@
-// app/page.tsx
-
 import HeroSection from '@/components/hero/Herosection';
 import DealsSection from '@/components/card/DealsSection';
 import CategoriesSection from '@/components/card/CategorySection';
@@ -15,20 +13,19 @@ export const metadata = {
 export default function Home() {
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      {/* 1. Hero – full-bleed feel, slightly taller on desktop */}
-      <div className="relative h-[50vh] min-h-[340px] max-h-[580px] overflow-hidden md:h-[55vh] lg:h-[65vh]">
+      {/* Hero – controlled height, full-bleed feel */}
+      <div className="relative h-[45vh] min-h-[300px] max-h-[520px] md:h-[50vh] lg:h-[58vh] xl:h-[62vh] 2xl:max-h-[680px] overflow-hidden">
         <HeroSection />
       </div>
 
-      {/* 2. Categories – immediately after hero, clean & inviting */}
+      {/* Categories */}
       <section className="py-12 md:py-16 lg:py-20 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
           <CategoriesSection />
         </div>
       </section>
 
-      {/* 3. Flash Deals – urgency with better contrast & spacing */}
+      {/* Flash Deals */}
       <section className="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-white to-gray-100 dark:from-gray-900 dark:to-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-extrabold text-center mb-10 md:mb-14 text-red-600 dark:text-red-400 tracking-tight">
@@ -38,7 +35,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 4. Trending – premium feel with accent color */}
+      {/* Trending */}
       <section className="py-12 md:py-16 lg:py-20 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-extrabold text-center mb-10 md:mb-14 text-orange-600 dark:text-orange-400">
@@ -48,7 +45,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 5. New Arrivals / All Products – final discovery section */}
+      {/* New Arrivals */}
       <section className="py-12 md:py-16 lg:py-20 bg-gray-50 dark:bg-gray-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-extrabold text-center mb-10 md:mb-14 text-gray-900 dark:text-gray-100">

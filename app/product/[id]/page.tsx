@@ -241,7 +241,7 @@ export default async function ProductPage({
                 return (
                   <Link
                     key={item._id}
-                    href={`/products/${item._id}`}
+                    href={`/product/${item._id}`}
                     className="group block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1"
                   >
                     <div className="relative aspect-square bg-gray-50 overflow-hidden">
