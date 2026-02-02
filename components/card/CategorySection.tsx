@@ -1,11 +1,11 @@
 // components/sections/CategoriesSection.tsx
 "use client";
 
-import CategoryCard from "./CateGoryCard"; // Make sure path & case is correct
+import CategoryCard from "./CateGoryCard"; // fix case if needed: CateGoryCard → CategoryCard
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { useEffect, useState, useRef, useCallback } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ChevronRight } from "lucide-react";
 
 interface Category {
   _id: string;
@@ -20,10 +20,6 @@ export default function CategoriesSection() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const carouselRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
-
   // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
@@ -36,14 +32,15 @@ export default function CategoriesSection() {
           next: { revalidate: 3600 },
         });
 
-        if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
         const result = await res.json();
         if (!result.success || !Array.isArray(result.data)) {
-          throw new Error("Invalid data format");
+          throw new Error("Invalid categories data format");
         }
 
-        setCategories(result.data);
+        // Take only first 12
+        setCategories(result.data.slice(0, 12));
       } catch (err: any) {
         console.error("Categories fetch error:", err);
         setError(err.message || "Failed to load categories");
@@ -55,86 +52,22 @@ export default function CategoriesSection() {
     fetchCategories();
   }, []);
 
-  // Check scrollability
-  const updateScrollButtons = useCallback(() => {
-    if (!carouselRef.current) return;
-
-    const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
-    setCanScrollLeft(scrollLeft > 10);
-    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
-  }, []);
-
-  useEffect(() => {
-    const carousel = carouselRef.current;
-    if (!carousel) return;
-
-    updateScrollButtons();
-    carousel.addEventListener("scroll", updateScrollButtons);
-
-    const checkOnResize = () => updateScrollButtons();
-    window.addEventListener("resize", checkOnResize);
-
-    return () => {
-      carousel.removeEventListener("scroll", updateScrollButtons);
-      window.removeEventListener("resize", checkOnResize);
-    };
-  }, [categories.length, updateScrollButtons]);
-
-  // Smooth scroll function
-  const scroll = useCallback((direction: "left" | "right") => {
-    if (!carouselRef.current) return;
-
-    const scrollAmount = carouselRef.current.clientWidth * 0.8;
-    const newScroll =
-      direction === "left"
-        ? carouselRef.current.scrollLeft - scrollAmount
-        : carouselRef.current.scrollLeft + scrollAmount;
-
-    carouselRef.current.scrollTo({
-      left: newScroll,
-      behavior: "smooth",
-    });
-  }, []);
-
-  // Auto-scroll
-  useEffect(() => {
-    if (categories.length <= 6 || loading) return;
-
-    const interval = setInterval(() => {
-      if (!carouselRef.current) return;
-
-      const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
-      const nearEnd = scrollLeft >= scrollWidth - clientWidth - 50;
-
-      if (nearEnd) {
-        carouselRef.current.scrollTo({ left: 0, behavior: "smooth" });
-      } else {
-        scroll("right");
-      }
-    }, 8000);
-
-    return () => clearInterval(interval);
-  }, [categories.length, loading, scroll]);
-
-  // Loading Skeleton
+  // Loading state
   if (loading) {
     return (
-      <section className="py-16 px-6 bg-gray-50">
+      <section className="py-16 px-5 md:px-8 bg-gray-50">
         <div className="text-center mb-10">
-          <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900">
-            Shop by Category
-          </h2>
-          <div className="w-32 h-1 bg-gradient-to-r from-blue-600 to-purple-600 mx-auto mt-4 rounded-full" />
+         
         </div>
 
-        <div className="flex gap-6 overflow-x-auto scrollbar-hide px-4 pb-4 snap-x snap-mandatory">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 md:gap-6 max-w-7xl mx-auto">
           {[...Array(8)].map((_, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, x: 60 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.1 }}
-              className="flex-shrink-0 w-64 h-56 bg-gray-200 rounded-2xl animate-pulse"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.06 }}
+              className="h-64 bg-gray-200 rounded-2xl animate-pulse"
             />
           ))}
         </div>
@@ -142,120 +75,82 @@ export default function CategoriesSection() {
     );
   }
 
-  // Error State
+  // Error state
   if (error) {
     return (
       <section className="py-20 px-6 bg-gray-50 text-center">
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="inline-block p-8 bg-red-50 rounded-2xl border border-red-200"
+          className="inline-block p-10 bg-red-50 rounded-2xl border border-red-200"
         >
-          <p className="text-red-700 text-lg mb-4">{error}</p>
+          <p className="text-red-700 text-lg mb-6">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition"
+            className="px-8 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition"
           >
-            Retry
+            Try Again
           </button>
         </motion.div>
       </section>
     );
   }
 
+  const showViewAll = categories.length === 12; // or always show if you prefer
+
   return (
-    <section className="py-16 px-6 bg-gradient-to-b from-gray-50 to-white">
+    <section className="py-16 px-5 md:px-8 bg-gradient-to-b from-gray-50 to-white">
       {/* Header */}
-      <div className="text-center mb-12">
+      <div className="text-center mb-12 md:mb-14">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4"
+          className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-3"
         >
-          
+          Shop by Category
         </motion.h2>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Explore our handpicked collections
+        <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
+          Discover our curated collections
         </p>
       </div>
 
-      {/* Horizontal Carousel */}
-      <div className="relative max-w-7xl mx-auto">
-        {/* Left Arrow */}
-        {canScrollLeft && (
-          <button
-            onClick={() => scroll("left")}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white/90 backdrop-blur rounded-full shadow-xl flex items-center justify-center hover:scale-110 transition md:left-4"
-            aria-label="Scroll left"
+      {/* Categories Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 md:gap-6 max-w-7xl mx-auto">
+        {categories.map((cat, index) => (
+          <motion.div
+            key={cat._id}
+            initial={{ opacity: 0, y: 25 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{
+              delay: index * 0.05,
+              duration: 0.5,
+              ease: "easeOut",
+            }}
           >
-            <ChevronLeft size={28} className="text-gray-800" />
-          </button>
-        )}
-
-        {/* Right Arrow */}
-        {canScrollRight && (
-          <button
-            onClick={() => scroll("right")}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white/90 backdrop-blur rounded-full shadow-xl flex items-center justify-center hover:scale-110 transition md:right-4"
-            aria-label="Scroll right"
-          >
-            <ChevronRight size={28} className="text-gray-800" />
-          </button>
-        )}
-
-        {/* Carousel Items */}
-        <div
-          ref={carouselRef}
-          className="flex gap-4 sm:gap-6 overflow-x-auto scrollbar-hide scroll-smooth px-4 sm:px-8 py-4 snap-x snap-mandatory"
-        >
-          {categories.map((cat, index) => (
-            
-            <motion.div
-              key={cat._id}
-              className="flex-shrink-0 w-[215px] xs:w-[240px] sm:w-64 md:w-72 snap-start"
-              initial={{ opacity: 0, x: 80 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{
-                delay: index * 0.08,
-                duration: 0.6,
-                ease: "easeOut",
-              }}
-            >
-              <CategoryCard
-                name={cat.name}
-                slug={cat.slug}
-                imageUrl={cat.image.url}
-                productCount={cat.productCount}
-              />
-            </motion.div>
-          ))}
-        </div>
+            <CategoryCard
+              name={cat.name}
+              slug={cat.slug}
+              imageUrl={cat.image.url}
+              productCount={cat.productCount}
+            />
+          </motion.div>
+        ))}
       </div>
 
-      {/* View All Link */}
-      {categories.length > 6 && (
-        <div className="text-center mt-12">
+      {/* View All Button */}
+      {showViewAll && (
+        <div className="text-center mt-12 md:mt-16">
           <Link
             href="/categories"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-2xl hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg"
+            className="inline-flex items-center gap-2.5 px-9 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold text-lg rounded-2xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
           >
             View All Categories
-            <ChevronRight size={20} />
+            <ChevronRight size={22} />
           </Link>
         </div>
       )}
-
-      {/* Stats - currently empty */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto text-center"
-      >
-        {/* You can add stats here later */}
-      </motion.div>
     </section>
   );
 }

@@ -9,7 +9,7 @@ import ProductGallery from "@/components/card/ProductGallery";
 import ReviewsSection from "@/components/card/ReviewsSection";
 import ProductTabs from "@/components/card/ProductTabs";
 import AddReviewForm from "@/components/card/AddReviewForm";
-import ProductActions from "@/components/card/ProducActions";
+import ProductActions from "@/components/card/ProducActions"; // fixed typo
 
 async function getProduct(id: string) {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -58,7 +58,7 @@ export default async function ProductPage({
         .map((line: string) => line.replace(/^[-•*]\s*/, "").trim())
     : ["Quality fabric", "Comfortable fit", "Modern design"];
 
-  // Discount logic
+  // Price calculations
   const originalPrice = Number(product.price) || 0;
   const salePrice = product.discountPrice ? Number(product.discountPrice) : null;
   const hasDiscount = salePrice !== null && salePrice > 0 && salePrice < originalPrice;
@@ -68,11 +68,11 @@ export default async function ProductPage({
   const displayPrice = hasDiscount ? salePrice : originalPrice;
 
   return (
-    <div className="min-h-screen bg-gray-50/40 py-6 sm:py-8 lg:py-12">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50/70">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
         {/* Breadcrumb */}
-        <nav className="mb-6 sm:mb-8" aria-label="Breadcrumb">
-          <ol className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-sm text-gray-600">
+        <nav className="mb-6 text-sm" aria-label="Breadcrumb">
+          <ol className="flex flex-wrap items-center gap-x-2.5 text-gray-600">
             <li>
               <Link href="/" className="hover:text-indigo-600 transition-colors">
                 Home
@@ -92,15 +92,15 @@ export default async function ProductPage({
                 <span className="text-gray-400">/</span>
               </>
             )}
-            <li className="font-medium text-gray-900 truncate max-w-[180px] xs:max-w-[260px] sm:max-w-none">
+            <li className="font-medium text-gray-900 truncate max-w-[220px] sm:max-w-none">
               {product.name}
             </li>
           </ol>
         </nav>
 
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-10 xl:gap-16">
-          {/* LEFT COLUMN - Gallery + Tabs + Mobile Reviews */}
-          <div className="mx-auto w-full max-w-xl lg:max-w-none lg:mx-0 space-y-8 sm:space-y-10 lg:space-y-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 xl:gap-16">
+          {/* Left column - Gallery + Tabs */}
+          <div className="space-y-10 lg:space-y-12">
             <ProductGallery images={images} productName={product.name} />
             <ProductTabs
               descriptionPoints={descriptionPoints}
@@ -112,84 +112,58 @@ export default async function ProductPage({
             </div>
           </div>
 
-          {/* RIGHT COLUMN - Product Info */}
-          <div className="mx-auto w-full max-w-xl lg:max-w-none lg:mx-0 space-y-7 sm:space-y-9 lg:space-y-12">
-            <div className="text-center lg:text-left">
-     <h1 
-  className="
-    text-2xl sm:text-3xl md:text-4xl lg:text-4.5xl xl:text-5xl 
-    font-bold 
-    text-gray-900 
-    tracking-tight 
-    leading-[1.15]           /* slightly more relaxed line height */
-    max-w-[95%] md:max-w-[90%] lg:max-w-[85%]  /* prevents too wide lines */
-    mx-auto lg:mx-0
-    text-center lg:text-left
-    break-words
-    hyphens-auto
-  "
->
-  {product.name}
-</h1>
+          {/* Right column - Product info */}
+          <div className="space-y-8 lg:space-y-10">
+            {/* Title & Rating */}
+            <div className="space-y-4">
+              <h1 className="text-2.5xl sm:text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight leading-tight">
+                {product.name}
+              </h1>
 
-              <div className="mt-4 flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-3">
-                <div className="flex items-center gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`h-5 w-5 sm:h-6 sm:w-6 ${
-                        i < Math.round(product.rating || 0)
-                          ? "fill-yellow-400 text-yellow-400"
-                          : "text-gray-300"
-                      }`}
-                    />
-                  ))}
-                </div>
-                <span className="text-sm sm:text-base text-gray-600 font-medium">
-                  {product.reviews?.length || 0} reviews
-                </span>
+              <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+                
                 {product.stock > 0 && product.stock <= 10 && (
-                  <span className="rounded-full bg-red-50 px-3.5 py-1 text-sm font-medium text-red-700 border border-red-200">
+                  <span className="inline-flex items-center px-3 py-1 text-xs font-medium bg-red-50 text-red-700 rounded-full border border-red-200">
                     Only {product.stock} left!
                   </span>
                 )}
               </div>
             </div>
 
-            {/* ── PRICE SECTION WITH DISCOUNT ── */}
+            {/* Price Section */}
             <div className="border-b border-gray-200 pb-7">
-              <div className="flex flex-col items-center lg:items-start gap-2">
-                <div className="flex flex-wrap items-end justify-center lg:justify-start gap-3 sm:gap-4">
-                  <span className="text-5xl sm:text-6xl md:text-7xl font-black tracking-tight text-red-600">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-end gap-3 flex-wrap">
+                  <span className="text-5xl sm:text-6xl font-extrabold text-gray-900 tracking-tight">
                     {displayPrice.toLocaleString("en-IN")}
                   </span>
-                  <span className="text-2xl sm:text-3xl font-medium text-gray-600 mb-1.5">
+                  <span className="text-2xl font-medium text-gray-600 mb-1.5">
                     {product.currency || "PKR"}
                   </span>
 
-                  {hasDiscount && discountPercentage > 5 && (
-                    <span className="ml-3 sm:ml-4 mb-1.5 inline-flex items-center px-4 py-1.5 bg-gradient-to-r from-red-600 to-rose-600 text-white text-base sm:text-lg font-bold rounded-full shadow-lg">
+                  {hasDiscount && (
+                    <span className="ml-4 mb-2 inline-flex items-center px-4 py-1.5 bg-gradient-to-r from-red-500 to-rose-600 text-white font-bold text-base rounded-full shadow-sm">
                       Save {discountPercentage}%
                     </span>
                   )}
                 </div>
 
                 {hasDiscount && (
-                  <div className="text-base sm:text-lg text-gray-500 line-through opacity-80 mt-1">
-                    Original: {originalPrice.toLocaleString("en-IN")}{" "}
-                    {product.currency || "PKR"}
+                  <div className="text-base text-gray-500 line-through">
+                    {originalPrice.toLocaleString("en-IN")} {product.currency || "PKR"}
                   </div>
                 )}
               </div>
             </div>
 
-            <form id="product-form" className="space-y-9">
+            {/* Form - Size + Actions */}
+            <form id="product-form" className="space-y-8">
               {availableSizes.length > 0 && (
                 <div className="space-y-4">
-                  <h3 className="text-center lg:text-left text-lg font-semibold text-gray-800">
+                  <h3 className="text-lg font-semibold text-gray-800">
                     Select Size
                   </h3>
-                  <div className="flex flex-wrap justify-center lg:justify-start gap-3 sm:gap-4">
+                  <div className="flex flex-wrap gap-3">
                     {availableSizes.map((size, index) => (
                       <label key={size} className="cursor-pointer">
                         <input
@@ -200,7 +174,13 @@ export default async function ProductPage({
                           defaultChecked={index === 0}
                           required
                         />
-                        <div className="min-w-[3.5rem] rounded-xl border-2 border-gray-300 px-4 py-2.5 text-base font-medium text-gray-700 transition-all hover:border-indigo-400 peer-checked:border-indigo-600 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 peer-checked:shadow-sm">
+                        <div className="
+                          min-w-14 px-4 py-2.5 rounded-lg border-2 border-gray-200 
+                          text-gray-700 font-medium text-center transition-all
+                          hover:border-indigo-400 hover:shadow-sm
+                          peer-checked:border-indigo-600 peer-checked:bg-indigo-50 
+                          peer-checked:text-indigo-700 peer-checked:font-semibold
+                        ">
                           {size}
                         </div>
                       </label>
@@ -209,34 +189,37 @@ export default async function ProductPage({
                 </div>
               )}
 
-              <div className="flex justify-center lg:justify-start pt-2">
+              <div className="pt-3">
                 <ProductActions product={product} formId="product-form" />
               </div>
             </form>
 
-            <div className="flex flex-wrap justify-center lg:justify-start gap-6 sm:gap-8 pt-4 text-sm sm:text-base text-gray-700">
+            {/* Trust badges */}
+            <div className="flex flex-wrap gap-8 text-sm text-gray-600">
               <div className="flex items-center gap-2.5">
                 <Truck className="h-5 w-5 text-indigo-600" />
-                <span>Free delivery over 5000 PKR</span>
+                Free delivery over 5000 PKR
               </div>
               <div className="flex items-center gap-2.5">
                 <Shield className="h-5 w-5 text-indigo-600" />
-                <span>Secure payment</span>
+                Secure payment
               </div>
               <div className="flex items-center gap-2.5">
                 <Check className="h-5 w-5 text-indigo-600" />
-                <span>7-day returns</span>
+                7-day returns
               </div>
             </div>
 
-            <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
-              <h2 className="mb-6 text-center lg:text-left text-xl sm:text-2xl font-bold text-gray-900">
+            {/* Write a Review */}
+            <div className="rounded-2xl border border-gray-200 bg-white p-7 shadow-sm">
+              <h2 className="mb-5 text-xl font-bold text-gray-900">
                 Write a Review
               </h2>
               <AddReviewForm productId={product._id} />
             </div>
 
-            <div className="hidden lg:block lg:mt-8">
+            {/* Desktop Reviews */}
+            <div className="hidden lg:block pt-4">
               <ReviewsSection productId={product._id} />
             </div>
           </div>
@@ -244,60 +227,62 @@ export default async function ProductPage({
 
         {/* Related Products */}
         {relatedProducts?.length > 0 && (
-          <section className="mt-16 sm:mt-20 lg:mt-24 pb-8 sm:pb-12">
-            <h2 className="mb-8 text-center lg:text-left text-2xl sm:text-3xl font-bold text-gray-900">
+          <section className="mt-16 lg:mt-20 pb-12">
+            <h2 className="mb-8 text-2xl sm:text-3xl font-bold text-gray-900 text-center lg:text-left">
               You May Also Like
             </h2>
-          <div className="grid grid-cols-2 gap-3 xs:gap-4 sm:grid-cols-3 sm:gap-5 lg:grid-cols-5 lg:gap-6">
-  {relatedProducts.map((item: any) => {
-    const itemHasDiscount =
-      item.discountPrice && Number(item.discountPrice) < Number(item.price);
-    const displayPrice = itemHasDiscount ? Number(item.discountPrice) : Number(item.price);
 
-    return (
-      <Link
-        key={item._id}
-        href={`/product/${item._id}`} // ← corrected route (assuming your product pages are /products/[id])
-        className="group block overflow-hidden rounded-lg bg-white shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1"
-      >
-        {/* Smaller image area */}
-        <div className="relative aspect-square bg-gray-50 overflow-hidden">
-          <Image
-            src={item.thumbnail}
-            alt={item.name || 'Product'}
-            fill
-            className="object-cover transition-transform duration-700 group-hover:scale-105"
-            sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 20vw"
-          />
-          {itemHasDiscount && (
-            <div className="absolute top-1.5 right-1.5 z-10">
-              <span className="inline-flex items-center px-2 py-0.5 text-[10px] sm:text-xs font-bold bg-red-600 text-white rounded-full shadow">
-                {Math.round(((Number(item.price) - Number(item.discountPrice)) / Number(item.price)) * 100)}%
-              </span>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
+              {relatedProducts.map((item: any) => {
+                const hasDisc =
+                  item.discountPrice && Number(item.discountPrice) < Number(item.price);
+                const dispPrice = hasDisc ? Number(item.discountPrice) : Number(item.price);
+
+                return (
+                  <Link
+                    key={item._id}
+                    href={`/products/${item._id}`}
+                    className="group block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1"
+                  >
+                    <div className="relative aspect-square bg-gray-50 overflow-hidden">
+                      <Image
+                        src={item.thumbnail}
+                        alt={item.name || "Related product"}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                      />
+                      {hasDisc && (
+                        <div className="absolute top-2 right-2 z-10">
+                          <span className="px-2.5 py-1 text-xs font-bold bg-red-600 text-white rounded-full shadow-sm">
+                            {Math.round(
+                              ((Number(item.price) - Number(item.discountPrice)) /
+                                Number(item.price)) *
+                                100
+                            )}%
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-4">
+                      <h3 className="line-clamp-2 text-sm font-medium text-gray-800 group-hover:text-indigo-600 transition-colors min-h-[2.8em]">
+                        {item.name}
+                      </h3>
+                      <div className="mt-2 flex items-baseline gap-2.5">
+                        <span className="font-bold text-lg text-gray-900">
+                          {dispPrice.toLocaleString("en-IN")}
+                        </span>
+                        {hasDisc && (
+                          <span className="text-sm text-gray-500 line-through">
+                            {Number(item.price).toLocaleString("en-IN")}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
-          )}
-        </div>
-
-        <div className="p-3 sm:p-4">
-          <h3 className="line-clamp-2 text-xs sm:text-sm font-medium text-gray-800 group-hover:text-indigo-600 transition-colors min-h-[2.4em]">
-            {item.name}
-          </h3>
-
-          <div className="mt-1.5 flex items-baseline gap-2">
-            <p className="font-bold text-red-600 text-sm sm:text-base">
-              {displayPrice.toLocaleString('en-IN')}
-            </p>
-            {itemHasDiscount && (
-              <p className="text-xs text-gray-500 line-through opacity-75">
-                {Number(item.price).toLocaleString('en-IN')}
-              </p>
-            )}
-          </div>
-        </div>
-      </Link>
-    );
-  })}
-</div>
           </section>
         )}
       </div>

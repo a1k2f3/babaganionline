@@ -1,28 +1,37 @@
 "use client";
-import { useState, FormEvent } from 'react';
+
+import { useState, FormEvent, useEffect } from 'react';
 
 interface ReviewFormProps {
   productId: string;
   onReviewSubmitted?: () => void;
 }
 
-const ReviewForm = ({ productId, onReviewSubmitted }: ReviewFormProps) => {
+export default function ReviewForm({ productId, onReviewSubmitted }: ReviewFormProps) {
   const [rating, setRating] = useState<number>(0);
   const [hoverRating, setHoverRating] = useState<number>(0);
   const [comment, setComment] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  // Read from localStorage as plain strings (no JSON.parse needed)
-  const userId = typeof window !== 'undefined' ? localStorage.getItem('UserId') : null;
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  // ── IMPORTANT: Move localStorage access into useEffect + state ──
+  const [userId, setUserId] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+
+  // Only read localStorage after component mounts (client-only)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const storedUserId = localStorage.getItem("UserId")?.replace(/"/g, '') ?? null;
+      const storedToken = localStorage.getItem("token") ?? null;
+      setUserId(storedUserId);
+      setToken(storedToken);
+    }
+  }, []);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     setError('');
 
-    // Validation
     if (rating === 0) {
       setError('Please select a rating');
       return;
@@ -38,7 +47,6 @@ const ReviewForm = ({ productId, onReviewSubmitted }: ReviewFormProps) => {
       return;
     }
 
-    // Basic format check for MongoDB ObjectIds
     const isValidId = (id: string) => /^[0-9a-fA-F]{24}$/.test(id);
 
     if (!isValidId(userId) || !isValidId(productId)) {
@@ -58,7 +66,7 @@ const ReviewForm = ({ productId, onReviewSubmitted }: ReviewFormProps) => {
         body: JSON.stringify({
           product: productId,
           user: userId,
-          rating: rating,
+          rating,
           comment: comment.trim() || undefined,
         }),
       });
@@ -66,13 +74,10 @@ const ReviewForm = ({ productId, onReviewSubmitted }: ReviewFormProps) => {
       const responseData = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(
-          responseData.message ||
-            `Failed to submit review (${response.status})`
-        );
+        throw new Error(responseData.message || `Failed (${response.status})`);
       }
 
-      // Success
+      // Reset form
       setRating(0);
       setComment('');
       setHoverRating(0);
@@ -134,10 +139,10 @@ const ReviewForm = ({ productId, onReviewSubmitted }: ReviewFormProps) => {
           )}
         </div>
 
-        {/* Review Text */}
+        {/* Comment */}
         <div className="space-y-2">
           <label htmlFor="comment" className="block text-sm font-medium text-gray-700">
-            Your review 
+            Your review
           </label>
           <textarea
             id="comment"
@@ -158,14 +163,14 @@ const ReviewForm = ({ productId, onReviewSubmitted }: ReviewFormProps) => {
           </div>
         </div>
 
-        {/* Messages */}
+        {/* Error message */}
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
             {error}
           </div>
         )}
 
-        {/* Submit */}
+        {/* Submit area */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-4 pt-2">
           <button
             type="submit"
@@ -184,6 +189,7 @@ const ReviewForm = ({ productId, onReviewSubmitted }: ReviewFormProps) => {
               <span className="flex items-center justify-center gap-2">
                 <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
                   <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
                 </svg>
                 Submitting...
               </span>
@@ -192,7 +198,8 @@ const ReviewForm = ({ productId, onReviewSubmitted }: ReviewFormProps) => {
             )}
           </button>
 
-          {!userId && (
+          {/* ── Login message – only shown after mount ── */}
+          {!userId && userId !== null && (   // ← userId !== null prevents flash during SSR → client mount
             <p className="text-sm text-amber-700 bg-amber-50 px-4 py-2 rounded-lg">
               You need to be logged in to write a review
             </p>
@@ -201,6 +208,4 @@ const ReviewForm = ({ productId, onReviewSubmitted }: ReviewFormProps) => {
       </form>
     </div>
   );
-};
-
-export default ReviewForm;
+}

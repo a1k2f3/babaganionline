@@ -23,9 +23,7 @@ export default function Home() {
       {/* 2. Categories – immediately after hero, clean & inviting */}
       <section className="py-12 md:py-16 lg:py-20 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-extrabold text-center mb-10 md:mb-14 bg-gradient-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 bg-clip-text text-transparent">
-            Shop by Category
-          </h2>
+          
           <CategoriesSection />
         </div>
       </section>

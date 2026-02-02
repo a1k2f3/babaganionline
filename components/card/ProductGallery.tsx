@@ -20,7 +20,6 @@ export default function ProductGallery({
   const [activeIndex, setActiveIndex] = useState(0)
   const activeImage = images[activeIndex] ?? images[0]
 
-  // Zoom state
   const [isZoomed, setIsZoomed] = useState(false)
   const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 })
 
@@ -32,16 +31,19 @@ export default function ProductGallery({
   }
 
   return (
-    <div className="space-y-5 md:space-y-6">
-      {/* ── MAIN IMAGE ──────────────────────────────────────────────── */}
+    <div className="space-y-4 md:space-y-5 max-w-md lg:max-w-lg mx-auto lg:mx-0">
+      {/* MAIN IMAGE – Daraz-like compact size */}
       <div
         className={`
           relative 
-          aspect-[4/4] md:aspect-[5/4] lg:aspect-square 
-          rounded-2xl md:rounded-3xl 
+          aspect-square sm:aspect-[5/6] md:aspect-square 
+          w-full max-w-[480px] lg:max-w-[500px] 
+          mx-auto lg:mx-0
+          rounded-xl md:rounded-2xl 
           overflow-hidden 
           bg-gray-50 
-          shadow-xl 
+          shadow-md 
+          border border-gray-200/70
           cursor-zoom-in
         `}
         onMouseEnter={() => setIsZoomed(true)}
@@ -55,39 +57,37 @@ export default function ProductGallery({
           src={activeImage.url}
           alt={`${productName} - main view`}
           fill
-          // ── Critical for responsive & correct srcset generation ──
           sizes={`
             (max-width: 540px) 90vw,
-            (max-width: 768px) 80vw,
-            (max-width: 1024px) 60vw,
-            (max-width: 1280px) 50vw,
-            45vw
+            (max-width: 768px) 75vw,
+            (max-width: 1024px) 50vw,
+            (max-width: 1280px) 42vw,
+            480px
           `}
-          // ── Quality settings for HD/sharp look ────────────────────
-          quality={92}           // 90–95 is sweet spot for product photos (sharp but not 3MB+)
-          priority={activeIndex === 0}  // Only first image gets priority
-          // ── Improves perceived sharpness during zoom ──────────────
+          quality={92}
+          priority={activeIndex === 0}
           className={`
-            object-contain           // ← changed: better for product photos (no forced crop)
-            transition-transform duration-300 ease-out
+            object-contain
+            transition-transform duration-500 ease-out
             will-change-transform
-            backface-hidden
           `}
           style={{
-            transform: isZoomed ? "scale(2.2)" : "scale(1)",   // 2.2–2.5 feels natural
+            transform: isZoomed ? "scale(2.4)" : "scale(1)",
             transformOrigin: `${mousePosition.x}% ${mousePosition.y}%`,
           }}
         />
 
-        {/* Zoom hint (desktop only) */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white text-xs md:text-sm px-4 py-2 rounded-full opacity-0 md:opacity-80 pointer-events-none transition-opacity duration-300">
-          Hover to zoom • Drag to explore
+        {/* Subtle zoom overlay hint (like many modern sites) */}
+        <div className="absolute inset-0 bg-black/0 hover:bg-black/5 transition-colors pointer-events-none flex items-center justify-center">
+          <span className="hidden md:inline-block bg-black/65 text-white text-xs px-4 py-2 rounded-full opacity-0 hover:opacity-90 transition-opacity">
+            Hover to zoom
+          </span>
         </div>
       </div>
 
-      {/* ── THUMBNAILS ──────────────────────────────────────────────── */}
+      {/* THUMBNAILS – Daraz style: small, tight row */}
       {images.length > 1 && (
-        <div className="grid grid-cols-5 gap-2.5 sm:gap-3 md:gap-4">
+        <div className="grid grid-cols-5 sm:grid-cols-6 gap-2 sm:gap-2.5 max-w-[480px] lg:max-w-[500px] mx-auto lg:mx-0">
           {images.map((img, index) => (
             <button
               key={img.id}
@@ -95,28 +95,26 @@ export default function ProductGallery({
                 setActiveIndex(index)
                 setIsZoomed(false)
               }}
-              aria-label={`Select image ${index + 1} of ${images.length}`}
+              aria-label={`Image ${index + 1} of ${images.length}`}
               className={`
-                relative aspect-square rounded-xl overflow-hidden 
-                transition-all duration-300 ease-in-out
+                relative aspect-square rounded-lg overflow-hidden 
+                transition-all duration-200
+                border-2 border-transparent
                 ${activeIndex === index
-                  ? "ring-3 md:ring-4 ring-indigo-600 ring-offset-2 shadow-lg scale-[1.04]"
-                  : "hover:scale-105 hover:ring-2 hover:ring-indigo-400 hover:shadow-md"
+                  ? "border-indigo-600 shadow-sm scale-[1.04]"
+                  : "hover:border-indigo-300 hover:shadow hover:scale-[1.02]"
                 }
-                focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500
               `}
             >
               <Image
                 src={img.url}
-                alt={`${productName} - thumbnail ${index + 1}`}
+                alt={`${productName} thumbnail ${index + 1}`}
                 fill
-                sizes="(max-width: 640px) 20vw, (max-width: 1024px) 15vw, 10vw"
+                sizes="(max-width: 640px) 18vw, 85px"
                 quality={80}
                 className="object-cover"
               />
-              {activeIndex === index && (
-                <div className="absolute inset-0 bg-indigo-600/15 pointer-events-none" />
-              )}
             </button>
           ))}
         </div>

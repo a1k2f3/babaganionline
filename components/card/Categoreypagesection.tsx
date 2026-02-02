@@ -4,7 +4,7 @@
 import CategoryCard from "./CateGoryCard";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
-import { ChevronDown, ChevronUp, Search, X } from "lucide-react";
+import { ChevronDown, ChevronUp, Search, X, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Category {
   _id: string;
@@ -16,8 +16,11 @@ interface Category {
 
 type SortOption = "name-asc" | "name-desc" | "count-desc" | "count-asc";
 
+const ITEMS_PER_PAGE = 12;
+
 export default function CategoriesSection() {
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [allCategories, setAllCategories] = useState<Category[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,22 +29,26 @@ export default function CategoriesSection() {
   const [sortBy, setSortBy] = useState<SortOption>("name-asc");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // Fetch categories (unchanged)
+  // Fetch all categories once
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
         if (!baseUrl) throw new Error("API base URL not defined");
+
         const res = await fetch(`${baseUrl}/api/categories`, {
           cache: "no-store",
           next: { revalidate: 3600 },
         });
-        if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
         const result = await res.json();
         if (!result.success || !Array.isArray(result.data)) {
           throw new Error("Invalid data format");
         }
-        setCategories(result.data);
+
+        setAllCategories(result.data);
       } catch (err: any) {
         console.error("Categories fetch error:", err);
         setError(err.message || "Failed to load categories");
@@ -49,14 +56,20 @@ export default function CategoriesSection() {
         setLoading(false);
       }
     };
+
     fetchCategories();
   }, []);
 
-  // Combined filtered & sorted categories
-  const displayedCategories = useMemo(() => {
-    let filtered = categories;
+  // Reset to page 1 when search or sort changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, sortBy]);
 
-    // Search filter (case-insensitive)
+  // Filtered + sorted + paginated
+  const { displayedCategories, totalPages } = useMemo(() => {
+    let filtered = allCategories;
+
+    // Search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
       filtered = filtered.filter((cat) =>
@@ -64,9 +77,8 @@ export default function CategoriesSection() {
       );
     }
 
-    // Then sort
+    // Sort
     let sorted = [...filtered];
-
     switch (sortBy) {
       case "name-asc":
         sorted.sort((a, b) => a.name.localeCompare(b.name));
@@ -80,17 +92,31 @@ export default function CategoriesSection() {
       case "count-asc":
         sorted.sort((a, b) => a.productCount - b.productCount);
         break;
-      default:
-        break;
     }
 
-    return sorted;
-  }, [categories, searchQuery, sortBy]);
+    const total = sorted.length;
+    const pages = Math.max(1, Math.ceil(total / ITEMS_PER_PAGE));
 
-  // Clear search
-  const clearSearch = () => setSearchQuery("");
+    // Paginate
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    const paginated = sorted.slice(start, start + ITEMS_PER_PAGE);
 
-  // Loading Skeleton (unchanged)
+    return {
+      displayedCategories: paginated,
+      totalPages: pages,
+    };
+  }, [allCategories, searchQuery, sortBy, currentPage]);
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const clearSearch = () => {
+    setSearchQuery("");
+  };
+
   if (loading) {
     return (
       <section className="py-16 px-5 sm:px-6 bg-gray-50">
@@ -100,7 +126,7 @@ export default function CategoriesSection() {
           </h2>
           <div className="w-32 h-1 bg-gradient-to-r from-blue-600 to-purple-600 mx-auto mt-4 rounded-full" />
         </div>
-        <div className="max-w-7xl mx-auto grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5 sm:gap-6">
+        <div className="max-w-7xl mx-auto grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5 sm:gap-6">
           {[...Array(10)].map((_, i) => (
             <motion.div
               key={i}
@@ -115,7 +141,6 @@ export default function CategoriesSection() {
     );
   }
 
-  // Error (unchanged)
   if (error) {
     return (
       <section className="py-20 px-6 bg-gray-50 text-center">
@@ -138,7 +163,6 @@ export default function CategoriesSection() {
 
   return (
     <section className="py-16 px-5 sm:px-6 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-950">
-      {/* Header + Controls (Search + Sort) */}
       <div className="max-w-7xl mx-auto mb-10 md:mb-14">
         <div className="text-center mb-8">
           <motion.h2
@@ -154,9 +178,8 @@ export default function CategoriesSection() {
           </p>
         </div>
 
-        {/* Search + Sort row */}
+        {/* Search + Sort */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 md:gap-6">
-          {/* Search Bar */}
           <div className="relative flex-1 max-w-md mx-auto sm:mx-0">
             <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
               <Search size={20} className="text-gray-400" />
@@ -178,7 +201,6 @@ export default function CategoriesSection() {
             )}
           </div>
 
-          {/* Sort Dropdown */}
           <div className="relative inline-block text-left w-full sm:w-64">
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -227,7 +249,7 @@ export default function CategoriesSection() {
         </div>
       </div>
 
-      {/* Categories Grid */}
+      {/* Grid */}
       <div className="max-w-7xl mx-auto">
         {displayedCategories.length === 0 ? (
           <motion.div
@@ -235,7 +257,9 @@ export default function CategoriesSection() {
             animate={{ opacity: 1 }}
             className="text-center py-16 text-gray-500 dark:text-gray-400"
           >
-            <p className="text-xl">No categories found matching "{searchQuery}"</p>
+            <p className="text-xl">
+              No categories found matching "{searchQuery}"
+            </p>
             <button
               onClick={clearSearch}
               className="mt-4 text-indigo-600 dark:text-indigo-400 hover:underline"
@@ -244,7 +268,7 @@ export default function CategoriesSection() {
             </button>
           </motion.div>
         ) : (
-          <div className="grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5 sm:gap-6 md:gap-7">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5 sm:gap-6 md:gap-7">
             <AnimatePresence mode="wait">
               {displayedCategories.map((cat, index) => (
                 <motion.div
@@ -269,17 +293,63 @@ export default function CategoriesSection() {
             </AnimatePresence>
           </div>
         )}
-      </div>
 
-      {/* Optional stats placeholder */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        className="mt-16 md:mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto text-center"
-      >
-        {/* Add stats here if needed */}
-      </motion.div>
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="mt-12 md:mt-16 flex items-center justify-center gap-2 flex-wrap">
+            <button
+              onClick={() => goToPage(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="p-3 rounded-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition"
+              aria-label="Previous page"
+            >
+              <ChevronLeft size={20} />
+            </button>
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1)
+              .filter(
+                (page) =>
+                  page === 1 ||
+                  page === totalPages ||
+                  (page >= currentPage - 2 && page <= currentPage + 2)
+              )
+              .map((page, idx, arr) => {
+                const showEllipsis =
+                  idx > 0 &&
+                  arr[idx - 1] !== page - 1 &&
+                  page !== 1 &&
+                  page !== totalPages;
+
+                return (
+                  <div key={page} className="flex items-center">
+                    {showEllipsis && (
+                      <span className="px-3 py-2 text-gray-500 dark:text-gray-400">...</span>
+                    )}
+                    <button
+                      onClick={() => goToPage(page)}
+                      className={`min-w-[40px] h-10 rounded-lg font-medium transition ${
+                        currentPage === page
+                          ? "bg-indigo-600 text-white"
+                          : "bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  </div>
+                );
+              })}
+
+            <button
+              onClick={() => goToPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="p-3 rounded-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition"
+              aria-label="Next page"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </div>
+        )}
+      </div>
     </section>
   );
 }
