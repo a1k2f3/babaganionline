@@ -124,7 +124,7 @@ export default async function ProductPage({
 
               <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
                 {/* Rating (placeholder – replace with real data when available) */}
-                s
+                
 
                 {product.stock > 0 && product.stock <= 10 && (
                   <span className="inline-flex items-center px-3 py-1 text-xs font-semibold bg-red-100 text-red-700 rounded-full border border-red-200">
@@ -253,7 +253,7 @@ export default async function ProductPage({
                 return (
                   <Link
                     key={item._id}
-                    href={`/products/${item._id}`} // note: changed to /products/ to match your route
+                    href={`/product/${item._id}`} // note: changed to /products/ to match your route
                     className="group block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1"
                   >
                     <div className="relative aspect-square bg-gray-50 overflow-hidden">
