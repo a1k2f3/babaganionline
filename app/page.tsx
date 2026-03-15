@@ -41,7 +41,7 @@ export default function Home() {
           <h2 className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-extrabold text-center mb-10 md:mb-14 text-orange-600 dark:text-orange-400">
             Trending Right Now
           </h2>
-          <TrendingProducts limit={12} />
+          <TrendingProducts  />
         </div>
       </section>
 
