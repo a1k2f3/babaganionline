@@ -1,11 +1,21 @@
 // components/sections/CategoriesSection.tsx
 "use client";
 
-import CategoryCard from "./CateGoryCard"; // fix case if needed: CateGoryCard → CategoryCard
-import Link from "next/link";
-import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination, A11y } from "swiper/modules";
+
+// Required Swiper styles
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+
+// import CategoryCard from "./CategoryCard"; 
+// // corrected filename case
+import CategoryCard from "./CateGoryCard";
 import { ChevronRight } from "lucide-react";
+import Link from "next/link";
 
 interface Category {
   _id: string;
@@ -20,7 +30,6 @@ export default function CategoriesSection() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -39,7 +48,7 @@ export default function CategoriesSection() {
           throw new Error("Invalid categories data format");
         }
 
-        // Take only first 12
+        // Still limit to first 12 (or remove .slice() if you want all)
         setCategories(result.data.slice(0, 12));
       } catch (err: any) {
         console.error("Categories fetch error:", err);
@@ -52,30 +61,39 @@ export default function CategoriesSection() {
     fetchCategories();
   }, []);
 
-  // Loading state
   if (loading) {
     return (
       <section className="py-16 px-5 md:px-8 bg-gray-50">
         <div className="text-center mb-10">
-         
+          <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900">
+            Shop by Category
+          </h2>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 md:gap-6 max-w-7xl mx-auto">
-          {[...Array(8)].map((_, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.06 }}
-              className="h-64 bg-gray-200 rounded-2xl animate-pulse"
-            />
-          ))}
+        <div className="max-w-7xl mx-auto">
+          <Swiper
+            modules={[Pagination]}
+            spaceBetween={16}
+            slidesPerView={2}
+            pagination={{ clickable: true }}
+            breakpoints={{
+              640: { slidesPerView: 3 },
+              768: { slidesPerView: 4 },
+              1024: { slidesPerView: 5 },
+              1280: { slidesPerView: 6 },
+            }}
+          >
+            {[...Array(8)].map((_, i) => (
+              <SwiperSlide key={i}>
+                <div className="h-64 bg-gray-200 rounded-2xl animate-pulse mx-1" />
+              </SwiperSlide>
+            ))}
+          </Swiper>
         </div>
       </section>
     );
   }
 
-  // Error state
   if (error) {
     return (
       <section className="py-20 px-6 bg-gray-50 text-center">
@@ -96,7 +114,7 @@ export default function CategoriesSection() {
     );
   }
 
-  const showViewAll = categories.length === 12; // or always show if you prefer
+  const showViewAll = categories.length === 12;
 
   return (
     <section className="py-16 px-5 md:px-8 bg-gradient-to-b from-gray-50 to-white">
@@ -115,28 +133,45 @@ export default function CategoriesSection() {
         </p>
       </div>
 
-      {/* Categories Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 md:gap-6 max-w-7xl mx-auto">
-        {categories.map((cat, index) => (
-          <motion.div
-            key={cat._id}
-            initial={{ opacity: 0, y: 25 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{
-              delay: index * 0.05,
-              duration: 0.5,
-              ease: "easeOut",
-            }}
-          >
-            <CategoryCard
-              name={cat.name}
-              slug={cat.slug}
-              imageUrl={cat.image.url}
-              productCount={cat.productCount}
-            />
-          </motion.div>
-        ))}
+      {/* Carousel */}
+      <div className="max-w-7xl mx-auto">
+        <Swiper
+          modules={[Navigation, Pagination, A11y]}
+          spaceBetween={20}
+          slidesPerView={2}
+          navigation={true}
+          pagination={{ clickable: true }}
+          breakpoints={{
+            640: { slidesPerView: 3 },
+            768: { slidesPerView: 4 },
+            1024: { slidesPerView: 5 },
+            1280: { slidesPerView: 6 },
+          }}
+          className="!pb-12" // extra bottom padding for pagination dots
+        >
+          {categories.map((cat, index) => (
+            <SwiperSlide key={cat._id}>
+              <motion.div
+                initial={{ opacity: 0, y: 25 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{
+                  delay: index * 0.04,
+                  duration: 0.5,
+                  ease: "easeOut",
+                }}
+                className="flex justify-center px-1 pb-4"
+              >
+                <CategoryCard
+                  name={cat.name}
+                  slug={cat.slug}
+                  imageUrl={cat.image.url}
+                  productCount={cat.productCount}
+                />
+              </motion.div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
       </div>
 
       {/* View All Button */}

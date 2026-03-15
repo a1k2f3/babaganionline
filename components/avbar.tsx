@@ -2,7 +2,7 @@
 "use client";
 
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -18,16 +18,33 @@ import {
   FiPhone,
   FiInfo,
   FiChevronRight,
+  FiLogIn,
 } from "react-icons/fi";
 
-import NavSearch from "./Searchbar"; // ← Make sure path is correct
+import NavSearch from "./Searchbar";
 import { Heart } from "lucide-react";
 
 const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [cartItemCount] = useState(0); // You can make this dynamic later
+  const [cartItemCount] = useState(0); // ← can be made dynamic later
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   const router = useRouter();
+
+  // Check login status (client-side)
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem("token"); // ← change key if your token has different name
+      setIsLoggedIn(!!token);
+    };
+
+    checkAuth();
+
+    // Optional: listen for storage changes (multi-tab support)
+    window.addEventListener("storage", checkAuth);
+    return () => window.removeEventListener("storage", checkAuth);
+  }, []);
 
   const sidebarLinks = [
     { href: "/", label: "Home", icon: FiHome },
@@ -67,15 +84,26 @@ const Navbar = () => {
               </span>
             )}
           </Link>
-          <Link href="/profile" className="text-gray-600 hover:text-gray-900">
-            <FiUser size={24} />
-          </Link>
+
+          {/* ── Conditional Auth Button ── */}
+          {isLoggedIn ? (
+            <Link href="/profile" className="text-gray-600 hover:text-gray-900">
+              <FiUser size={24} />
+            </Link>
+          ) : (
+            <Link
+              href="/auth/login" // ← adjust route if your login page is /signin, /auth/login, etc.
+              className="flex items-center gap-1.5 text-gray-700 hover:text-indigo-600 font-medium transition"
+            >
+              <FiLogIn size={22} />
+              <span>Login</span>
+            </Link>
+          )}
         </div>
       </nav>
 
       {/* ==================== MOBILE TOP HEADER ==================== */}
       <div className="bg-white shadow-md fixed top-0 left-0 right-0 z-50 flex md:hidden items-center justify-between px-4 py-3">
-        {/* Hamburger */}
         <button
           onClick={() => setIsSidebarOpen(true)}
           className="text-gray-700 hover:text-indigo-600 transition z-10"
@@ -84,13 +112,11 @@ const Navbar = () => {
           <FiMenu size={28} />
         </button>
 
-        {/* Logo center */}
         <Link href="/" className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2">
           <Image src="/logo2.jpg" alt="BabaGaniOnline" width={40} height={40} className="rounded-lg" />
           <span className="text-lg font-bold text-gray-800">BabaGani</span>
         </Link>
 
-        {/* Right icons */}
         <div className="flex items-center gap-5">
           <button
             onClick={() => setIsSearchOpen(!isSearchOpen)}
@@ -98,7 +124,6 @@ const Navbar = () => {
               isSearchOpen ? "text-indigo-600 scale-110" : "text-gray-700 hover:text-indigo-600 hover:scale-110"
             }`}
             aria-label="Search"
-            aria-expanded={isSearchOpen}
           >
             <FiSearch size={26} />
           </button>
@@ -114,7 +139,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* ==================== MOBILE COMPACT SEARCH DROPDOWN ==================== */}
+      {/* Mobile search dropdown – unchanged */}
       {isSearchOpen && (
         <div className="fixed top-[60px] left-0 right-0 z-40 md:hidden bg-white shadow-lg border-b">
           <div className="px-4 py-3">
@@ -122,11 +147,9 @@ const Navbar = () => {
               <button
                 onClick={() => setIsSearchOpen(false)}
                 className="text-gray-600 p-2 -ml-2 rounded-full hover:bg-gray-100 active:bg-gray-200 transition"
-                aria-label="Close search"
               >
                 <FiX size={24} />
               </button>
-
               <div className="flex-1">
                 <NavSearch />
               </div>
@@ -168,6 +191,29 @@ const Navbar = () => {
                   </Link>
                 );
               })}
+
+              {/* Optional: add Login / Profile in sidebar too */}
+              <div className="pt-4 mt-4 border-t">
+                {isLoggedIn ? (
+                  <Link
+                    href="/profile"
+                    onClick={() => setIsSidebarOpen(false)}
+                    className="flex items-center gap-4 p-4 rounded-xl hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 transition"
+                  >
+                    <FiUser size={22} />
+                    <span className="font-medium">Profile</span>
+                  </Link>
+                ) : (
+                  <Link
+                    href="/auth/login"
+                    onClick={() => setIsSidebarOpen(false)}
+                    className="flex items-center gap-4 p-4 rounded-full hover:bg-indigo-50 text-indigo-600 font-medium transition"
+                  >
+                    <FiLogIn size={22} />
+                    <span>Login / Sign up</span>
+                  </Link>
+                )}
+              </div>
             </nav>
           </div>
         </>
@@ -185,10 +231,18 @@ const Navbar = () => {
           <span className="text-xs mt-1">Orders</span>
         </Link>
 
-        <Link href="/profile" className="flex flex-col items-center text-gray-600 hover:text-indigo-600 transition">
-          <FiUser size={24} />
-          <span className="text-xs mt-1">Profile</span>
-        </Link>
+        {/* ── Conditional in bottom nav ── */}
+        {isLoggedIn ? (
+          <Link href="/profile" className="flex flex-col items-center text-gray-600 hover:text-indigo-600 transition">
+            <FiUser size={24} />
+            <span className="text-xs mt-1">Profile</span>
+          </Link>
+        ) : (
+          <Link href="/auth/login" className="flex flex-col items-center   hover:bg-blue-600 transition">
+            <FiLogIn size={24} />
+            <span className="text-xs mt-1 ">Login</span>
+          </Link>
+        )}
 
         <Link href="/shop/cart" className="flex flex-col items-center text-gray-600 hover:text-indigo-600 transition relative">
           <div className="relative">
