@@ -98,24 +98,17 @@ export default async function ProductPage({
           </ol>
         </nav>
 
+        {/* Main Product Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 xl:gap-16">
-          {/* Left: Gallery + Tabs */}
-          <div className="space-y-10 lg:space-y-12 order-1 lg:order-none">
+          
+          {/* LEFT: Gallery - Now FIRST on mobile */}
+          <div className="lg:order-1 order-1">
             <ProductGallery images={images} productName={product.name} />
-
-            <ProductTabs
-              descriptionPoints={descriptionPoints}
-              specifications={product.specifications}
-              highlights={product.highlights}
-            />
-
-            <div className="lg:hidden">
-              <ReviewsSection productId={product._id} />
-            </div>
           </div>
 
-          {/* Right: Product Info */}
-          <div className="space-y-8 lg:space-y-10 lg:sticky lg:top-6 self-start">
+          {/* RIGHT: Product Info - Comes AFTER gallery on mobile */}
+          <div className="space-y-8 lg:space-y-10 lg:sticky lg:top-6 self-start lg:order-2 order-2">
+            
             {/* Title & Rating/Stock */}
             <div className="space-y-4">
               <h1 className="text-3xl sm:text-4xl lg:text-4.5xl font-bold text-gray-900 tracking-tight leading-tight">
@@ -123,9 +116,6 @@ export default async function ProductPage({
               </h1>
 
               <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-                {/* Rating (placeholder – replace with real data when available) */}
-                
-
                 {product.stock > 0 && product.stock <= 10 && (
                   <span className="inline-flex items-center px-3 py-1 text-xs font-semibold bg-red-100 text-red-700 rounded-full border border-red-200">
                     Only {product.stock} left!
@@ -230,11 +220,16 @@ export default async function ProductPage({
               <AddReviewForm productId={product._id} />
             </div>
 
-            {/* Desktop Reviews */}
+            {/* Desktop Reviews - Hidden on mobile */}
             <div className="hidden lg:block pt-6">
               <ReviewsSection productId={product._id} />
             </div>
           </div>
+        </div>
+
+        {/* Mobile Reviews Section */}
+        <div className="lg:hidden mt-12">
+          <ReviewsSection productId={product._id} />
         </div>
 
         {/* Related Products */}
@@ -253,7 +248,7 @@ export default async function ProductPage({
                 return (
                   <Link
                     key={item._id}
-                    href={`/product/${item._id}`} // note: changed to /products/ to match your route
+                    href={`/products/${item._id}`} // Fixed route (was /product/)
                     className="group block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1"
                   >
                     <div className="relative aspect-square bg-gray-50 overflow-hidden">

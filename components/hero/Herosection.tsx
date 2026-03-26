@@ -1,4 +1,4 @@
-// components/HeroSection.tsx
+// components/hero/Herosection.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -9,17 +9,20 @@ const slides = [
   {
     image: '/hero.png',
     title: 'Find Your Vibe',
-    subtitle: 'New Season • Best Prices • Fast Delivery',
+    subtitle: 'New Season Collection with Best Prices & Fast Delivery',
+    highlight: 'Across Pakistan',
   },
   {
     image: '/hero2.png',
-    title: 'Summer and Winter Must-Haves',
-    subtitle: 'Up to 10 to 40% Off on every single product Limited Time Only',
+    title: 'Summer & Winter Must-Haves',
+    subtitle: 'Up to 40% OFF',
+    highlight: 'Limited Time Only',
   },
   {
     image: '/hero3.png',
     title: 'Street Style Collection',
-    subtitle: 'Trendy Looks • Free Delivery ',
+    subtitle: 'Trendy Looks',
+    highlight: 'Free Delivery on Orders Over 5000 PKR',
   },
 ];
 
@@ -29,82 +32,91 @@ const HeroSection = () => {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 5000); // change slide every 5 seconds
+    }, 5000);
 
     return () => clearInterval(timer);
   }, []);
 
   return (
-    <section className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10 md:py-14 lg:py-16">
-      {/* Carousel container - smaller height */}
-      <div className="relative aspect-[4/3] sm:aspect-[16/7] md:aspect-[21/8] overflow-hidden rounded-2xl shadow-xl">
-        {/* Slides */}
-        {slides.map((slide, index) => (
-          <div
-            key={index}
-            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-              index === currentSlide ? 'opacity-100' : 'opacity-0'
-            }`}
-          >
-            <Image
-              src={slide.image}
-              alt={slide.title}
-              fill
-              className="object-cover brightness-[0.75]"
-              priority={index === 0}
-              sizes="(max-width: 768px) 100vw, 90vw"
-            />
+    <div className="relative w-full h-full overflow-hidden">
+      {slides.map((slide, index) => (
+        <div
+          key={index}
+          className={`absolute inset-0 transition-all duration-1000 ease-out ${
+            index === currentSlide ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
+          }`}
+        >
+          {/* Background Image */}
+          <Image
+            src={slide.image}
+            alt={slide.title}
+            fill
+            className="object-cover object-center"
+            priority={index === 0}
+            sizes="100vw"
+            quality={92}
+          />
 
-            {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/35 to-transparent" />
+          {/* Improved Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30" />
 
-            {/* Content */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center text-white px-5 sm:px-8 max-w-2xl md:max-w-3xl">
-                <h1 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl">
-                  {slide.title}
-                </h1>
-
-                <p className="mt-3 text-base sm:text-lg md:text-xl opacity-90">
-                  {slide.subtitle}
-                </p>
-
-                <div className="mt-6 sm:mt-8 flex flex-wrap justify-center gap-3 sm:gap-4">
-                  <Link
-                    href="/"
-                    className="inline-flex items-center px-6 py-3 text-base font-medium rounded-lg bg-white text-gray-900 hover:bg-gray-100 transition-colors shadow-md"
-                  >
-                    Shop Now
-                  </Link>
-                  <Link
-                    href="/categories"
-                    className="inline-flex items-center px-6 py-3 text-base font-medium rounded-lg border-2 border-white text-white hover:bg-white/10 transition-colors"
-                  >
-                    Browse Categories
-                  </Link>
+          {/* Content Container */}
+          <div className="absolute inset-0 flex items-center justify-center px-6 sm:px-8">
+            <div className="max-w-3xl text-center text-white space-y-6">
+              {/* Highlight Tag */}
+              {slide.highlight && (
+                <div className="inline-block px-6 py-2 bg-white/20 backdrop-blur-md border border-white/30 rounded-full text-sm font-medium tracking-wide">
+                  {slide.highlight}
                 </div>
+              )}
+
+              {/* Main Title */}
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter leading-none">
+                {slide.title}
+              </h1>
+
+              {/* Subtitle */}
+              <p className="text-lg sm:text-xl md:text-2xl font-light opacity-95 max-w-xl mx-auto">
+                {slide.subtitle}
+              </p>
+
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                <Link
+                  href="/products"
+                  className="group inline-flex items-center justify-center px-10 py-4 text-base font-semibold rounded-2xl bg-white text-gray-900 hover:bg-amber-400 hover:text-gray-900 transition-all duration-300 shadow-2xl active:scale-95"
+                >
+                  Shop Now
+                </Link>
+
+                <Link
+                  href="/categories"
+                  className="group inline-flex items-center justify-center px-10 py-4 text-base font-semibold rounded-2xl border-2 border-white/90 hover:bg-white hover:text-gray-900 transition-all duration-300 active:scale-95"
+                >
+                  Explore Categories
+                </Link>
               </div>
             </div>
           </div>
-        ))}
-
-        {/* Simple dots indicator */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-          {slides.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentSlide(index)}
-              className={`w-2.5 h-2.5 rounded-full transition-all ${
-                index === currentSlide
-                  ? 'bg-white w-6'
-                  : 'bg-white/50 hover:bg-white/80'
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
         </div>
+      ))}
+
+      {/* Modern Dots Indicator */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-20">
+        {slides.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentSlide(index)}
+            className={`transition-all duration-300 rounded-full ${
+              index === currentSlide 
+                ? 'bg-white w-9 h-3' 
+                : 'bg-white/60 hover:bg-white/80 w-3 h-3'
+            }`}
+            aria-label={`Go to slide ${index + 1}`}
+          />
+        ))}
       </div>
-    </section>
+    </div>
   );
 };
 
