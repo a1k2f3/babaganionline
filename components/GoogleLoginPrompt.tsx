@@ -75,7 +75,7 @@ const GoogleLoginPrompt = () => {
           Sign in to unlock full features
         </h3>
         <p className="text-sm text-gray-600 mb-5">
-          Login with Google to write reviews, save favorites, and get personalized recommendations and for book orders if ou arhesitate then chat on whatsapp.
+          Login with Google to write reviews, save favorites, and get personalized recommendations and for book orders if you are hesitant then chat on whatsapp. 
         </p>
 
         <button
