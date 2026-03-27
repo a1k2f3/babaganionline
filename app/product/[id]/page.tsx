@@ -11,6 +11,9 @@ import ProductTabs from "@/components/card/ProductTabs";
 import AddReviewForm from "@/components/card/AddReviewForm";
 import ProductActions from "@/components/card/ProducActions";
 
+// NEW: Import the client component for Google Login
+import GoogleLoginPrompt from "@/components/GoogleLoginPrompt";
+
 async function getProduct(id: string) {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
   const url = `${baseUrl}/api/products/${id}`;
@@ -101,12 +104,12 @@ export default async function ProductPage({
         {/* Main Product Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 xl:gap-16">
           
-          {/* LEFT: Gallery - Now FIRST on mobile */}
+          {/* LEFT: Gallery */}
           <div className="lg:order-1 order-1">
             <ProductGallery images={images} productName={product.name} />
           </div>
 
-          {/* RIGHT: Product Info - Comes AFTER gallery on mobile */}
+          {/* RIGHT: Product Info */}
           <div className="space-y-8 lg:space-y-10 lg:sticky lg:top-6 self-start lg:order-2 order-2">
             
             {/* Title & Rating/Stock */}
@@ -129,6 +132,9 @@ export default async function ProductPage({
                 )}
               </div>
             </div>
+
+            {/* === GOOGLE LOGIN PROMPT - NOW AT THE TOP === */}
+            <GoogleLoginPrompt />
 
             {/* Price Section */}
             <div className="border-b border-gray-200 pb-8">
@@ -220,14 +226,14 @@ export default async function ProductPage({
               <AddReviewForm productId={product._id} />
             </div>
 
-            {/* Desktop Reviews - Hidden on mobile */}
+            {/* Desktop Reviews */}
             <div className="hidden lg:block pt-6">
               <ReviewsSection productId={product._id} />
             </div>
           </div>
         </div>
 
-        {/* Mobile Reviews Section */}
+        {/* Mobile Reviews */}
         <div className="lg:hidden mt-12">
           <ReviewsSection productId={product._id} />
         </div>
@@ -248,7 +254,7 @@ export default async function ProductPage({
                 return (
                   <Link
                     key={item._id}
-                    href={`/products/${item._id}`} // Fixed route (was /product/)
+                    href={`/products/${item._id}`}
                     className="group block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1"
                   >
                     <div className="relative aspect-square bg-gray-50 overflow-hidden">
