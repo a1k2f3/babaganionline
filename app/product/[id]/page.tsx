@@ -5,13 +5,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Star, Truck, Shield, Check } from "lucide-react";
+
 import ProductGallery from "@/components/card/ProductGallery";
-import ReviewsSection from "@/components/card/ReviewsSection";
 import ProductTabs from "@/components/card/ProductTabs";
+import ReviewsSection from "@/components/card/ReviewsSection";
 import AddReviewForm from "@/components/card/AddReviewForm";
 import ProductActions from "@/components/card/ProducActions";
 
-// NEW: Import the client component for Google Login
 import GoogleLoginPrompt from "@/components/GoogleLoginPrompt";
 
 async function getProduct(id: string) {
@@ -104,15 +104,22 @@ export default async function ProductPage({
         {/* Main Product Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 xl:gap-16">
           
-          {/* LEFT: Gallery */}
-          <div className="lg:order-1 order-1">
+          {/* LEFT COLUMN: Gallery + ProductTabs */}
+          <div className="space-y-12 lg:order-1">
+            {/* Gallery */}
             <ProductGallery images={images} productName={product.name} />
+
+            {/* Product Tabs - Placed right below the gallery */}
+            <ProductTabs 
+              descriptionPoints={descriptionPoints}
+              // product={product}   // Uncomment if your ProductTabs needs the full product object
+            />
           </div>
 
-          {/* RIGHT: Product Info */}
-          <div className="space-y-8 lg:space-y-10 lg:sticky lg:top-6 self-start lg:order-2 order-2">
+          {/* RIGHT COLUMN: Product Info */}
+          <div className="space-y-8 lg:space-y-10 lg:sticky lg:top-6 self-start lg:order-2">
             
-            {/* Title & Rating/Stock */}
+            {/* Title & Stock Status */}
             <div className="space-y-4">
               <h1 className="text-3xl sm:text-4xl lg:text-4.5xl font-bold text-gray-900 tracking-tight leading-tight">
                 {product.name}
@@ -133,7 +140,7 @@ export default async function ProductPage({
               </div>
             </div>
 
-            {/* === GOOGLE LOGIN PROMPT - NOW AT THE TOP === */}
+            {/* Google Login Prompt */}
             <GoogleLoginPrompt />
 
             {/* Price Section */}
@@ -218,23 +225,18 @@ export default async function ProductPage({
               </div>
             </div>
 
-            {/* Write a Review */}
+            {/* Write a Review - Always Visible */}
             <div className="rounded-2xl border border-gray-200 bg-white p-7 shadow-sm">
               <h2 className="mb-6 text-2xl font-bold text-gray-900">
                 Write a Review
               </h2>
               <AddReviewForm productId={product._id} />
             </div>
-
-            {/* Desktop Reviews */}
-            <div className="hidden lg:block pt-6">
-              <ReviewsSection productId={product._id} />
-            </div>
           </div>
         </div>
 
-        {/* Mobile Reviews */}
-        <div className="lg:hidden mt-12">
+        {/* Reviews Section - Kept below everything */}
+        <div className="mt-16 lg:mt-20">
           <ReviewsSection productId={product._id} />
         </div>
 
@@ -254,7 +256,7 @@ export default async function ProductPage({
                 return (
                   <Link
                     key={item._id}
-                    href={`/product/${item._id}`}
+                    href={`/products/${item._id}`}
                     className="group block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1"
                   >
                     <div className="relative aspect-square bg-gray-50 overflow-hidden">
