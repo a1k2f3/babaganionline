@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Loader2 } from "lucide-react";
+import { Loader2, Sparkles } from "lucide-react";
 import useSWRInfinite from "swr/infinite";
 import ProductCard from "../featureproducts/ProductCard";
 
@@ -30,7 +30,7 @@ interface Product {
   _id: string;
   name: string;
   price: number;
-  discountPrice?: number;     // ← final discounted price (e.g. 2499 instead of percentage)
+  discountPrice?: number;
   thumbnail: string;
   images: Image[];
   category: Category;
@@ -64,14 +64,13 @@ export default function ProductsSection() {
       revalidateFirstPage: false,
       revalidateOnFocus: false,
       dedupingInterval: 60000,
-      fallbackData: [],
     }
   );
 
   const products: Product[] = data ? data.flatMap((page) => page.data || []) : [];
 
-  const isLoadingMore = isValidating && data && data.length === size;
-  const hasMore = products.length < 100; // reasonable cap for random endpoint
+  const isLoadingMore = isValidating && size > 0;
+  const hasMore = products.length < 120; // Increased reasonable limit
 
   const handleObserver = useCallback(
     (entries: IntersectionObserverEntry[]) => {
@@ -86,7 +85,7 @@ export default function ProductsSection() {
   useEffect(() => {
     const observer = new IntersectionObserver(handleObserver, {
       root: null,
-      rootMargin: "300px",
+      rootMargin: "400px",
       threshold: 0.1,
     });
 
@@ -94,20 +93,17 @@ export default function ProductsSection() {
       observer.observe(observerRef.current);
     }
 
-    return () => {
-      if (observerRef.current) {
-        observer.unobserve(observerRef.current);
-      }
-    };
+    return () => observer.disconnect();
   }, [handleObserver]);
 
+  // Initial Loading State
   if (isLoading && products.length === 0) {
     return (
-      <section className="py-20 px-4 gap-10 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white">
+      <section className="py-24 bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
         <div className="flex flex-col items-center justify-center min-h-[60vh]">
-          <Loader2 className="w-16 h-16 animate-spin text-indigo-600" />
-          <p className="mt-6 text-xl font-medium text-gray-700">
-            Loading amazing products...
+          <Loader2 className="w-16 h-16 animate-spin text-violet-600 dark:text-violet-500" />
+          <p className="mt-6 text-xl font-medium text-gray-700 dark:text-gray-300">
+            Loading premium products...
           </p>
         </div>
       </section>
@@ -116,15 +112,18 @@ export default function ProductsSection() {
 
   if (error) {
     return (
-      <section className="py-20 px-4 sm:px-6 lg:px-8 text-center">
-        <div className="max-w-lg mx-auto">
-          <p className="text-red-600 text-2xl font-semibold mb-4">Oops!</p>
-          <p className="text-gray-700 text-lg mb-8">
-            Something went wrong while loading products.
+      <section className="py-2 px-4 text-center bg-white dark:bg-gray-900">
+        <div className="max-w-md mx-auto">
+          <p className="text-6xl mb-4">😕</p>
+          <p className="text-2xl font-semibold text-red-600 dark:text-red-500 mb-3">
+            Failed to load products
+          </p>
+          <p className="text-gray-600 dark:text-gray-400 mb-8">
+            Please check your connection and try again.
           </p>
           <button
             onClick={() => window.location.reload()}
-            className="px-8 py-4 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition shadow-lg"
+            className="px-10 py-4 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-2xl transition-all active:scale-95"
           >
             Try Again
           </button>
@@ -134,45 +133,55 @@ export default function ProductsSection() {
   }
 
   return (
-    <section className="w-full bg-gradient-to-b from-gray-50 to-white pb-20">
+    <section className="w-full bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900 py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="relative text-center mb-16 pt-12 overflow-hidden">
-          <div className="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none">
-            <div className="w-96 h-96 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full blur-3xl animate-pulse" />
+        {/* Enhanced Header */}
+        <div className="text-center mb-16">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <Sparkles className="w-8 h-8 text-violet-500" />
+            <span className="uppercase tracking-[3px] text-sm font-semibold text-violet-600 dark:text-violet-400">
+              New Arrivals
+            </span>
+            <Sparkles className="w-8 h-8 text-violet-500" />
           </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
+          <motion.h2
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.7 }}
             viewport={{ once: true }}
+            className="text-5xl sm:text-6xl font-bold tracking-tight text-gray-900 dark:text-white mb-4"
           >
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 mb-4">
-              Featured Products
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Discover our curated collection of premium items
-            </p>
-          </motion.div>
+            Featured Products
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            viewport={{ once: true }}
+            className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto"
+          >
+            Handpicked premium products just for you
+          </motion.p>
         </div>
 
         {/* Products Grid */}
         {products.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-gray-500 text-2xl font-medium">
-              No products available at the moment.
+          <div className="text-center py-24">
+            <p className="text-2xl text-gray-500 dark:text-gray-400">
+              No products found at the moment.
             </p>
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 sm:gap-8">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-6 sm:gap-7">
               {products.map((product, index) => (
                 <motion.div
                   key={`${product._id}-${index}`}
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={{ opacity: 0, y: 40 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.03 }}
+                  transition={{ duration: 0.6, delay: Math.min(index * 0.025, 0.6) }}
                   viewport={{ once: true }}
                 >
                   <ProductCard product={product} />
@@ -180,26 +189,31 @@ export default function ProductsSection() {
               ))}
             </div>
 
-            {/* Infinite Scroll Loader */}
+            {/* Infinite Scroll Trigger */}
             {hasMore && (
-              <div ref={observerRef} className="flex justify-center py-16">
+              <div ref={observerRef} className="flex justify-center py-20">
                 {isLoadingMore ? (
-                  <div className="flex items-center gap-4 text-indigo-600">
-                    <Loader2 className="w-8 h-8 animate-spin" />
-                    <span className="text-lg font-medium">Loading more products...</span>
+                  <div className="flex items-center gap-3 text-violet-600 dark:text-violet-400">
+                    <Loader2 className="w-7 h-7 animate-spin" />
+                    <span className="text-lg font-medium">Loading more amazing products...</span>
                   </div>
                 ) : (
-                  <p className="text-gray-400 text-sm">Scroll down for more</p>
+                  <p className="text-gray-400 dark:text-gray-500 text-sm flex items-center gap-2">
+                    Keep scrolling to discover more <span className="text-base">↓</span>
+                  </p>
                 )}
               </div>
             )}
 
-            {/* End message */}
+            {/* End Message */}
             {!hasMore && products.length > 0 && (
-              <div className="text-center py-16">
-                <p className="text-gray-500 text-lg font-medium">
-                  You've seen all our featured products! ✨
-                </p>
+              <div className="text-center py-20">
+                <div className="inline-flex items-center gap-2 px-8 py-4 bg-gray-100 dark:bg-gray-800 rounded-3xl">
+                  <Sparkles className="w-5 h-5 text-amber-500" />
+                  <p className="text-gray-600 dark:text-gray-400 font-medium">
+                    You've explored all our featured products ✨
+                  </p>
+                </div>
               </div>
             )}
           </>

@@ -63,7 +63,7 @@ export default function CategoriesSection() {
 
   if (loading) {
     return (
-      <section className="py-16 px-5 md:px-8 bg-gray-50">
+      <section className="py-16 px-5 md:px-">
         <div className="text-center mb-10">
           <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900">
             Shop by Category
@@ -124,7 +124,7 @@ export default function CategoriesSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-3"
+          className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 mb-4"
         >
           Shop by Category
         </motion.h2>

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Flame, Loader2 } from "lucide-react"; // ← added Flame icon for trending feel
+import { Flame, Loader2, Sparkles } from "lucide-react";
 import useSWRInfinite from "swr/infinite";
 import ProductCard from "../featureproducts/ProductCard";
 
@@ -38,7 +38,7 @@ interface Product {
   tags: Tag[];
 }
 
-const PRODUCTS_PER_PAGE = 12; // reduced a bit for better performance on trending
+const PRODUCTS_PER_PAGE = 12;
 
 const fetcher = (url: string) =>
   fetch(url).then((res) => {
@@ -64,14 +64,13 @@ export default function TrendingProductsSection() {
       revalidateFirstPage: false,
       revalidateOnFocus: false,
       dedupingInterval: 60000,
-      fallbackData: [],
     }
   );
 
   const products: Product[] = data ? data.flatMap((page) => page.data || []) : [];
 
-  const isLoadingMore = isValidating && data && data.length === size;
-  const hasMore = products.length < 120; // slightly higher cap for trending feel
+  const isLoadingMore = isValidating && size > 0;
+  const hasMore = products.length < 100;
 
   const handleObserver = useCallback(
     (entries: IntersectionObserverEntry[]) => {
@@ -86,24 +85,25 @@ export default function TrendingProductsSection() {
   useEffect(() => {
     const observer = new IntersectionObserver(handleObserver, {
       root: null,
-      rootMargin: "400px", // load earlier
+      rootMargin: "400px",
       threshold: 0.1,
     });
 
-    if (observerRef.current) observer.observe(observerRef.current);
+    if (observerRef.current) {
+      observer.observe(observerRef.current);
+    }
 
-    return () => {
-      if (observerRef.current) observer.unobserve(observerRef.current);
-    };
+    return () => observer.disconnect();
   }, [handleObserver]);
 
+  // Initial Loading
   if (isLoading && products.length === 0) {
     return (
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-orange-50/40 via-white to-white">
+      <section className="py-24 bg-white dark:bg-gray-900">
         <div className="flex flex-col items-center justify-center min-h-[50vh]">
-          <Loader2 className="w-16 h-16 animate-spin text-orange-600" />
-          <p className="mt-6 text-xl font-medium text-gray-700">
-            Loading trending items...
+          <Loader2 className="w-16 h-16 animate-spin text-orange-600 dark:text-orange-500" />
+          <p className="mt-6 text-xl font-medium text-gray-700 dark:text-gray-300">
+            Loading trending products...
           </p>
         </div>
       </section>
@@ -112,15 +112,18 @@ export default function TrendingProductsSection() {
 
   if (error) {
     return (
-      <section className="py-20 px-4 sm:px-6 lg:px-8 text-center">
-        <div className="max-w-lg mx-auto">
-          <p className="text-red-600 text-2xl font-semibold mb-4">Oops!</p>
-          <p className="text-gray-700 text-lg mb-8">
-            Couldn't load trending products right now.
+      <section className="py-24 px-4 text-center bg-white dark:bg-gray-900">
+        <div className="max-w-md mx-auto">
+          <p className="text-6xl mb-4">🔥</p>
+          <p className="text-2xl font-semibold text-red-600 dark:text-red-500 mb-3">
+            Failed to load trending products
+          </p>
+          <p className="text-gray-600 dark:text-gray-400 mb-8">
+            Please try again later
           </p>
           <button
             onClick={() => window.location.reload()}
-            className="px-8 py-4 bg-orange-600 text-white font-medium rounded-xl hover:bg-orange-700 transition shadow-lg"
+            className="px-10 py-4 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-2xl transition-all active:scale-95"
           >
             Try Again
           </button>
@@ -130,89 +133,92 @@ export default function TrendingProductsSection() {
   }
 
   return (
-    <section className="w-full bg-gradient-to-b from-orange-50/30 via-white to-white pb-24 pt-16">
+    <section className="w-full bg-white dark:bg-gray-900 py-20 border-t border-gray-100 dark:border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header – Trending style */}
-        <div className="relative text-center mb-16">
-          {/* Subtle animated background glow */}
-          <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
-            <div className="w-[500px] h-[500px] bg-gradient-to-r from-orange-400 to-red-400 rounded-full blur-3xl animate-pulse-slow" />
+        {/* Premium Trending Header */}
+        <div className="text-center mb-16">
+          <div className="flex items-center justify-center gap-4 mb-6">
+            <div className="h-px w-12 bg-gradient-to-r from-transparent via-orange-500 to-transparent" />
+            <Flame className="w-12 h-12 text-orange-500" />
+            <div className="h-px w-12 bg-gradient-to-r from-transparent via-orange-500 to-transparent" />
           </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
+          <motion.h2
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, ease: "easeOut" }}
+            transition={{ duration: 0.7 }}
             viewport={{ once: true }}
-            className="relative"
+            className="text-5xl sm:text-6xl font-bold tracking-tighter text-gray-900 dark:text-white mb-4"
           >
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <Flame className="w-10 h-10 text-orange-600 animate-pulse" />
-              <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-                Trending Products
-              </h2>
-              <Flame className="w-10 h-10 text-orange-600 animate-pulse" />
-            </div>
+            Trending Now
+          </motion.h2>
 
-            <p className="text-xl md:text-2xl text-gray-700 font-medium max-w-3xl mx-auto">
-              Hot right now • Updated in real-time • Don't miss out!
-            </p>
-          </motion.div>
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            viewport={{ once: true }}
+            className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto flex items-center justify-center gap-2"
+          >
+            <Sparkles className="w-5 h-5 text-amber-500" />
+            Hot picks • Real-time updates • Limited stock
+          </motion.p>
         </div>
 
         {/* Products Grid */}
         {products.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-gray-600 text-2xl font-medium">
-              No trending products at the moment... check back soon!
+          <div className="text-center py-24">
+            <p className="text-2xl text-gray-500 dark:text-gray-400">
+              No trending products right now. Check back soon!
             </p>
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 sm:gap-6 lg:gap-8">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-6 sm:gap-7">
               {products.map((product, index) => (
                 <motion.div
                   key={`${product._id}-${index}`}
-                  initial={{ opacity: 0, y: 35 }}
+                  initial={{ opacity: 0, y: 40 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{
-                    duration: 0.6,
-                    delay: Math.min(index * 0.06, 0.8),
-                    ease: "easeOut",
+                    duration: 0.55,
+                    delay: Math.min(index * 0.03, 0.6),
                   }}
                   viewport={{ once: true }}
-                  className="transform-gpu"
                 >
                   <ProductCard product={product} />
                 </motion.div>
               ))}
             </div>
 
-            {/* Infinite Scroll Trigger */}
+            {/* Infinite Scroll Loader */}
             {hasMore && (
               <div ref={observerRef} className="flex justify-center py-20">
                 {isLoadingMore ? (
-                  <div className="flex items-center gap-4 text-orange-600">
-                    <Loader2 className="w-9 h-9 animate-spin" />
-                    <span className="text-xl font-medium">Loading more hot items...</span>
+                  <div className="flex items-center gap-3 text-orange-600 dark:text-orange-500">
+                    <Loader2 className="w-8 h-8 animate-spin" />
+                    <span className="text-lg font-medium">Loading more trending items...</span>
                   </div>
                 ) : (
-                  <p className="text-gray-400 text-base italic">
-                    Scroll down to discover more trending finds 🔥
+                  <p className="text-gray-400 dark:text-gray-500 flex items-center gap-2 text-sm">
+                    Scroll for more trending finds <span className="text-base">↓</span>
                   </p>
                 )}
               </div>
             )}
 
-            {/* End of content message */}
+            {/* End Message */}
             {!hasMore && products.length > 0 && (
               <div className="text-center py-20">
-                <p className="text-gray-600 text-xl font-medium">
-                  You've reached the end of today's trending picks! ✨
-                </p>
-                <p className="text-gray-500 mt-2">
-                  New hot products added regularly — come back soon!
-                </p>
+                <div className="inline-flex flex-col items-center gap-3 px-10 py-6 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30 rounded-3xl">
+                  <Flame className="w-10 h-10 text-orange-500" />
+                  <p className="text-gray-700 dark:text-gray-300 font-medium text-lg">
+                    You've seen all trending products for now!
+                  </p>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm">
+                    New trending items are added regularly ✨
+                  </p>
+                </div>
               </div>
             )}
           </>
