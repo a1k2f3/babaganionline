@@ -269,10 +269,7 @@ export default async function ProductPage({
           <section className="mt-20 lg:mt-28 pb-12">
             <div className="flex items-center justify-between mb-10">
               <h2 className="text-3xl font-bold text-gray-900">You May Also Like</h2>
-              <Link href="/shop" className="text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-2 group">
-                View All 
-                <span className="group-hover:translate-x-1 transition">→</span>
-              </Link>
+             
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
