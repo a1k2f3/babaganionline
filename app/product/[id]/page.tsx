@@ -1,5 +1,5 @@
 // app/products/[id]/page.tsx
-// SERVER COMPONENT
+// SERVER COMPONENT - Enhanced Design with Safe Rendering
 
 import Image from "next/image";
 import Link from "next/link";
@@ -13,6 +13,16 @@ import AddReviewForm from "@/components/card/AddReviewForm";
 import ProductActions from "@/components/card/ProducActions";
 
 import GoogleLoginPrompt from "@/components/GoogleLoginPrompt";
+
+// Helper to safely render strings (prevents "Objects are not valid as a React child" error)
+const safeString = (value: any): string => {
+  if (!value) return "";
+  if (typeof value === "string") return value;
+  if (typeof value === "object" && value !== null) {
+    return value.name || value.title || value._id || "";
+  }
+  return String(value);
+};
 
 async function getProduct(id: string) {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -71,71 +81,83 @@ export default async function ProductPage({
   const displayPrice = hasDiscount ? salePrice : originalPrice;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 lg:py-12">
-        {/* Breadcrumb */}
-        <nav className="mb-6 text-sm font-medium" aria-label="Breadcrumb">
-          <ol className="flex flex-wrap items-center gap-x-3 text-gray-600">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 lg:py-16">
+        
+        {/* Enhanced Breadcrumb */}
+        <nav className="mb-8 text-sm" aria-label="Breadcrumb">
+          <ol className="flex flex-wrap items-center gap-x-3 text-gray-500">
             <li>
-              <Link href="/" className="hover:text-indigo-600 transition-colors">
+              <Link href="/" className="hover:text-indigo-600 transition-all duration-200">
                 Home
               </Link>
             </li>
-            <span className="text-gray-400">/</span>
+            <span className="text-gray-300">›</span>
             {product.category && (
               <>
                 <li>
                   <Link
-                    href={`/categories/${product.category.slug}`}
-                    className="hover:text-indigo-600 transition-colors"
+                    href={`/categories/${product.category.slug || product.category._id || ""}`}
+                    className="hover:text-indigo-600 transition-all duration-200"
                   >
-                    {product.category.name}
+                    {safeString(product.category)}
                   </Link>
                 </li>
-                <span className="text-gray-400">/</span>
+                <span className="text-gray-300">›</span>
               </>
             )}
-            <li className="text-gray-900 truncate max-w-xs sm:max-w-md lg:max-w-lg">
-              {product.name}
+            <li className="text-gray-900 font-medium truncate max-w-xs sm:max-w-md">
+              {safeString(product.name)}
             </li>
           </ol>
         </nav>
 
         {/* Main Product Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 xl:gap-16">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 xl:gap-16">
           
-          {/* LEFT COLUMN: Gallery + ProductTabs */}
-          <div className="space-y-12 lg:order-1">
-            {/* Gallery */}
-            <ProductGallery images={images} productName={product.name} />
+          {/* LEFT COLUMN: Gallery + Tabs */}
+          <div className="lg:col-span-7 xl:col-span-7 space-y-14">
+            <div className="bg-white rounded-3xl shadow-xl shadow-gray-100/80 p-4">
+              <ProductGallery images={images} productName={safeString(product.name)} />
+            </div>
 
-            {/* Product Tabs - Placed right below the gallery */}
-            <ProductTabs 
-              descriptionPoints={descriptionPoints}
-              // product={product}   // Uncomment if your ProductTabs needs the full product object
-            />
+            <div className="bg-white rounded-3xl shadow-xl shadow-gray-100/80 p-8">
+              <ProductTabs 
+                descriptionPoints={descriptionPoints}
+              />
+            </div>
           </div>
 
           {/* RIGHT COLUMN: Product Info */}
-          <div className="space-y-8 lg:space-y-10 lg:sticky lg:top-6 self-start lg:order-2">
+          <div className="lg:col-span-5 xl:col-span-5 lg:sticky lg:top-8 self-start space-y-10">
             
-            {/* Title & Stock Status */}
-            <div className="space-y-4">
-              <h1 className="text-3xl sm:text-4xl lg:text-4.5xl font-bold text-gray-900 tracking-tight leading-tight">
-                {product.name}
-              </h1>
-
-              <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-                {product.stock > 0 && product.stock <= 10 && (
-                  <span className="inline-flex items-center px-3 py-1 text-xs font-semibold bg-red-100 text-red-700 rounded-full border border-red-200">
-                    Only {product.stock} left!
-                  </span>
+            {/* Header */}
+            <div className="space-y-6">
+              <div>
+                <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 leading-[1.1] tracking-tighter">
+                  {safeString(product.name)}
+                </h1>
+                
+                {/* Safe Brand Rendering */}
+                {product.brand && (
+                  <p className="mt-2 text-lg text-gray-500 font-medium">
+                    {safeString(product.brand)}
+                  </p>
                 )}
+              </div>
 
+              {/* Stock Status */}
+              <div className="flex flex-wrap items-center gap-4">
+                {product.stock > 0 && product.stock <= 10 && (
+                  <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-amber-100 text-amber-700 text-sm font-semibold rounded-2xl border border-amber-200">
+                    <span className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></span>
+                    Only {product.stock} left!
+                  </div>
+                )}
                 {product.stock === 0 && (
-                  <span className="inline-flex items-center px-3 py-1 text-xs font-semibold bg-gray-200 text-gray-700 rounded-full">
+                  <div className="inline-flex items-center px-4 py-1.5 bg-red-100 text-red-700 text-sm font-semibold rounded-2xl">
                     Out of stock
-                  </span>
+                  </div>
                 )}
               </div>
             </div>
@@ -144,110 +166,116 @@ export default async function ProductPage({
             <GoogleLoginPrompt />
 
             {/* Price Section */}
-            <div className="border-b border-gray-200 pb-8">
-              <div className="flex flex-col gap-1.5">
-                <div className="flex items-end gap-3 flex-wrap">
-                  <span className="text-5xl sm:text-6xl font-extrabold text-gray-900 tracking-tight">
-                    {displayPrice.toLocaleString("en-PK")}
-                  </span>
-                  <span className="text-2xl font-semibold text-gray-700 mb-2">
-                    {product.currency || "PKR"}
-                  </span>
-
-                  {hasDiscount && (
-                    <span className="ml-5 mb-3 inline-flex items-center px-4 py-1.5 bg-red-600 text-white font-bold text-base rounded-full shadow-sm">
-                      -{discountPercentage}%
-                    </span>
-                  )}
-                </div>
+            <div className="bg-white rounded-3xl p-8 shadow-xl shadow-gray-100/80 border border-gray-100">
+              <div className="flex items-end gap-4">
+                <span className="text-6xl font-bold text-gray-900 tracking-tighter">
+                  {displayPrice.toLocaleString("en-PK")}
+                </span>
+                <span className="text-2xl text-gray-600 font-medium mb-2">
+                  {product.currency || "PKR"}
+                </span>
 
                 {hasDiscount && (
-                  <div className="text-lg text-gray-500 line-through">
-                    {originalPrice.toLocaleString("en-PK")} {product.currency || "PKR"}
+                  <div className="ml-auto flex flex-col items-end">
+                    <span className="px-5 py-1.5 bg-gradient-to-r from-red-600 to-rose-600 text-white text-lg font-bold rounded-2xl shadow-md">
+                      -{discountPercentage}%
+                    </span>
+                    <div className="text-sm text-gray-500 line-through mt-1">
+                      {originalPrice.toLocaleString("en-PK")} {product.currency || "PKR"}
+                    </div>
                   </div>
                 )}
               </div>
             </div>
 
             {/* Size Selection + Actions */}
-            <form id="product-form" className="space-y-8">
-              {availableSizes.length > 0 && (
-                <div className="space-y-4">
-                  <h3 className="text-xl font-semibold text-gray-900">
-                    Select Size
-                  </h3>
-                  <div className="flex flex-wrap gap-3">
-                    {availableSizes.map((size, index) => (
-                      <label key={size} className="cursor-pointer">
-                        <input
-                          type="radio"
-                          name="selectedSize"
-                          value={size}
-                          className="peer sr-only"
-                          defaultChecked={index === 0}
-                          required
-                        />
-                        <div
-                          className={`
-                            min-w-16 px-5 py-3 rounded-xl border-2 border-gray-200 
-                            text-gray-800 font-medium text-center transition-all
-                            hover:border-indigo-500 hover:shadow
-                            peer-checked:border-indigo-600 peer-checked:bg-indigo-50 
-                            peer-checked:text-indigo-700 peer-checked:font-semibold
-                          `}
-                        >
-                          {size}
-                        </div>
-                      </label>
-                    ))}
+            <div className="bg-white rounded-3xl p-8 shadow-xl shadow-gray-100/80 border border-gray-100">
+              <form id="product-form" className="space-y-9">
+                {availableSizes.length > 0 && (
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-5">Select Size</h3>
+                    <div className="flex flex-wrap gap-3">
+                      {availableSizes.map((size, index) => (
+                        <label key={size} className="cursor-pointer">
+                          <input
+                            type="radio"
+                            name="selectedSize"
+                            value={size}
+                            className="peer sr-only"
+                            defaultChecked={index === 0}
+                            required
+                          />
+                          <div className="min-w-[62px] px-6 py-3.5 text-center font-semibold rounded-2xl border-2 border-gray-200 transition-all duration-200 hover:border-indigo-400 hover:shadow-md peer-checked:border-indigo-600 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 peer-checked:shadow-lg">
+                            {size}
+                          </div>
+                        </label>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              <div className="pt-2">
                 <ProductActions product={product} formId="product-form" />
-              </div>
-            </form>
+              </form>
+            </div>
 
             {/* Trust Badges */}
-            <div className="flex flex-wrap gap-6 sm:gap-10 text-sm text-gray-700 font-medium">
-              <div className="flex items-center gap-2.5">
-                <Truck className="h-6 w-6 text-indigo-600" />
-                Free delivery over 5000 PKR
+            <div className="flex flex-wrap justify-center sm:justify-start gap-x-10 gap-y-6 text-sm text-gray-600">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-indigo-100 flex items-center justify-center">
+                  <Truck className="h-5 w-5 text-indigo-600" />
+                </div>
+                <div>
+                  <p className="font-medium">Free Delivery</p>
+                  <p className="text-xs text-gray-500">Over 5000 PKR</p>
+                </div>
               </div>
-              <div className="flex items-center gap-2.5">
-                <Shield className="h-6 w-6 text-indigo-600" />
-                Secure payment
+
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-indigo-100 flex items-center justify-center">
+                  <Shield className="h-5 w-5 text-indigo-600" />
+                </div>
+                <div>
+                  <p className="font-medium">Secure Payment</p>
+                  <p className="text-xs text-gray-500">100% Protected</p>
+                </div>
               </div>
-              <div className="flex items-center gap-2.5">
-                <Check className="h-6 w-6 text-indigo-600" />
-                7-day returns
+
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-indigo-100 flex items-center justify-center">
+                  <Check className="h-5 w-5 text-indigo-600" />
+                </div>
+                <div>
+                  <p className="font-medium">Easy Returns</p>
+                  <p className="text-xs text-gray-500">7 Days</p>
+                </div>
               </div>
             </div>
 
-            {/* Write a Review - Always Visible */}
-            <div className="rounded-2xl border border-gray-200 bg-white p-7 shadow-sm">
-              <h2 className="mb-6 text-2xl font-bold text-gray-900">
-                Write a Review
-              </h2>
+            {/* Write a Review */}
+            <div className="bg-white rounded-3xl p-8 shadow-xl shadow-gray-100/80 border border-gray-100">
+              <h2 className="text-2xl font-bold text-gray-900 mb-7">Write a Review</h2>
               <AddReviewForm productId={product._id} />
             </div>
           </div>
         </div>
 
-        {/* Reviews Section - Kept below everything */}
-        <div className="mt-16 lg:mt-20">
+        {/* Reviews Section */}
+        <div className="mt-20 lg:mt-24">
           <ReviewsSection productId={product._id} />
         </div>
 
         {/* Related Products */}
         {relatedProducts?.length > 0 && (
-          <section className="mt-16 lg:mt-24 pb-16">
-            <h2 className="mb-10 text-3xl font-bold text-gray-900 text-center lg:text-left">
-              You May Also Like
-            </h2>
+          <section className="mt-20 lg:mt-28 pb-12">
+            <div className="flex items-center justify-between mb-10">
+              <h2 className="text-3xl font-bold text-gray-900">You May Also Like</h2>
+              <Link href="/shop" className="text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-2 group">
+                View All 
+                <span className="group-hover:translate-x-1 transition">→</span>
+              </Link>
+            </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
               {relatedProducts.map((item: any) => {
                 const hasDisc =
                   item.discountPrice && Number(item.discountPrice) < Number(item.price);
@@ -257,38 +285,38 @@ export default async function ProductPage({
                   <Link
                     key={item._id}
                     href={`/product/${item._id}`}
-                    className="group block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1"
+                    className="group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300"
                   >
-                    <div className="relative aspect-square bg-gray-50 overflow-hidden">
+                    <div className="relative aspect-square overflow-hidden bg-gray-50">
                       <Image
                         src={item.thumbnail}
-                        alt={item.name || "Related product"}
+                        alt={safeString(item.name)}
                         fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        className="object-cover transition-transform duration-700 group-hover:scale-110"
                         sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
                       />
                       {hasDisc && (
-                        <div className="absolute top-2 right-2 z-10">
-                          <span className="px-2.5 py-1 text-xs font-bold bg-red-600 text-white rounded-full shadow-sm">
+                        <div className="absolute top-4 right-4">
+                          <span className="px-3.5 py-1 text-xs font-bold bg-red-600 text-white rounded-2xl shadow">
                             {Math.round(
                               ((Number(item.price) - Number(item.discountPrice)) /
                                 Number(item.price)) *
                                 100
-                            )}%
+                            )}% OFF
                           </span>
                         </div>
                       )}
                     </div>
-                    <div className="p-4">
-                      <h3 className="line-clamp-2 text-sm font-medium text-gray-800 group-hover:text-indigo-600 transition-colors min-h-[2.8em]">
-                        {item.name}
+                    <div className="p-5">
+                      <h3 className="line-clamp-2 font-medium text-gray-900 group-hover:text-indigo-600 transition-colors min-h-[2.6em]">
+                        {safeString(item.name)}
                       </h3>
-                      <div className="mt-2 flex items-baseline gap-2.5">
-                        <span className="font-bold text-lg text-gray-900">
+                      <div className="mt-4 flex items-baseline gap-2">
+                        <span className="text-xl font-bold text-gray-900">
                           {dispPrice.toLocaleString("en-PK")}
                         </span>
                         {hasDisc && (
-                          <span className="text-sm text-gray-500 line-through">
+                          <span className="text-sm text-gray-400 line-through">
                             {Number(item.price).toLocaleString("en-PK")}
                           </span>
                         )}
