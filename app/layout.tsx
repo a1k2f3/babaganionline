@@ -88,98 +88,57 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <head>
-        {/* Favicon & App Icons */}
-        <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <link rel="manifest" href="/site.webmanifest" />
+  {/* Favicon & App Icons */}
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
 
-        {/* Preconnect to important third-parties (optional – add if using fonts/CDN) */}
-        {/* <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" /> */}
+  {/* Structured Data (JSON-LD) - Organization */}
+  <script
+    type="application/ld+json"
+    dangerouslySetInnerHTML={{
+      __html: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        name: "Baba Gani Online",
+        url: "https://www.babaganionline.com",
+        logo: "https://www.babaganionline.com/logo2.png",
+        contactPoint: {
+          "@type": "ContactPoint",
+          telephone: "+92-XXX-XXXXXXX", // Update with real number
+          contactType: "Customer Service",
+          areaServed: "PK",
+          availableLanguage: ["English", "Urdu"],
+        },
+        sameAs: [],
+      }),
+    }}
+  />
 
-        {/* Structured Data (JSON-LD) - Organization */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Organization",
-              name: "Baba Gani Online",
-              url: "https://www.babaganionline.com",
-              logo: "https://www.babaganionline.com/logo2.png",
-              contactPoint: {
-                "@type": "ContactPoint",
-                telephone: "+92-XXX-XXXXXXX", // Update with real number
-                contactType: "Customer Service",
-                areaServed: "PK",
-                availableLanguage: ["English", "Urdu"],
-              },
-              sameAs: [
-                // "https://facebook.com/babaganionline",
-                // "https://instagram.com/babaganionline",
-                // "https://twitter.com/babaganionline",
-              ],
-            }),
-          }}
-        />
-
-        {/* Google Analytics (GA4) - Replace with your ID */}
-        {/* <script
-          async
-          src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"
-        />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-XXXXXXXXXX');
-            `,
-          }}
-        /> */}
-
-        {/* Facebook Pixel (Optional) */}
-        {/* <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              !function(f,b,e,v,n,t,s)
-              {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-              n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-              if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-              n.queue=[];t=b.createElement(e);t.async=!0;
-              t.src=v;s=b.getElementsByTagName(e)[0];
-              s.parentNode.insertBefore(t,s)}(window, document,'script',
-              'https://connect.facebook.net/en_US/fbevents.js');
-              fbq('init', 'YOUR_PIXEL_ID');
-              fbq('track', 'PageView');
-            `,
-          }}
-        /> */}
-        {/* <!-- Meta Pixel Code --> */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              !function(f,b,e,v,n,t,s)
-              {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-              n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-              if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-              n.queue=[];t=b.createElement(e);t.async=!0;
-              t.src=v;s=b.getElementsByTagName(e)[0];
-              s.parentNode.insertBefore(t,s)}(window, document,'script',
-              'https://connect.facebook.net/en_US/fbevents.js');
-              fbq('init', '1385138273451295');
-              fbq('track', 'PageView');
-            `,
-          }}
-        />
-        <noscript
-          dangerouslySetInnerHTML={{
-            __html: `<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1385138273451295&ev=PageView&noscript=1" alt="Facebook Pixel" />`,
-          }}
-        />
-        {/* <!-- End Meta Pixel Code --> */}
-      </head>
+  {/* <!-- Meta Pixel Code --> */}
+  <script
+    dangerouslySetInnerHTML={{
+      __html: `
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '1385138273451295');
+        fbq('track', 'PageView');
+      `,
+    }}
+  />
+  <noscript
+    dangerouslySetInnerHTML={{
+      __html: `<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1385138273451295&ev=PageView&noscript=1" alt="Facebook Pixel" />`,
+    }}
+  />
+  {/* <!-- End Meta Pixel Code --> */}  
+</head>
 
       <body className={`${inter.variable} font-sans antialiased bg-gray-50 text-gray-900`}>
         <Navbar />
