@@ -250,6 +250,7 @@ export default async function ProductPage({
                 )}
 
                 <ProductActions product={product} formId="product-form" />
+                
               </form>
             </div>
 
