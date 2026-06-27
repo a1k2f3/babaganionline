@@ -271,7 +271,7 @@ export default function CheckoutPage() {
     return sum + effectivePrice * item.quantity;
   }, 0);
 
-  const delivery = subtotal >= 1000 ? 0 : 99;
+  const delivery = subtotal >= 5000 ? 0 : 149;
   const total = subtotal + delivery;
 
   const steps = [
