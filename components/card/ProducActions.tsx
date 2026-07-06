@@ -147,6 +147,47 @@ export default function ProductActions({
     return (formData.get("selectedSize") as string) || null;
   };
 
+const addToLocalCart = (item: any) => {
+  let cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+  // === DEBUG LOGS ===
+  console.log("🔍 Adding to local cart - Raw product:", item);
+  console.log("🔍 Images array:", item.image.url);
+  console.log("🔍 Thumbnail:", item.thumbnail);
+
+  // Get the best image possible - SAFE CHECKING
+  let imageUrl =item.image.url
+console.log("hello",imageUrl)
+ 
+
+  console.log("✅ Final image URL chosen:", imageUrl);
+
+  const itemToAdd = {
+    productId: item.productId,
+    name: item.name || "Unknown Product",
+    price: Number(item.price) || 0,
+    discountPrice:  Number(item.discountPrice)||0,
+    size: item.size || undefined,
+    quantity: Number(item.quantity) || 1,
+    image: imageUrl,
+    storeId: item.storeId || "",
+  };
+
+  // Check for existing item
+  const existingIndex = cart.findIndex((cartItem: any) => 
+    cartItem.productId === item.productId && 
+    cartItem.size === item.size
+  );
+
+  if (existingIndex !== -1) {
+    cart[existingIndex].quantity += Number(item.quantity);
+  } else {
+    cart.push(itemToAdd);
+  }
+
+  localStorage.setItem("cart", JSON.stringify(cart));
+  console.log("💾 Cart saved to localStorage:", cart);
+};
   const handleAddToCart = async (buyNow = false) => {
     setCartLoading(true);
     setMessage(null);
@@ -163,12 +204,28 @@ export default function ProductActions({
     const token = localStorage.getItem("token");
     const userID = localStorage.getItem("UserId")?.replace(/"/g, "");
 
+    // Guest user - save to localStorage
     if (!token || !userID) {
-      handleRequireLogin();
+      addToLocalCart({
+        productId: product._id,
+        quantity,
+        storeId: product.brand?._id || "",
+        size: selectedSize || undefined,
+        discountPrice:  Number(product.discountPrice),
+        name: product.name,
+        price: product.price,
+        image: product.images?.[0] 
+      });
+      setMessage({ type: "success", text: "Added to cart successfully!" });
+
+      if (buyNow) {
+        router.push("/shop/cart");
+      }
       setCartLoading(false);
       return;
     }
 
+    // Logged-in user - existing API call
     try {
       const res = await fetch(`${API_BASE}/api/cart/add?userId=${userID}`, {
         method: "POST",

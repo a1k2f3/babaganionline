@@ -23,21 +23,27 @@ export default function CartPage() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isGuest, setIsGuest] = useState(false);
 
   const router = useRouter();
 
+  // Load cart - supports both logged-in and guest users
   const fetchCart = async () => {
     setLoading(true);
     setError(null);
 
     const token = localStorage.getItem("token");
-     const userId = localStorage.getItem("UserId")?.replace(/"/g, "");
+    const userId = localStorage.getItem("UserId")?.replace(/"/g, "");
 
+    // Guest User → Load from localStorage
     if (!token || !userId) {
-      router.push("/auth/login?redirect=/cart");
+      setIsGuest(true);
+      loadLocalCart();
       return;
     }
 
+    // Logged-in User → Load from API
+    setIsGuest(false);
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/cart?userId=${userId}`,
@@ -51,7 +57,6 @@ export default function CartPage() {
 
       if (res.status === 401) {
         localStorage.removeItem("token");
-        const userId = localStorage.getItem("UserId")?.replace(/"/g, "");
         router.push("/auth/login?redirect=/cart");
         return;
       }
@@ -81,22 +86,73 @@ export default function CartPage() {
     }
   };
 
+  // Load cart from localStorage for guest users
+ const loadLocalCart = () => {
+  try {
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+    
+    const formattedCart: CartItem[] = cart.map((item: any) => ({
+      id: item.productId,
+      name: item.name || "Product",
+      price: Number(item.price) || 0,
+      discountPrice: item.discountPrice ? Number(item.discountPrice) : undefined,
+      size: item.size,
+      quantity: item.quantity || 1,
+      image: item.image ,
+      inStock: true,
+    }));
+
+    setItems(formattedCart);
+  } catch (err) {
+    console.error("Failed to load local cart", err);
+    setItems([]);
+  } finally {
+    setLoading(false);
+  }
+};
+
+  // Save cart to localStorage (for guest users)
+  const saveLocalCart = (updatedItems: CartItem[]) => {
+    const cartForStorage = updatedItems.map(item => ({
+      productId: item.id,
+      name: item.name,
+      price: item.price,
+      discountPrice: item.discountPrice,
+      size: item.size,
+      quantity: item.quantity,
+      image: item.image,
+    }));
+    localStorage.setItem("cart", JSON.stringify(cartForStorage));
+  };
+
   useEffect(() => {
     fetchCart();
   }, []);
 
+  // Update quantity (works for both guest & logged-in)
   const updateQuantity = async (id: string, change: number) => {
     const token = localStorage.getItem("token");
-    const userId = localStorage.getItem("UserId")?.replace(/"/g, ""); 
+    const userId = localStorage.getItem("UserId")?.replace(/"/g, "");
 
     const item = items.find((i) => i.id === id);
-    if (!item || !token || !userId) return;
+    if (!item) return;
 
     const newQty = Math.max(1, item.quantity + change);
 
     setActionLoading(id);
-    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, quantity: newQty } : i)));
+    const updatedItems = items.map((i) =>
+      i.id === id ? { ...i, quantity: newQty } : i
+    );
+    setItems(updatedItems);
 
+    if (!token || !userId) {
+      // Guest User
+      saveLocalCart(updatedItems);
+      setActionLoading(null);
+      return;
+    }
+
+    // Logged-in User - API call
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/cart/update?userId=${userId}`,
@@ -112,25 +168,32 @@ export default function CartPage() {
 
       if (!res.ok) throw new Error("Failed to update");
     } catch {
-      setItems((prev) =>
-        prev.map((i) => (i.id === id ? { ...i, quantity: item.quantity } : i))
-      );
+      setItems(items); // revert on error
       alert("Failed to update quantity");
     } finally {
       setActionLoading(null);
     }
   };
 
+  // Remove item (works for both guest & logged-in)
   const removeItem = async (id: string) => {
     const token = localStorage.getItem("token");
-     const userId = localStorage.getItem("UserId")?.replace(/"/g, "");
-
-    if (!token || !userId) return;
+    const userId = localStorage.getItem("UserId")?.replace(/"/g, "");
 
     const prevItems = [...items];
-    setActionLoading(id);
-    setItems((prev) => prev.filter((i) => i.id !== id));
+    const updatedItems = items.filter((i) => i.id !== id);
 
+    setActionLoading(id);
+    setItems(updatedItems);
+
+    if (!token || !userId) {
+      // Guest User
+      saveLocalCart(updatedItems);
+      setActionLoading(null);
+      return;
+    }
+
+    // Logged-in User
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/cart/remove/${id}?userId=${userId}`,
@@ -151,7 +214,7 @@ export default function CartPage() {
     }
   };
 
-  // Price calculation (only product-level discounts)
+  // Price calculation
   const subtotal = items.reduce((sum, item) => {
     const price = item.discountPrice && item.discountPrice < item.price
       ? item.discountPrice
@@ -232,7 +295,6 @@ export default function CartPage() {
                 item.discountPrice > 0 &&
                 item.discountPrice < item.price;
 
-              // Safe price handling after condition check
               const displayPrice = hasDiscount ? item.discountPrice! : item.price;
 
               const discountPercent = hasDiscount
@@ -257,6 +319,7 @@ export default function CartPage() {
                       className="object-cover"
                       sizes="(max-width: 640px) 100vw, 128px"
                     />
+                  
                     {!item.inStock && (
                       <div className="absolute inset-0 bg-black/65 grid place-items-center">
                         <span className="text-white text-sm font-medium px-4 py-1.5 bg-red-600/90 rounded-lg">

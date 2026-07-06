@@ -98,6 +98,7 @@ export default function OrderHistory() {
         }
 
         const data: Order[] = await response.json();
+        console.log(data);
         setOrders(data);
       } catch (err) {
         console.error("Fetch orders error:", err);
