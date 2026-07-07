@@ -333,23 +333,27 @@ console.log("hello",imageUrl)
 
       {/* Messages */}
       {message && (
-        <div
-          className={`flex items-center gap-2.5 px-5 py-3.5 rounded-xl font-medium ${
-            message.type === "success"
-              ? "bg-green-50 text-green-800"
-              : "bg-red-50 text-red-800"
-          }`}
+  <div
+    className={`mt-4 rounded-lg p-3 ${
+      message.type === "success"
+        ? "bg-green-100 text-green-700"
+        : "bg-red-100 text-red-700"
+    }`}
+  >
+    <div className="flex items-center justify-between">
+      <span>{message.text}</span>
+
+      {message.type === "success" && (
+        <button
+          onClick={() => router.push("/shop/cart")}
+          className="ml-4 rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 transition"
         >
-          {message.type === "success" ? (
-            <CheckCircle className="w-5 h-5" />
-          ) : (
-            <div className="w-5 h-5 rounded-full bg-red-600 flex items-center justify-center text-white text-xs font-bold">
-              !
-            </div>
-          )}
-          {message.text}
-        </div>
+          Go to Cart
+        </button>
       )}
+    </div>
+  </div>
+)}
 
       {/* Login Prompt when needed */}
       {showLoginPrompt && !message && (
