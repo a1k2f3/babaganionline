@@ -10,6 +10,7 @@ import AddReviewForm from "@/components/card/AddReviewForm";
 import ProductActions from "@/components/card/ProducActions";
 
 import GoogleLoginPrompt from "@/components/GoogleLoginPrompt";
+import LiveViewers from "@/components/LiveViewers";
 
 const safeString = (value: any): string => {
   if (!value) return "";
@@ -40,6 +41,7 @@ export default async function ProductPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  
   const productData = await getProduct(id);
 
   if (!productData || !productData.success || !productData.data) {
@@ -186,7 +188,10 @@ export default async function ProductPage({
 
             {/* Google Login */}
             <GoogleLoginPrompt />
-
+<div className="flex items-center gap-3">
+  {/* Your existing stock badge */}
+  <LiveViewers productId={product._id} />
+</div>
             {/* Price */}
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
               <div className="flex items-start justify-between gap-4">
