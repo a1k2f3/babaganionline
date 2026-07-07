@@ -21,7 +21,7 @@ export async function POST(
   }, 30000); // remove after 30 seconds
 
   return Response.json({
-    count: activeViewers.get(id) || 3,
+    count: activeViewers.get(id),
     productId: id
   });
 }
