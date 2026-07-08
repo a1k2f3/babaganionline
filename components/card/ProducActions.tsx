@@ -11,6 +11,7 @@ import {
   Loader2,
   CheckCircle,
 } from "lucide-react";
+import Link from "next/link";
 
 interface ProductActionsProps {
   product: any;
@@ -344,13 +345,12 @@ console.log("hello",imageUrl)
       <span>{message.text}</span>
 
       {message.type === "success" && (
-        <button
-          onClick={() => router.push("/shop/cart")}
-          className="ml-4 rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 transition"
-        >
+        <Link href="/shop/cart" className="ml-4 rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 transition">
           Go to Cart
-        </button>
+        </Link>
       )}
+        
+      
     </div>
   </div>
 )}
