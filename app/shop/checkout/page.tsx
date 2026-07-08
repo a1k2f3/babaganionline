@@ -437,7 +437,7 @@ export default function CheckoutPage() {
                       />
                     </div>
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-semibold mb-1">Street Address *</label>
+                      <label className="block text-sm font-semibold mb-1"> Address *</label>
                       <input
                         type="text"
                         value={guestInfo.street}
