@@ -187,7 +187,7 @@ export default async function ProductPage({
             </div>
 
             {/* Google Login */}
-            <GoogleLoginPrompt />
+            {/* <GoogleLoginPrompt /> */}
 <div className="flex items-center gap-3">
   {/* Your existing stock badge */}
   <LiveViewers productId={product._id} />
