@@ -246,7 +246,7 @@ export default function CheckoutPage() {
           return sum + effectivePrice * item.quantity;
         }, 0);
 
-        const shippingFee = subtotal >= 5000 ? 0 : 199;
+        const shippingFee = subtotal >= 2500 ? 0 : 109;
         const totalAmount = subtotal + shippingFee;
 
         const discountAmount = items.reduce((sum, item) => {
