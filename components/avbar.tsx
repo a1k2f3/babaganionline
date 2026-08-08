@@ -58,28 +58,32 @@ const Navbar = () => {
   return (
     <>
       {/* ==================== DESKTOP NAVBAR ==================== */}
-      <nav className="bg-white shadow-md fixed top-0 left-0 right-0 z-50 hidden md:flex items-center justify-between px-6 py-4">
-        <Link href="/" className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-          <Image src="/logo2.jpg" alt="logo" width={50} height={50} />
-          BabaGaniOnline
+      <nav className="bg-white/80 backdrop-blur-xl border-b border-slate-200/80 shadow-[0_10px_35px_rgba(15,23,42,0.06)] fixed top-0 left-0 right-0 z-50 hidden md:flex items-center justify-between px-5 py-3.5">
+        <Link href="/" className="flex items-center gap-3 text-xl font-black tracking-tight text-slate-800 shrink-0">
+          <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-indigo-600 via-violet-600 to-sky-500 shadow-lg shadow-indigo-200">
+            <Image src="/logo2.jpg" alt="logo" width={40} height={40} className="h-full w-full object-cover" />
+          </div>
+          <span className="bg-gradient-to-r from-slate-900 via-indigo-700 to-violet-700 bg-clip-text text-transparent">
+            BabaGaniOnline
+          </span>
         </Link>
         <div className="flex-1 max-w-xl mx-8">
           <NavSearch />
         </div>
-        <div className="flex space-x-6">
-          <Link href="/" className="text-gray-600 hover:text-gray-900">Home</Link>
-          <Link href="/shop/orders" className="text-gray-600 hover:text-gray-900">Orders</Link>
-          <Link href="/categories" className="text-gray-600 hover:text-gray-900">Categories</Link>
-          <Link href="/about" className="text-gray-600 hover:text-gray-900">About</Link>
-          <Link href="/contact" className="text-gray-600 hover:text-gray-900">Contact</Link>
-          <Link href="/support" className="text-gray-600 hover:text-gray-900">Support</Link>
+        <div className="flex items-center gap-6">
+          <Link href="/" className="text-sm font-medium text-slate-600 hover:text-indigo-600">Home</Link>
+          <Link href="/shop/orders" className="text-sm font-medium text-slate-600 hover:text-indigo-600">Orders</Link>
+          <Link href="/categories" className="text-sm font-medium text-slate-600 hover:text-indigo-600">Categories</Link>
+          <Link href="/about" className="text-sm font-medium text-slate-600 hover:text-indigo-600">About</Link>
+          <Link href="/contact" className="text-sm font-medium text-slate-600 hover:text-indigo-600">Contact</Link>
+          <Link href="/support" className="text-sm font-medium text-slate-600 hover:text-indigo-600">Support</Link>
         </div>
 
-        <div className="flex space-x-6 items-center">
-          <Link href="/shop/cart" className="text-gray-600 hover:text-gray-900 relative">
-            <FiShoppingCart size={24} />
+        <div className="flex items-center gap-5 pl-2">
+          <Link href="/shop/cart" className="relative rounded-full p-2.5 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">
+            <FiShoppingCart size={22} />
             {cartItemCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+              <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-sm">
                 {cartItemCount}
               </span>
             )}
@@ -87,15 +91,15 @@ const Navbar = () => {
 
           {/* ── Conditional Auth Button ── */}
           {isLoggedIn ? (
-            <Link href="/profile" className="text-gray-600 hover:text-gray-900">
-              <FiUser size={24} />
+            <Link href="/profile" className="rounded-full p-2.5 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">
+              <FiUser size={22} />
             </Link>
           ) : (
             <Link
               href="/auth/login" // ← adjust route if your login page is /signin, /auth/login, etc.
-              className="flex items-center gap-1.5 text-gray-700 hover:text-indigo-600 font-medium transition"
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-200 hover:from-indigo-500 hover:to-violet-500"
             >
-              <FiLogIn size={22} />
+              <FiLogIn size={18} />
               <span>Login</span>
             </Link>
           )}
@@ -103,35 +107,37 @@ const Navbar = () => {
       </nav>
 
       {/* ==================== MOBILE TOP HEADER ==================== */}
-      <div className="bg-white shadow-md fixed top-0 left-0 right-0 z-50 flex md:hidden items-center justify-between px-4 py-3">
+      <div className="bg-white/80 backdrop-blur-xl border-b border-slate-200/80 shadow-[0_10px_25px_rgba(15,23,42,0.05)] fixed top-0 left-0 right-0 z-50 flex md:hidden items-center justify-between px-4 py-3">
         <button
           onClick={() => setIsSidebarOpen(true)}
-          className="text-gray-700 hover:text-indigo-600 transition z-10"
+          className="z-10 rounded-full p-2 text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition"
           aria-label="Open menu"
         >
-          <FiMenu size={28} />
+          <FiMenu size={24} />
         </button>
 
         <Link href="/" className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2">
-          <Image src="/logo2.jpg" alt="BabaGaniOnline" width={40} height={40} className="rounded-lg" />
-          <span className="text-lg font-bold text-gray-800">BabaGani</span>
+          <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-indigo-600 to-violet-600 shadow-sm">
+            <Image src="/logo2.jpg" alt="BabaGaniOnline" width={32} height={32} className="h-full w-full object-cover" />
+          </div>
+          <span className="text-base font-bold text-slate-800">BabaGani</span>
         </Link>
 
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-4">
           <button
             onClick={() => setIsSearchOpen(!isSearchOpen)}
-            className={`transition-all duration-200 ${
-              isSearchOpen ? "text-indigo-600 scale-110" : "text-gray-700 hover:text-indigo-600 hover:scale-110"
+            className={`rounded-full p-2 transition-all duration-200 ${
+              isSearchOpen ? "bg-indigo-50 text-indigo-600 scale-105" : "text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 hover:scale-105"
             }`}
             aria-label="Search"
           >
-            <FiSearch size={26} />
+            <FiSearch size={22} />
           </button>
 
-          <Link href="/shop/cart" className="text-gray-700 hover:text-indigo-600 relative">
-            <FiShoppingCart size={24} />
+          <Link href="/shop/cart" className="relative rounded-full p-2 text-slate-700 hover:bg-indigo-50 hover:text-indigo-600">
+            <FiShoppingCart size={22} />
             {cartItemCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+              <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-sm">
                 {cartItemCount}
               </span>
             )}

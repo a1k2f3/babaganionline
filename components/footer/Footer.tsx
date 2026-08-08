@@ -37,31 +37,33 @@ export default function Footer() {
 //   ];
 
   return (
-    <footer className="bg-gray-900 text-gray-300">
+    <footer className="bg-slate-950 text-slate-300">
       {/* Main Footer */}
       <div className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
         {/* Brand & Description */}
         <div className="space-y-6">
           <Link href="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg" />
-            <h3 className="text-2xl font-bold text-white">BabaGaniOnline</h3>
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 via-violet-600 to-sky-500 shadow-lg shadow-indigo-900/40">
+              <span className="text-lg font-black text-white">B</span>
+            </div>
+            <h3 className="text-2xl font-black tracking-tight text-white">BabaGaniOnline</h3>
           </Link>
-          <p className="text-sm leading-relaxed max-w-xs">
+          <p className="max-w-xs text-sm leading-relaxed text-slate-300/85">
             Your trusted online marketplace connecting customers with premium products and reliable vendors across Pakistan.
           </p>
 
-          <div className="flex items-center gap-4">
-            <a href="#" className="text-gray-400 hover:text-white transition">
-              <FiFacebook size={20} />
+          <div className="flex items-center gap-3">
+            <a href="#" className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-700 bg-slate-900 text-slate-300 hover:border-indigo-400 hover:bg-indigo-500/10 hover:text-white transition">
+              <FiFacebook size={18} />
             </a>
-            <a href="#" className="text-gray-400 hover:text-white transition">
-              <FiInstagram size={20} />
+            <a href="#" className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-700 bg-slate-900 text-slate-300 hover:border-pink-400 hover:bg-pink-500/10 hover:text-white transition">
+              <FiInstagram size={18} />
             </a>
-            <a href="#" className="text-gray-400 hover:text-white transition">
-              <FiTwitter size={20} />
+            <a href="#" className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-700 bg-slate-900 text-slate-300 hover:border-sky-400 hover:bg-sky-500/10 hover:text-white transition">
+              <FiTwitter size={18} />
             </a>
-            <a href="#" className="text-gray-400 hover:text-white transition">
-              <FiYoutube size={20} />
+            <a href="#" className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-700 bg-slate-900 text-slate-300 hover:border-red-400 hover:bg-red-500/10 hover:text-white transition">
+              <FiYoutube size={18} />
             </a>
           </div>
         </div>
@@ -129,14 +131,14 @@ export default function Footer() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-gray-800 mt-12 pt-8">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
+      <div className="border-t border-slate-800/80 mt-12 pt-8">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center text-sm text-slate-400">
           <p>
             © {currentYear}{" "}
             <span className="font-semibold text-indigo-400">BabaGaniOnline</span>. All rights reserved.
           </p>
 
-          <div className="flex items-center gap-6 mt-4 md:mt-0">
+          <div className="mt-4 flex items-center gap-6 md:mt-0">
             <Link href="/static/privacy-policy" className="hover:text-white transition">
               Privacy Policy
             </Link>

@@ -70,63 +70,60 @@ export default function ProductCard({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.45, ease: "easeOut" }}
       viewport={{ once: true }}
-      className="group block"
+      whileHover={{ y: -8 }}
+      className="group block h-full"
     >
       <Link href={`/product/${product._id}`} className="block h-full">
-        <div className="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-          {/* Image + Badges */}
-          <div className="relative aspect-square">
+        <div className="h-full overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white shadow-[0_14px_40px_rgba(15,23,42,0.06)] transition-all duration-300 hover:border-indigo-200 hover:shadow-[0_20px_50px_rgba(79,70,229,0.12)]">
+          <div className="relative aspect-square overflow-hidden bg-slate-100">
             <Image
               src={safeImage}
               alt={product.name}
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              className="object-cover transition-transform duration-500 group-hover:scale-110"
             />
 
-            {/* Discount badge - top left - red like DealsSection */}
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/15 via-transparent to-transparent" />
+
             {hasDiscount && discountPercent > 5 && (
-              <div className="absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg z-10">
+              <div className="absolute left-3 top-3 z-10 rounded-full bg-gradient-to-r from-red-500 to-rose-500 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-white shadow-lg shadow-red-500/30">
                 -{discountPercent}%
               </div>
             )}
 
-            {/* Flash / urgency badge - top right */}
             {showFlashBadge && (
-              <div className="absolute top-2 right-2 bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded flex items-center gap-1 shadow z-10">
-                <span className="w-2 h-2 bg-black rounded-full animate-ping" />
+              <div className="absolute right-3 top-3 z-10 flex items-center gap-1 rounded-full bg-gradient-to-r from-amber-300 to-orange-400 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-slate-900 shadow-lg shadow-orange-500/20">
+                <span className="h-1.5 w-1.5 animate-ping rounded-full bg-slate-900" />
                 FLASH
               </div>
             )}
           </div>
 
-          {/* Content area */}
-          <div className="p-3">
-            <h3 className="text-sm font-medium text-gray-800 line-clamp-2 mb-2 group-hover:text-orange-600 transition-colors min-h-[2.75rem]">
+          <div className="space-y-3 p-3.5">
+            <h3 className="min-h-[2.75rem] text-sm font-semibold leading-5 text-slate-800 transition-colors duration-200 group-hover:text-indigo-600 line-clamp-2">
               {product.name}
             </h3>
 
-            {/* Price row */}
-            <div className="flex items-end justify-between">
-              <div className="flex items-baseline gap-2">
-                <span className="text-lg font-bold text-green-600">
+            <div className="flex items-end justify-between gap-2">
+              <div className="flex flex-col">
+                <span className="text-lg font-black tracking-tight text-emerald-600">
                   {currency} {finalPrice.toLocaleString("en-IN")}
                 </span>
 
                 {hasDiscount && (
-                  <span className="text-xs text-gray-500 line-through ml-1">
+                  <span className="text-[11px] text-slate-400 line-through">
                     {currency} {originalPrice.toLocaleString("en-IN")}
                   </span>
                 )}
               </div>
 
-              {/* Optional small rating - can remove if not needed */}
-              {/* <div className="flex items-center text-xs text-amber-500">
-                <Star size={14} className="fill-current" />
-                <span className="ml-1">{displayRating.toFixed(1)}</span>
-              </div> */}
+              <div className="flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-700">
+                <Star size={12} className="fill-amber-400 text-amber-400" />
+                {displayRating.toFixed(1)}
+              </div>
             </div>
           </div>
         </div>

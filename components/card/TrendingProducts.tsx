@@ -38,7 +38,7 @@ interface Product {
   tags: Tag[];
 }
 
-const PRODUCTS_PER_PAGE = 12;
+const PRODUCTS_PER_PAGE = 8;
 
 const fetcher = (url: string) =>
   fetch(url).then((res) => {
@@ -70,7 +70,7 @@ export default function TrendingProductsSection() {
   const products: Product[] = data ? data.flatMap((page) => page.data || []) : [];
 
   const isLoadingMore = isValidating && size > 0;
-  const hasMore = products.length < 100;
+  const hasMore = products.length < 24;
 
   const handleObserver = useCallback(
     (entries: IntersectionObserverEntry[]) => {
