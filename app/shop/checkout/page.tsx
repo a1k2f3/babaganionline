@@ -246,7 +246,7 @@ export default function CheckoutPage() {
           return sum + effectivePrice * item.quantity;
         }, 0);
 
-        const shippingFee = subtotal >= 2500 ? 0 : 109;
+        const shippingFee = 0;
         const totalAmount = subtotal + shippingFee;
 
         const discountAmount = items.reduce((sum, item) => {
@@ -333,7 +333,7 @@ export default function CheckoutPage() {
     return sum + effectivePrice * item.quantity;
   }, 0);
 
-  const delivery = subtotal >= 5000 ? 0 : 199;
+  const delivery = 0;
   const total = subtotal + delivery;
 
   const steps = [
@@ -673,7 +673,7 @@ export default function CheckoutPage() {
                 <div className="flex justify-between">
                   <span>Delivery</span>
                   <span className={delivery === 0 ? "text-green-600 font-bold" : ""}>
-                    {delivery === 0 ? "FREE" : `RS${delivery.toLocaleString("en-IN")}`}
+                    FREE
                   </span>
                 </div>
                 <div className="flex justify-between text-xl font-bold border-t pt-4">
