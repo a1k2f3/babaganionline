@@ -1,13 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useCallback, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { Flame, Clock, Loader2 } from "lucide-react";
 import useSWR from "swr";
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 interface Product {
   _id: string;
@@ -15,19 +10,18 @@ interface Product {
   price: number;
   discountPrice?: number;
   currency: string;
-  stock: number;
   thumbnail?: string;
   images?: { url: string }[];
-  slug?: string;
-  createdAt: string;
 }
 
-export default function DealsSection() {
-  const timeLeftRef = useRef<Record<string, number>>({});
-  const [_, forceUpdate] = useState({});
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+const fetcher = async (url: string): Promise<{ products?: Product[] }> => {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error("Failed to load new arrivals");
+  return response.json();
+};
 
-  const { data, isLoading, error } = useSWR(
+export default function DealsSection() {
+  const { data, isLoading, error } = useSWR<{ products?: Product[] }>(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/products/new/arrival`,
     fetcher,
     {
@@ -36,197 +30,95 @@ export default function DealsSection() {
     }
   );
 
-  const products: Product[] = data?.products || [];
-
-  const formatTime = useCallback((seconds: number): string => {
-    if (seconds <= 0) return "00:00:00";
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = seconds % 60;
-    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-  }, []);
-
-  // Initialize countdown timers
-  useEffect(() => {
-    if (!products.length) {
-      timeLeftRef.current = {};
-      return;
-    }
-
-    let shouldUpdate = false;
-
-    products.forEach((product) => {
-      if (!(product._id in timeLeftRef.current)) {
-        // Random countdown between 2 to 12 hours
-        timeLeftRef.current[product._id] = Math.floor(Math.random() * 36000) + 7200;
-        shouldUpdate = true;
-      }
-    });
-
-    // Clean up old timers
-    Object.keys(timeLeftRef.current).forEach((id) => {
-      if (!products.some((p) => p._id === id)) {
-        delete timeLeftRef.current[id];
-      }
-    });
-
-    if (shouldUpdate) forceUpdate({});
-  }, [products]);
-
-  // Countdown Timer
-  useEffect(() => {
-    intervalRef.current = setInterval(() => {
-      let hasActive = false;
-
-      Object.keys(timeLeftRef.current).forEach((id) => {
-        if (timeLeftRef.current[id] > 0) {
-          timeLeftRef.current[id] -= 1;
-          hasActive = true;
-        } else {
-          timeLeftRef.current[id] = 0;
-        }
-      });
-
-      if (hasActive) {
-        forceUpdate({});
-      } else if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    }, 1000);
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, []);
-
-  // Hide entire section if no products
-  if (error || products.length === 0) {
-    return null;
-  }
-
-  if (isLoading) {
+  if (error) {
     return (
-      <section className="py-16 md:py-20 bg-gradient-to-br from-red-50 via-white to-orange-50 dark:from-red-950/30 dark:via-gray-900 dark:to-orange-950/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center gap-3 mb-12">
-            <Flame className="w-8 h-8 text-red-600 animate-pulse" />
-            <h2 className="text-4xl font-bold text-gray-900 dark:text-white">Flash Deals</h2>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden animate-pulse">
-                <div className="aspect-square bg-gray-200 dark:bg-gray-700" />
-                <div className="p-4 space-y-3">
-                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
-                  <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/2" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+      <section className="bg-slate-50 px-4 py-8 text-center">
+        <p className="text-sm text-slate-600">New arrivals are temporarily unavailable.</p>
       </section>
     );
   }
 
+  const products = data?.products?.slice(0, 10) ?? [];
+  if (!isLoading && products.length === 0) return null;
+
   return (
-    <section className="py-16 md:py-20 bg-gradient-to-br from-red-50 via-white to-orange-50 dark:from-red-950/30 dark:via-gray-900 dark:to-orange-950/30">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-14">
-          <div className="flex items-center justify-center gap-4 mb-4">
-            <Flame className="w-10 h-10 text-red-600" />
-            <h2 className="text-5xl font-bold tracking-tight text-gray-900 dark:text-white">
-              Flash Deals
-            </h2>
-            <Flame className="w-10 h-10 text-red-600" />
-          </div>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-md mx-auto">
-            Limited time offers • Prices drop every hour
+    <section className="border-y border-slate-200 bg-slate-50 py-12 md:py-16">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-8">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+            Baba Gani Online
           </p>
+          <h2 className="text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
+            New arrivals
+          </h2>
         </div>
 
-        {/* Deals Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 sm:gap-7">
-          {products.map((product, index) => {
-            const hasDiscount = product.discountPrice && product.discountPrice < product.price;
-            const displayPrice = hasDiscount ? product.discountPrice! : product.price;
-            const discountPercent = hasDiscount
-              ? Math.round(((product.price - product.discountPrice!) / product.price) * 100)
-              : 0;
+        {isLoading ? (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4 xl:grid-cols-5">
+            {Array.from({ length: 4 }, (_, index) => (
+              <div key={index} className="aspect-[3/4] animate-pulse rounded-xl bg-slate-200" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4 xl:grid-cols-5">
+            {products.map((product) => {
+              const image = product.thumbnail || product.images?.[0]?.url;
+              const hasDiscount =
+                product.discountPrice !== undefined &&
+                product.discountPrice > 0 &&
+                product.discountPrice < product.price;
+              const salePrice =
+                hasDiscount && product.discountPrice !== undefined
+                  ? product.discountPrice
+                  : product.price;
+              const discountPercent =
+                hasDiscount && product.discountPrice !== undefined
+                  ? Math.round(((product.price - product.discountPrice) / product.price) * 100)
+                  : 0;
 
-            const remainingSeconds = timeLeftRef.current[product._id] ?? 0;
-            const isExpired = remainingSeconds <= 0;
-
-            return (
-              <motion.div
-                key={product._id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.04 }}
-                viewport={{ once: true }}
-              >
-                <Link href={`/product/${product._id}`} className="group block">
-                  <div className="bg-white dark:bg-gray-800 rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group-hover:ring-2 group-hover:ring-red-500/30">
-                    <div className="relative aspect-square">
-                      <Image
-                        src={product.thumbnail || product.images?.[0]?.url || "/placeholder.jpg"}
-                        alt={product.name}
-                        fill
-                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-
-                      {/* Discount Badge */}
-                      {hasDiscount && (
-                        <div className="absolute top-3 left-3 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                          -{discountPercent}%
-                        </div>
-                      )}
-
-                      {/* Flash Badge */}
-                      <div className="absolute top-3 right-3 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-bold px-3 py-1 rounded-full flex items-center gap-1 shadow">
-                        <Clock className="w-3 h-3" />
-                        FLASH
-                      </div>
-                    </div>
-
-                    <div className="p-4">
-                      <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-100 line-clamp-2 min-h-[42px] group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
-                        {product.name}
-                      </h3>
-
-                      <div className="mt-3 flex items-baseline gap-2">
-                        <span className="text-xl font-bold text-green-600 dark:text-green-500">
-                          {product.currency} {displayPrice.toLocaleString()}
-                        </span>
+              return (
+                <article key={product._id} className="group">
+                  <Link href={`/product/${product._id}`} className="block h-full">
+                    <div className="h-full overflow-hidden rounded-xl border border-slate-200 bg-white transition-colors hover:border-slate-400">
+                      <div className="relative aspect-square bg-slate-100">
+                        {image && (
+                          <Image
+                            src={image}
+                            alt={product.name}
+                            fill
+                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                            className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                          />
+                        )}
                         {hasDiscount && (
-                          <span className="text-sm text-gray-500 line-through">
-                            {product.currency} {product.price.toLocaleString()}
+                          <span className="absolute left-2 top-2 rounded-md bg-white px-2 py-1 text-xs font-semibold text-slate-900">
+                            -{discountPercent}%
                           </span>
                         )}
                       </div>
-
-                      {/* Countdown Timer */}
-                      <div className="mt-4 bg-gray-900 dark:bg-black text-white text-center py-2.5 rounded-2xl text-xs font-mono tracking-wider">
-                        {isExpired ? (
-                          <span className="text-red-400 font-medium">Deal Expired</span>
-                        ) : (
-                          <div className="flex items-center justify-center gap-2">
-                            <Clock className="w-4 h-4" />
-                            {formatTime(remainingSeconds)}
-                          </div>
-                        )}
+                      <div className="space-y-2 p-3 sm:p-4">
+                        <h3 className="line-clamp-2 min-h-10 text-sm font-medium leading-5 text-slate-800 group-hover:text-slate-950">
+                          {product.name}
+                        </h3>
+                        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                          <span className="text-base font-semibold text-slate-950">
+                            {product.currency}{" "}
+                            {salePrice.toLocaleString("en-PK")}
+                          </span>
+                          {hasDiscount && (
+                            <span className="text-xs text-slate-500 line-through">
+                              {product.currency} {product.price.toLocaleString("en-PK")}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Link>
-              </motion.div>
-            );
-          })}
-        </div>
+                  </Link>
+                </article>
+              );
+            })}
+          </div>
+        )}
       </div>
     </section>
   );

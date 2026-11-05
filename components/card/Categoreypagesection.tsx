@@ -12,7 +12,8 @@
       slug: string;
       image: { url: string; public_id: string };
       productCount: number;
-    }
+    }   
+    
 
     type SortOption = "name-asc" | "name-desc" | "count-desc" | "count-asc";
 

@@ -1,10 +1,8 @@
-// components/card/CategoryCard.tsx
 "use client";
 
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
-import { ArrowRight, ShoppingBag } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 interface CategoryCardProps {
   name: string;
@@ -20,43 +18,33 @@ export default function CategoryCard({
   productCount,
 }: CategoryCardProps) {
   return (
-    <motion.div
-      whileHover={{ y: -8, scale: 1.02 }}
-      whileTap={{ scale: 0.99 }}
-      transition={{ duration: 0.2, ease: "easeOut" }}
-      className="group relative h-52 w-40 sm:h-56 sm:w-44"
-    >
+    <article className="group w-36 shrink-0 sm:w-full">
       <Link
         href={`/categories/${slug}`}
-        className="block h-full w-full overflow-hidden rounded-[1.7rem] shadow-[0_18px_35px_rgba(15,23,42,0.12)] transition-all duration-300 hover:shadow-[0_22px_40px_rgba(79,70,229,0.18)]"
+        className="block h-full overflow-hidden rounded-xl border border-slate-200 bg-white transition-colors hover:border-slate-400"
       >
-        <div className="relative h-full w-full overflow-hidden rounded-[1.7rem]">
+        <div className="relative aspect-[4/5] overflow-hidden bg-slate-100">
           <Image
             src={imageUrl}
             alt={name}
             fill
-            className="object-cover transition-transform duration-700 group-hover:scale-110"
-            sizes="(max-width: 640px) 44vw, (max-width: 768px) 24vw, 208px"
+            className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+            sizes="(max-width: 640px) 36vw, (max-width: 1024px) 28vw, 16vw"
           />
-
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/55 to-slate-900/10" />
-
-          <div className="absolute right-3 top-3 rounded-full border border-white/25 bg-white/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-white backdrop-blur-sm">
-            {productCount}+ items
-          </div>
-
-          <div className="absolute inset-x-0 bottom-0 flex flex-col items-start p-4 text-left">
-            <h3 className="max-w-[80%] text-base font-black leading-tight text-white drop-shadow-[0_4px_10px_rgba(0,0,0,0.4)] sm:text-lg">
-              {name}
-            </h3>
-
-            <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white/12 px-2.5 py-1 text-[11px] font-medium text-white/90 backdrop-blur-sm ring-1 ring-white/25">
-              <span>Explore</span>
-              <ArrowRight size={14} className="transition-transform duration-200 group-hover:translate-x-1" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 p-3 text-white">
+            <div>
+              <h3 className="text-sm font-semibold leading-5">{name}</h3>
+              <p className="mt-1 text-xs text-white/80">{productCount} items</p>
             </div>
+            <ArrowRight
+              size={16}
+              className="mb-0.5 shrink-0 transition-transform group-hover:translate-x-1"
+              aria-hidden="true"
+            />
           </div>
         </div>
       </Link>
-    </motion.div>
+    </article>
   );
 }

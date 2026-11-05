@@ -4,7 +4,6 @@
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   FiSearch,
   FiShoppingCart,
@@ -29,8 +28,6 @@ const Navbar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [cartItemCount] = useState(0); // ← can be made dynamic later
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  const router = useRouter();
 
   // Check login status (client-side)
   useEffect(() => {
@@ -58,12 +55,12 @@ const Navbar = () => {
   return (
     <>
       {/* ==================== DESKTOP NAVBAR ==================== */}
-      <nav className="bg-white/80 backdrop-blur-xl border-b border-slate-200/80 shadow-[0_10px_35px_rgba(15,23,42,0.06)] fixed top-0 left-0 right-0 z-50 hidden md:flex items-center justify-between px-5 py-3.5">
+      <nav className="fixed left-0 right-0 top-0 z-50 hidden items-center justify-between border-b border-slate-200 bg-white px-5 py-3 md:flex">
         <Link href="/" className="flex items-center gap-3 text-xl font-black tracking-tight text-slate-800 shrink-0">
-          <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-indigo-600 via-violet-600 to-sky-500 shadow-lg shadow-indigo-200">
+          <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg bg-slate-100">
             <Image src="/logo2.jpg" alt="logo" width={40} height={40} className="h-full w-full object-cover" />
           </div>
-          <span className="bg-gradient-to-r from-slate-900 via-indigo-700 to-violet-700 bg-clip-text text-transparent">
+          <span className="text-slate-950">
             BabaGaniOnline
           </span>
         </Link>
@@ -71,16 +68,16 @@ const Navbar = () => {
           <NavSearch />
         </div>
         <div className="flex items-center gap-6">
-          <Link href="/" className="text-sm font-medium text-slate-600 hover:text-indigo-600">Home</Link>
-          <Link href="/shop/orders" className="text-sm font-medium text-slate-600 hover:text-indigo-600">Orders</Link>
-          <Link href="/categories" className="text-sm font-medium text-slate-600 hover:text-indigo-600">Categories</Link>
-          <Link href="/about" className="text-sm font-medium text-slate-600 hover:text-indigo-600">About</Link>
-          <Link href="/contact" className="text-sm font-medium text-slate-600 hover:text-indigo-600">Contact</Link>
-          <Link href="/support" className="text-sm font-medium text-slate-600 hover:text-indigo-600">Support</Link>
+          <Link href="/" className="text-sm font-medium text-slate-600 hover:text-slate-950">Home</Link>
+          <Link href="/shop/orders" className="text-sm font-medium text-slate-600 hover:text-slate-950">Orders</Link>
+          <Link href="/categories" className="text-sm font-medium text-slate-600 hover:text-slate-950">Categories</Link>
+          <Link href="/about" className="text-sm font-medium text-slate-600 hover:text-slate-950">About</Link>
+          <Link href="/contact" className="text-sm font-medium text-slate-600 hover:text-slate-950">Contact</Link>
+          <Link href="/support" className="text-sm font-medium text-slate-600 hover:text-slate-950">Support</Link>
         </div>
 
         <div className="flex items-center gap-5 pl-2">
-          <Link href="/shop/cart" className="relative rounded-full p-2.5 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">
+          <Link href="/shop/cart" className="relative rounded-full p-2.5 text-slate-600 hover:bg-slate-100 hover:text-slate-950">
             <FiShoppingCart size={22} />
             {cartItemCount > 0 && (
               <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-sm">
@@ -91,13 +88,13 @@ const Navbar = () => {
 
           {/* ── Conditional Auth Button ── */}
           {isLoggedIn ? (
-            <Link href="/profile" className="rounded-full p-2.5 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">
+            <Link href="/profile" className="rounded-full p-2.5 text-slate-600 hover:bg-slate-100 hover:text-slate-950">
               <FiUser size={22} />
             </Link>
           ) : (
             <Link
               href="/auth/login" // ← adjust route if your login page is /signin, /auth/login, etc.
-              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-200 hover:from-indigo-500 hover:to-violet-500"
+              className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-700"
             >
               <FiLogIn size={18} />
               <span>Login</span>
@@ -107,7 +104,7 @@ const Navbar = () => {
       </nav>
 
       {/* ==================== MOBILE TOP HEADER ==================== */}
-      <div className="bg-white/80 backdrop-blur-xl border-b border-slate-200/80 shadow-[0_10px_25px_rgba(15,23,42,0.05)] fixed top-0 left-0 right-0 z-50 flex md:hidden items-center justify-between px-4 py-3">
+      <div className="fixed left-0 right-0 top-0 z-50 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 md:hidden">
         <button
           onClick={() => setIsSidebarOpen(true)}
           className="z-10 rounded-full p-2 text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition"

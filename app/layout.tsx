@@ -7,53 +7,36 @@ import Footer from "@/components/footer/Footer";
 import Whatsaapbutton from "@/components/card/Whatsaapbutton"
 // import BottomNavbar from "@/components/ui/BottomNavbar";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-// Use Inter – 100% stable, looks almost exactly like Geist
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-inter",
 });
 
-// Enhanced Metadata for SEO
 export const metadata: Metadata = {
   title: {
-    default: "Baba Gani Online - Shop Smarter in Pakistan",
+    default: "Baba Gani Online | Online Shopping in Pakistan",
     template: "%s | Baba Gani Online",
   },
-  description:
-    "Baba Gani Online: Pakistan's trusted online shopping store. Enjoy secure payments, fast nationwide delivery, easy returns, and great deals on quality products.",
-  keywords:
-    "online shopping Pakistan, buy online Pakistan, ecommerce Pakistan, Baba Gani Online, fast delivery Pakistan, secure shopping, cash on delivery",
+  description: "Browse products and categories at Baba Gani Online.",
   authors: [{ name: "Baba Gani Online Team" }],
   creator: "Baba Gani Online",
   publisher: "Baba Gani Online",
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
-  },
-  metadataBase: new URL("https://www.babaganionline.com"), // Change to your actual domain
-  alternates: {
-    canonical: "/",
-  },
+  metadataBase: new URL("https://www.babaganionline.com"),
   openGraph: {
-    title: "Baba Gani Online - Shop Smarter in Pakistan",
-    description:
-      "Shop quality products online with secure checkout, fast delivery across Pakistan, and easy returns.",
-    url: "https://www.babaganionline.com",
+    title: "Baba Gani Online | Online Shopping in Pakistan",
+    description: "Browse products and categories at Baba Gani Online.",
     siteName: "Baba Gani Online",
-    images: [
-      {
-        url: "/og-image.jpg", // Recommended: Add a 1200x630 image in /public
-        width: 1200,
-        height: 630,
-        alt: "Baba Gani Online - Pakistan's Trusted Online Store",
-      },
-    ],
+    images: ["/logo2.jpg"],
     locale: "en_PK",
     type: "website",
   },
-  
+  twitter: {
+    card: "summary",
+    title: "Baba Gani Online | Online Shopping in Pakistan",
+    description: "Browse products and categories at Baba Gani Online.",
+    images: ["/logo2.jpg"],
+  },
   robots: {
     index: true,
     follow: true,
@@ -65,16 +48,10 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  verification: {
-    google: "your-google-site-verification-code", // Add from Google Search Console
-    // yandex: "",
-    // bing: "",
-  },
 };
 
-// Viewport for mobile responsiveness
 export const viewport: Viewport = {
-  themeColor: "#4f46e5", // Indigo-600 – matches your brand
+  themeColor: "#0f172a",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -88,37 +65,41 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <head>
-  {/* Favicon & App Icons */}
-  <link rel="icon" href="/favicon.ico" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-  <link rel="manifest" href="/site.webmanifest" />
-
-  {/* Structured Data (JSON-LD) - Organization */}
-  <script
-    type="application/ld+json"
-    dangerouslySetInnerHTML={{
-      __html: JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        name: "Baba Gani Online",
-        url: "https://www.babaganionline.com",
-        logo: "https://www.babaganionline.com/logo2.png",
-        contactPoint: {
-          "@type": "ContactPoint",
-          telephone: "+92-XXX-XXXXXXX", // Update with real number
-          contactType: "Customer Service",
-          areaServed: "PK",
-          availableLanguage: ["English", "Urdu"],
-        },
-        sameAs: [],
-      }),
-    }}
-  />
-
-  {/* <!-- Meta Pixel Code --> */}
-  <script
-    dangerouslySetInnerHTML={{
-      __html: `
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@graph": [
+                {
+                  "@type": "Organization",
+                  "@id": "https://www.babaganionline.com/#organization",
+                  name: "Baba Gani Online",
+                  url: "https://www.babaganionline.com",
+                  logo: "https://www.babaganionline.com/logo2.jpg",
+                  areaServed: { "@type": "Country", name: "Pakistan" },
+                },
+                {
+                  "@type": "WebSite",
+                  "@id": "https://www.babaganionline.com/#website",
+                  name: "Baba Gani Online",
+                  url: "https://www.babaganionline.com",
+                  publisher: { "@id": "https://www.babaganionline.com/#organization" },
+                  inLanguage: "en-PK",
+                  potentialAction: {
+                    "@type": "SearchAction",
+                    target: "https://www.babaganionline.com/search?q={search_term_string}",
+                    "query-input": "required name=search_term_string",
+                  },
+                },
+              ],
+            }),
+          }}
+        />
+        {/* Meta Pixel */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
         !function(f,b,e,v,n,t,s)
         {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
         n.callMethod.apply(n,arguments):n.queue.push(arguments)};
@@ -130,26 +111,25 @@ export default function RootLayout({
         fbq('init', '1385138273451295');
         fbq('track', 'PageView');
       `,
-    }}
-  />
-  <noscript
-    dangerouslySetInnerHTML={{
-      __html: `<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1385138273451295&ev=PageView&noscript=1" alt="Facebook Pixel" />`,
-    }}
-  />
-  {/* <!-- End Meta Pixel Code --> */}  
-</head>
+          }}
+        />
+        <noscript
+          dangerouslySetInnerHTML={{
+            __html: `<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1385138273451295&ev=PageView&noscript=1" alt="Facebook Pixel" />`,
+          }}
+        />
+      </head>
 
       <body className={`${inter.variable} font-sans antialiased bg-gray-50 text-gray-900`}>
         <Navbar />
-        <main className="min-h-screen pt-6 md:pt-16 pb-20 lg:pb-0">
+        <div className="min-h-screen pb-20 lg:pb-0">
           <GoogleOAuthProvider
   clientId={"951319721836-ugom4e2tv9n462jjndnl4abjjpvi96f1.apps.googleusercontent.com"}
 >
   {children}
 </GoogleOAuthProvider>
           <Whatsaapbutton/>
-        </main>
+        </div>
 
         <Footer />
         {/* <BottomNavbar /> */}

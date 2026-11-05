@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { Star } from "lucide-react";
@@ -22,7 +21,7 @@ interface Brand {
 
 interface ImageObj {
   url: string;
-  public_id: string;
+  public_id?: string;
 }
 
 interface Product {
@@ -37,97 +36,71 @@ interface Product {
   brand?: Brand | null;
   tags?: Tag[];
   rating?: number;
-  // If you later want to add flash-deal timer per product, you can add:
-  // isFlash?: boolean;
 }
 
 interface ProductCardProps {
   product: Product;
-  showFlashBadge?: boolean; // optional prop — show "FLASH" badge like in deals
 }
 
-export default function ProductCard({
-  product,
-  showFlashBadge = false, // default: false → normal product card
-}: ProductCardProps) {
-  // Safe fallbacks
-  const safeImage = product.thumbnail || product.images?.[0]?.url || "/placeholder.jpg";
+export default function ProductCard({ product }: ProductCardProps) {
+  const image = product.thumbnail || product.images?.[0]?.url;
   const currency = product.currency || "Rs";
-
   const originalPrice = Number(product.price) || 0;
   const salePrice = product.discountPrice !== undefined ? Number(product.discountPrice) : undefined;
-
   const hasDiscount = salePrice !== undefined && salePrice > 0 && salePrice < originalPrice;
   const finalPrice = hasDiscount ? salePrice : originalPrice;
-
   const discountPercent = hasDiscount
     ? Math.round(((originalPrice - salePrice) / originalPrice) * 100)
     : 0;
 
-  const displayRating = product.rating ?? 4.5;
-
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, ease: "easeOut" }}
-      viewport={{ once: true }}
-      whileHover={{ y: -8 }}
-      className="group block h-full"
-    >
+    <article className="group h-full">
       <Link href={`/product/${product._id}`} className="block h-full">
-        <div className="h-full overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white shadow-[0_14px_40px_rgba(15,23,42,0.06)] transition-all duration-300 hover:border-indigo-200 hover:shadow-[0_20px_50px_rgba(79,70,229,0.12)]">
+        <div className="h-full overflow-hidden rounded-xl border border-slate-200 bg-white transition-colors duration-200 hover:border-slate-400">
           <div className="relative aspect-square overflow-hidden bg-slate-100">
-            <Image
-              src={safeImage}
-              alt={product.name}
-              fill
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-              className="object-cover transition-transform duration-500 group-hover:scale-110"
-            />
+            {image ? (
+              <Image
+                src={image}
+                alt={product.name}
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+              />
+            ) : (
+              <div className="absolute inset-0 bg-slate-100" aria-hidden="true" />
+            )}
 
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/15 via-transparent to-transparent" />
-
-            {hasDiscount && discountPercent > 5 && (
-              <div className="absolute left-3 top-3 z-10 rounded-full bg-gradient-to-r from-red-500 to-rose-500 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-white shadow-lg shadow-red-500/30">
+            {hasDiscount && discountPercent > 0 && (
+              <span className="absolute left-2 top-2 rounded-md bg-white px-2 py-1 text-xs font-semibold text-slate-900">
                 -{discountPercent}%
-              </div>
+              </span>
             )}
 
-            {showFlashBadge && (
-              <div className="absolute right-3 top-3 z-10 flex items-center gap-1 rounded-full bg-gradient-to-r from-amber-300 to-orange-400 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-slate-900 shadow-lg shadow-orange-500/20">
-                <span className="h-1.5 w-1.5 animate-ping rounded-full bg-slate-900" />
-                FLASH
-              </div>
-            )}
           </div>
 
-          <div className="space-y-3 p-3.5">
-            <h3 className="min-h-[2.75rem] text-sm font-semibold leading-5 text-slate-800 transition-colors duration-200 group-hover:text-indigo-600 line-clamp-2">
+          <div className="space-y-2 p-3 sm:p-4">
+            <h3 className="line-clamp-2 min-h-10 text-sm font-medium leading-5 text-slate-800 group-hover:text-slate-950">
               {product.name}
             </h3>
-
-            <div className="flex items-end justify-between gap-2">
-              <div className="flex flex-col">
-                <span className="text-lg font-black tracking-tight text-emerald-600">
-                  {currency} {finalPrice.toLocaleString("en-IN")}
+            <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+              <span className="text-base font-semibold text-slate-950">
+                {currency} {finalPrice.toLocaleString("en-PK")}
+              </span>
+              {hasDiscount && (
+                <span className="text-xs text-slate-500 line-through">
+                  {currency} {originalPrice.toLocaleString("en-PK")}
                 </span>
-
-                {hasDiscount && (
-                  <span className="text-[11px] text-slate-400 line-through">
-                    {currency} {originalPrice.toLocaleString("en-IN")}
-                  </span>
-                )}
-              </div>
-
-              <div className="flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-700">
-                <Star size={12} className="fill-amber-400 text-amber-400" />
-                {displayRating.toFixed(1)}
-              </div>
+              )}
             </div>
+            {product.rating !== undefined && Number.isFinite(Number(product.rating)) && (
+              <span className="inline-flex items-center gap-1 text-xs text-slate-600">
+                <Star size={13} className="fill-amber-400 text-amber-500" aria-hidden="true" />
+                <span>{Number(product.rating).toFixed(1)}</span>
+              </span>
+            )}
           </div>
         </div>
       </Link>
-    </motion.div>
+    </article>
   );
 }

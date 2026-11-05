@@ -2,15 +2,11 @@
 
 :root {
   --bg: #f8fafc;
-  --panel: rgba(255, 255, 255, 0.82);
-  --panel-strong: #ffffff;
-  --brand: #4f46e5;
-  --brand-dark: #312e81;
-  --brand-soft: #eef2ff;
+  --panel: #ffffff;
+  --brand: #0f172a;
   --text: #0f172a;
-  --muted: #475569;
-  --line: rgba(148, 163, 184, 0.2);
-  --shadow-soft: 0 20px 55px rgba(15, 23, 42, 0.08);
+  --muted: #64748b;
+  --line: #e2e8f0;
 }
 
 html {
@@ -19,10 +15,7 @@ html {
 
 body {
   min-height: 100vh;
-  background:
-    radial-gradient(circle at top left, rgba(99, 102, 241, 0.12), transparent 28%),
-    radial-gradient(circle at bottom right, rgba(14, 165, 233, 0.10), transparent 24%),
-    linear-gradient(180deg, #f8fafc 0%, #f8fafc 28%, #f1f5f9 100%);
+  background: var(--bg);
   color: var(--text);
   font-family: var(--font-inter), Arial, sans-serif;
 }
@@ -43,18 +36,17 @@ video {
   color: var(--text);
 }
 
-button,
-a {
-  transition: all 180ms ease;
-}
-
 main {
   position: relative;
 }
 
-@media (max-width: 767px) {
-  body {
-    background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 120%);
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
-

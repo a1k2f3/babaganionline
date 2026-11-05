@@ -21,9 +21,6 @@ const nextConfig: NextConfig = {
       //   hostname: "images.unsplash.com",
       // },
     ],
-
-    // This disables Next.js image optimization globally
-    // → images load directly from the original source (no Vercel optimization, no 402 errors)
     unoptimized: true,
   },
 };
