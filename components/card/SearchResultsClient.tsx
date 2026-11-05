@@ -1,11 +1,10 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { Search, Package, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Package, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 
 interface Product {
   stock: number;
@@ -38,13 +37,17 @@ function SearchResultsContent() {
   const [results, setResults] = useState<Product[]>([]);
   const [totalResults, setTotalResults] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
 
   const limit = 20;
 
   useEffect(() => {
+    const controller = new AbortController();
+
     if (!query) {
       setResults([]);
       setTotalResults(0);
+      setFetchError(false);
       setLoading(false);
       return;
     }
@@ -53,8 +56,8 @@ function SearchResultsContent() {
 
     const fetchResults = async () => {
       setLoading(true);
+      setFetchError(false);
       try {
-        const controller = new AbortController();
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/products/search?q=${encodeURIComponent(query)}&page=${currentPage}&limit=${limit}`,
           { signal: controller.signal }
@@ -68,12 +71,13 @@ function SearchResultsContent() {
           setResults(data.data || []);
           setTotalResults(data.total || data.count || 0);
         }
-      } catch (error: any) {
-        if (error.name !== "AbortError") {
+      } catch (error: unknown) {
+        if (!(error instanceof Error && error.name === "AbortError")) {
           console.error("Search error:", error);
           if (isMounted) {
             setResults([]);
             setTotalResults(0);
+            setFetchError(true);
           }
         }
       } finally {
@@ -85,6 +89,7 @@ function SearchResultsContent() {
 
     return () => {
       isMounted = false;
+      controller.abort();
     };
   }, [query, currentPage]);
 
@@ -125,44 +130,48 @@ function SearchResultsContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-10 md:py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-10 md:mb-12">
-          <motion.div
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.5 }}
-  className="inline-flex items-center gap-3 sm:gap-4 
-    bg-white/80 backdrop-blur-sm border border-gray-200/70 
-    rounded-full px-5 sm:px-7 py-3 sm:py-3.5 
-    shadow-md hover:shadow-lg transition-shadow duration-300"
->
-  <Search className="w-6 h-6 sm:w-7 sm:h-7 text-indigo-600 flex-shrink-0" />
-  
-  <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-gray-900 tracking-tight">
-    Results for:{" "}
-    <span className="text-indigo-600 break-words">"{query}"</span>
-  </h1>
-</motion.div>
-          <p className="text-lg sm:text-xl text-gray-600">
-            {loading ? "Searching..." : `${totalResults} product${totalResults !== 1 ? "s" : ""} found`}
-          </p>
-        </div>
+    <main className="min-h-screen bg-slate-50">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+        <header className="mb-7 border-b border-slate-200 pb-6">
+          <div className="flex items-start gap-3">
+            <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white text-slate-700 ring-1 ring-slate-200">
+              <Search className="h-5 w-5" aria-hidden="true" />
+            </div>
+            <div className="min-w-0">
+              <h1 className="break-words text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
+                {query ? `Results for “${query}”` : "Search products"}
+              </h1>
+              <p className="mt-2 text-sm text-slate-600" aria-live="polite">
+                {loading
+                  ? "Searching products..."
+                  : query
+                    ? `${totalResults} ${totalResults === 1 ? "product" : "products"} found`
+                    : "Enter a search term to find products."}
+              </p>
+            </div>
+          </div>
+        </header>
+
+        {fetchError && !loading && (
+          <div role="alert" className="rounded-xl border border-red-200 bg-white p-5 text-sm text-red-700">
+            Search results could not be loaded. Please try again.
+          </div>
+        )}
 
         {/* Loading State */}
         {loading && (
-          <div className="flex flex-col items-center justify-center py-24 sm:py-32">
-            <Loader2 className="w-14 h-14 sm:w-16 sm:h-16 animate-spin text-indigo-600 mb-5 sm:mb-6" />
-            <p className="text-lg sm:text-xl text-gray-700">Finding the best matches...</p>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4 xl:grid-cols-5">
+            {Array.from({ length: 10 }, (_, index) => (
+              <div key={index} className="aspect-[3/4] animate-pulse rounded-xl bg-slate-200" />
+            ))}
           </div>
         )}
 
         {/* Results Grid */}
         {!loading && results.length > 0 && (
           <>
-            <div className="grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 sm:gap-6 md:gap-7 lg:gap-8">
-              {results.map((product, index) => {
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4 xl:grid-cols-5">
+              {results.map((product) => {
                 const price = Number(product.price) || 0;
                 const discountPrice = Number(product.discountPrice) || 0;
                 const hasDiscount = discountPrice > 0 && discountPrice < price;
@@ -172,67 +181,61 @@ function SearchResultsContent() {
                   : 0;
 
                 return (
-                  <motion.div
-                    key={product._id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.04, duration: 0.5 }}
-                    className="group flex flex-col h-full"
-                  >
-                    <Link href={`/product/${product._id}`} className="flex flex-col h-full">
-                      <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-200 hover:border-indigo-200 overflow-hidden flex-1 flex flex-col">
+                    <article key={product._id} className="group h-full">
+                    <Link href={`/product/${product._id}`} className="block h-full">
+                      <div className="flex h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white transition-colors hover:border-slate-400">
                         {/* Image */}
-                        <div className="relative pt-[100%] overflow-hidden bg-gray-50">
+                        <div className="relative aspect-square overflow-hidden bg-slate-100">
                           <Image
                             src={product.thumbnail || "/images/placeholder.jpg"}
                             alt={product.name}
                             fill
                             sizes="(max-width: 475px) 45vw, (max-width: 640px) 42vw, (max-width: 768px) 30vw, (max-width: 1024px) 23vw, 18vw"
-                            className="object-cover group-hover:scale-105 transition-transform duration-700"
-                            priority={index < 8}
+                            className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                            priority={false}
                           />
 
                           {product.stock === 0 && (
-                            <div className="absolute inset-0 bg-black/65 flex items-center justify-center">
-                              <span className="text-white text-base sm:text-lg font-bold tracking-wide">Sold Out</span>
+                            <div className="absolute inset-0 flex items-center justify-center bg-slate-950/45">
+                              <span className="rounded-md bg-white px-3 py-1.5 text-xs font-semibold text-slate-900">Sold out</span>
                             </div>
                           )}
 
                           {product.stock > 0 && product.stock <= 5 && (
-                            <div className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-red-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md">
+                            <div className="absolute left-2 top-2 rounded-md bg-white px-2 py-1 text-[11px] font-semibold text-slate-900">
                               Only {product.stock} left
                             </div>
                           )}
 
                           {hasDiscount && discountPercent >= 5 && (
-                            <div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-gradient-to-r from-red-600 to-rose-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md z-10">
+                            <div className="absolute right-2 top-2 rounded-md bg-white px-2 py-1 text-[11px] font-semibold text-slate-900">
                               {discountPercent}% OFF
                             </div>
                           )}
                         </div>
 
                         {/* Content */}
-                        <div className="p-4 sm:p-5 flex flex-col flex-1">
-                          <h3 className="font-semibold text-base sm:text-lg text-gray-900 line-clamp-2 mb-1.5 group-hover:text-indigo-700 transition-colors">
+                        <div className="flex flex-1 flex-col space-y-2 p-3 sm:p-4">
+                          <h3 className="line-clamp-2 min-h-10 text-sm font-medium leading-5 text-slate-800 group-hover:text-slate-950">
                             {product.name}
                           </h3>
 
                           {(product.brand?.name || product.category?.name) && (
-                            <p className="text-xs sm:text-sm text-gray-500 mb-2 line-clamp-1">
+                            <p className="line-clamp-1 text-xs text-slate-500">
                               {product.brand?.name}
                               {product.brand?.name && product.category?.name && " • "}
                               {product.category?.name}
                             </p>
                           )}
 
-                          <div className="mt-auto flex items-baseline gap-2.5 flex-wrap">
-                            <span className="text-xl sm:text-2xl font-bold text-red-600 tracking-tight">
-                              {product.currency || "PKR"} {displayPrice.toLocaleString("en-IN")}
+                          <div className="mt-auto flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                            <span className="text-base font-semibold text-slate-950">
+                              {product.currency || "PKR"} {displayPrice.toLocaleString("en-PK")}
                             </span>
 
                             {hasDiscount && (
-                              <span className="text-sm sm:text-lg text-gray-500 line-through opacity-75">
-                                {product.currency || "PKR"} {price.toLocaleString("en-IN")}
+                              <span className="text-xs text-slate-500 line-through">
+                                {product.currency || "PKR"} {price.toLocaleString("en-PK")}
                               </span>
                             )}
                           </div>
@@ -241,7 +244,7 @@ function SearchResultsContent() {
                         </div>
                       </div>
                     </Link>
-                  </motion.div>
+                    </article>
                 );
               })}
             </div>
@@ -250,6 +253,7 @@ function SearchResultsContent() {
             {totalPages > 1 && (
               <div className="mt-12 sm:mt-16 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
                 <button
+                  type="button"
                   onClick={() => goToPage(1)}
                   disabled={currentPage === 1}
                   className="hidden sm:flex items-center gap-2 px-5 py-2.5 rounded-lg bg-white border border-gray-300 disabled:opacity-40 disabled:hover:bg-white hover:bg-gray-50 transition text-sm font-medium shadow-sm"
@@ -258,6 +262,7 @@ function SearchResultsContent() {
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => goToPage(currentPage - 1)}
                   disabled={currentPage === 1}
                   className="flex items-center gap-2 px-6 py-3 rounded-xl bg-white border border-gray-300 disabled:opacity-50 hover:bg-gray-50 transition shadow-sm font-medium"
@@ -274,8 +279,10 @@ function SearchResultsContent() {
                       </span>
                     ) : (
                       <button
+                        type="button"
                         key={page}
                         onClick={() => goToPage(page as number)}
+                        aria-current={currentPage === page ? "page" : undefined}
                         className={`min-w-[42px] sm:min-w-[48px] py-3 rounded-xl font-medium transition-colors ${
                           currentPage === page
                             ? "bg-indigo-600 text-white shadow-md"
@@ -289,6 +296,7 @@ function SearchResultsContent() {
                 </div>
 
                 <button
+                  type="button"
                   onClick={() => goToPage(currentPage + 1)}
                   disabled={currentPage === totalPages}
                   className="flex items-center gap-2 px-6 py-3 rounded-xl bg-white border border-gray-300 disabled:opacity-50 hover:bg-gray-50 transition shadow-sm font-medium"
@@ -298,6 +306,7 @@ function SearchResultsContent() {
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => goToPage(totalPages)}
                   disabled={currentPage === totalPages}
                   className="hidden sm:flex items-center gap-2 px-5 py-2.5 rounded-lg bg-white border border-gray-300 disabled:opacity-40 disabled:hover:bg-white hover:bg-gray-50 transition text-sm font-medium shadow-sm"
@@ -319,41 +328,30 @@ function SearchResultsContent() {
         )}
 
         {/* No results */}
-        {!loading && query && results.length === 0 && (
-          <div className="text-center py-24 sm:py-32">
-            <Package className="w-20 h-20 sm:w-24 sm:h-24 text-gray-300 mx-auto mb-6 sm:mb-8" />
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">
-              No results for "{query}"
+        {!loading && !fetchError && query && results.length === 0 && (
+          <div className="rounded-xl border border-slate-200 bg-white px-5 py-14 text-center sm:px-8">
+            <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-500">
+              <Package className="h-6 w-6" aria-hidden="true" />
+            </div>
+            <h2 className="text-xl font-semibold text-slate-950">
+              No results for “{query}”
             </h2>
-            <p className="text-lg sm:text-xl text-gray-600 max-w-xl mx-auto">
+            <p className="mx-auto mt-2 max-w-xl text-sm text-slate-600">
               Try different keywords, check spelling, or browse our categories.
             </p>
             <Link
-              href="/"
-              className="mt-8 inline-block px-8 py-4 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition"
+              href="/categories"
+              className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-lg bg-slate-900 px-5 py-3 text-sm font-semibold text-white hover:bg-slate-700"
             >
-              Back to Home
+              Browse categories <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
         )}
       </div>
-    </div>
+    </main>
   );
 }
 
 export default function SearchResultsClient() {
-  return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center">
-          <div className="text-center">
-            <Loader2 className="w-16 h-16 sm:w-20 sm:h-20 animate-spin text-indigo-600 mb-6 sm:mb-8" />
-            <p className="text-xl sm:text-2xl text-gray-700">Loading search results...</p>
-          </div>
-        </div>
-      }
-    >
-      <SearchResultsContent />
-    </Suspense>
-  );
+  return <SearchResultsContent />;
 }
