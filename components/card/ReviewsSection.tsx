@@ -61,7 +61,7 @@ export default function ReviewsSection({ productId }: { productId: string }) {
   // Loading state
   if (isLoading) {
     return (
-      <section className="mt-20 py-12 bg-white rounded-2xl shadow-sm">
+      <section className="rounded-2xl border border-slate-200 bg-white px-5 py-8 sm:px-8">
         <div className="max-w-4xl mx-auto text-center px-6">
           <h2 className="text-2xl font-bold mb-4">Customer Reviews</h2>
           <div className="flex items-center justify-center gap-3 text-gray-500">
@@ -76,7 +76,7 @@ export default function ReviewsSection({ productId }: { productId: string }) {
   // Error state
   if (error) {
     return (
-      <section className="mt-20 py-12 bg-white rounded-2xl shadow-sm">
+      <section className="rounded-2xl border border-slate-200 bg-white px-5 py-8 sm:px-8">
         <div className="max-w-4xl mx-auto text-center px-6">
           <h2 className="text-2xl font-bold mb-4">Customer Reviews</h2>
           <p className="text-red-600">
@@ -95,7 +95,7 @@ export default function ReviewsSection({ productId }: { productId: string }) {
   // No reviews
   if (reviews.length === 0) {
     return (
-      <section className="mt-20 py-12 bg-white rounded-2xl shadow-sm">
+      <section className="rounded-2xl border border-slate-200 bg-white px-5 py-8 sm:px-8">
         <div className="max-w-4xl mx-auto text-center px-6">
           <h2 className="text-2xl font-bold mb-4">Customer Reviews</h2>
           <p className="text-gray-500">No reviews yet. Be the first to review!</p>
@@ -105,13 +105,13 @@ export default function ReviewsSection({ productId }: { productId: string }) {
   }
 
   return (
-    <section className="mt-20 py-12 bg-white rounded-2xl shadow-lg">
-      <div className="max-w-5xl mx-auto px-6">
-        <h2 className="text-3xl font-bold mb-8">Customer Reviews</h2>
+    <section className="rounded-2xl border border-slate-200 bg-white px-5 py-8 sm:px-8">
+      <div className="mx-auto max-w-5xl">
+        <h2 className="mb-6 text-xl font-semibold tracking-tight text-slate-950">Customer reviews</h2>
 
         {/* Average Rating */}
         <div className="flex items-center gap-5 mb-10">
-          <div className="text-6xl font-extrabold text-indigo-600">
+          <div className="text-4xl font-semibold text-slate-950">
             {avgRating.toFixed(1)}
           </div>
           <div>
@@ -127,7 +127,7 @@ export default function ReviewsSection({ productId }: { productId: string }) {
                 />
               ))}
             </div>
-            <p className="text-gray-600 mt-2 text-lg">
+            <p className="mt-2 text-sm text-slate-500">
               Based on {reviews.length} {reviews.length === 1 ? "review" : "reviews"}
             </p>
           </div>
@@ -138,10 +138,10 @@ export default function ReviewsSection({ productId }: { productId: string }) {
           {reviews.map((review) => (
             <div
               key={review._id}
-              className="border-b border-gray-200 pb-10 last:border-0 last:pb-0"
+              className="border-b border-slate-200 pb-6 last:border-0 last:pb-0"
             >
               <div className="flex items-start gap-4">
-                <div className="relative w-14 h-14 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
+                <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-slate-100">
                   {review.user.avatar ? (
                     <Image
                       src={review.user.avatar}
@@ -150,7 +150,7 @@ export default function ReviewsSection({ productId }: { productId: string }) {
                       className="object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-2xl font-bold text-gray-500 bg-gray-200">
+                    <div className="flex h-full w-full items-center justify-center bg-slate-100 text-lg font-semibold text-slate-600">
                       {review.user.name?.charAt(0)?.toUpperCase() || "?"}
                     </div>
                   )}
@@ -158,15 +158,15 @@ export default function ReviewsSection({ productId }: { productId: string }) {
 
                 <div className="flex-1">
                   <div className="flex flex-wrap items-center gap-3 mb-3">
-                    <h4 className="font-semibold text-lg">{review.user.name}</h4>
+                    <h4 className="text-sm font-semibold text-slate-900">{review.user.name}</h4>
                     {review.verified && (
-                      <span className="bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full font-medium">
+                      <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-800">
                         Verified Purchase
                       </span>
                     )}
                   </div>
 
-                  <div className="flex items-center gap-3 mb-4">
+                  <div className="mb-3 flex items-center gap-3">
                     <div className="flex">
                       {[...Array(5)].map((_, i) => (
                         <Star
@@ -179,7 +179,7 @@ export default function ReviewsSection({ productId }: { productId: string }) {
                         />
                       ))}
                     </div>
-                    <span className="text-sm text-gray-500">
+                    <span className="text-xs text-slate-500">
                       {new Date(review.createdAt).toLocaleDateString("en-US", {
                         year: "numeric",
                         month: "short",
@@ -188,7 +188,7 @@ export default function ReviewsSection({ productId }: { productId: string }) {
                     </span>
                   </div>
 
-                  <p className="text-gray-700 leading-relaxed text-[15px]">
+                  <p className="text-sm leading-6 text-slate-700">
                     {review.comment}
                   </p>
                 </div>

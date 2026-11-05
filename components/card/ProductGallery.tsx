@@ -1,4 +1,3 @@
-// app/products/[id]/ProductGallery.tsx
 "use client";
 
 import Image from "next/image";
@@ -16,47 +15,47 @@ export default function ProductGallery({
   images: ImageItem[];
   productName: string;
 }) {
-  const [activeImage, setActiveImage] = useState(images[0].url);
+  const [activeImage, setActiveImage] = useState(images[0]?.url ?? "");
 
   return (
-    <div className="space-y-4">
-      {/* Main Image with Zoom – made smaller */}
-      <div className="relative mx-auto max-w-md aspect-square rounded-2xl overflow-hidden bg-white shadow-xl group">
-        <div className="relative w-full h-full cursor-zoom-in">
+    <div className="space-y-3 p-3 sm:space-y-4 sm:p-5">
+      <div className="relative aspect-square overflow-hidden rounded-xl bg-slate-50">
+        {activeImage ? (
           <Image
             src={activeImage}
             alt={productName}
             fill
-            sizes="(max-width: 768px) 90vw, 448px"  // better for smaller display size
-            quality={95}
-            className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.3] crisp-scale"
+            sizes="(max-width: 1024px) 100vw, 58vw"
+            quality={82}
+            className="object-contain"
             priority
           />
-        </div>
-        <div className="absolute bottom-3 right-3 bg-black/60 text-white text-xs px-3 py-1.5 rounded-full opacity-0 group-hover:opacity-100 transition">
-          Hover to zoom
-        </div>
+        ) : (
+          <div className="absolute inset-0" aria-hidden="true" />
+        )}
       </div>
 
-      {/* Thumbnails – unchanged */}
       {images.length > 1 && (
-        <div className="grid grid-cols-5 gap-3">
-          {images.map((img) => (
+        <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 sm:gap-3">
+          {images.map((image, index) => (
             <button
-              key={img.id}
-              onClick={() => setActiveImage(img.url)}
-              onMouseEnter={() => setActiveImage(img.url)}
-              className={`relative aspect-square rounded-lg overflow-hidden border-3 transition-all duration-300 ${
-                activeImage === img.url
-                  ? "border-indigo-600 shadow-lg ring-4 ring-indigo-600/30"
-                  : "border-gray-200 hover:border-indigo-400"
+              key={`${image.id}-${index}`}
+              type="button"
+              onClick={() => setActiveImage(image.url)}
+              aria-label={`View image ${index + 1} of ${productName}`}
+              aria-pressed={activeImage === image.url}
+              className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 bg-slate-50 sm:h-20 sm:w-20 ${
+                activeImage === image.url
+                  ? "border-slate-900"
+                  : "border-transparent hover:border-slate-300"
               }`}
             >
               <Image
-                src={img.url}
-                alt={`${productName} thumbnail`}
+                src={image.url}
+                alt=""
                 fill
-                className="object-cover"
+                sizes="80px"
+                className="object-contain"
               />
             </button>
           ))}

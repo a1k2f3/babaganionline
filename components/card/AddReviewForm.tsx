@@ -85,8 +85,8 @@ export default function ReviewForm({ productId, onReviewSubmitted }: ReviewFormP
 
       alert('Thank you! Your review has been submitted.');
 
-    } catch (err: any) {
-      setError(err.message || 'Failed to submit review. Please try again.');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to submit review. Please try again.');
       console.error('Review submission error:', err);
     } finally {
       setIsSubmitting(false);
@@ -94,8 +94,8 @@ export default function ReviewForm({ productId, onReviewSubmitted }: ReviewFormP
   };
 
   return (
-    <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-sm border border-gray-200 p-6 mt-8">
-      <h3 className="text-xl font-semibold text-gray-800 mb-6">
+    <div className="max-w-2xl pt-4">
+      <h3 className="mb-5 text-base font-semibold text-slate-900">
         Share Your Experience
       </h3>
 

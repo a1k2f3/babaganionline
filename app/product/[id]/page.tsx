@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Truck, Shield, Check, Tag, ChevronRight } from "lucide-react";
+import { Tag, ChevronRight } from "lucide-react";
 
 import ProductGallery from "@/components/card/ProductGallery";
 import ProductTabs from "@/components/card/ProductTabs";
@@ -9,14 +9,14 @@ import ReviewsSection from "@/components/card/ReviewsSection";
 import AddReviewForm from "@/components/card/AddReviewForm";
 import ProductActions from "@/components/card/ProducActions";
 
-import GoogleLoginPrompt from "@/components/GoogleLoginPrompt";
 import LiveViewers from "@/components/LiveViewers";
 
-const safeString = (value: any): string => {
+const safeString = (value: unknown): string => {
   if (!value) return "";
   if (typeof value === "string") return value;
   if (typeof value === "object" && value !== null) {
-    return value.name || value.title || value._id || "";
+    const record = value as Record<string, unknown>;
+    return safeString(record.name || record.title || record._id || "");
   }
   return String(value);
 };
@@ -50,9 +50,23 @@ export default async function ProductPage({
 
   const { data: product, relatedProducts } = productData;
 
+  const imageList: unknown[] = Array.isArray(product.images) ? product.images : [];
   const images = [
-    { id: "main", url: product.thumbnail },
-    ...(product.images?.map((img: any) => ({ id: img._id, url: img.url })) || []),
+    ...(product.thumbnail ? [{ id: "main", url: product.thumbnail }] : []),
+    ...imageList.flatMap((image, index) => {
+      if (
+        typeof image !== "object" ||
+        image === null ||
+        !("url" in image) ||
+        typeof image.url !== "string" ||
+        image.url.length === 0
+      ) {
+        return [];
+      }
+
+      const id = "_id" in image && typeof image._id === "string" ? image._id : `image-${index}`;
+      return [{ id, url: image.url }];
+    }),
   ];
 
   const availableSizes: string[] = Array.isArray(product.size)
@@ -67,7 +81,7 @@ export default async function ProductPage({
         .map((line: string) => line.trim())
         .filter((line: string) => line.length > 0)
         .map((line: string) => line.replace(/^[-•*]\s*/, "").trim())
-    : ["Quality fabric", "Comfortable fit", "Modern design"];
+    : [];
 
   const originalPrice = Number(product.price) || 0;
   const salePrice = product.discountPrice ? Number(product.discountPrice) : null;
@@ -78,18 +92,14 @@ export default async function ProductPage({
   const displayPrice = hasDiscount ? salePrice! : originalPrice;
 
   return (
-    <div className="min-h-screen bg-[#f8f8f6]">
-
-      {/* Top accent bar */}
-      <div className="h-1 w-full bg-gradient-to-r from-orange-400 via-amber-400 to-orange-500" />
-
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
+    <main className="min-h-screen bg-slate-50">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
 
         {/* Breadcrumb */}
         <nav className="mb-6 text-xs" aria-label="Breadcrumb">
-          <ol className="flex flex-wrap items-center gap-1 text-slate-400 font-medium tracking-wide uppercase">
+          <ol className="flex flex-wrap items-center gap-2 text-xs font-medium text-slate-500">
             <li>
-              <Link href="/" className="hover:text-orange-500 transition-colors">
+              <Link href="/" className="hover:text-slate-950">
                 Home
               </Link>
             </li>
@@ -99,7 +109,7 @@ export default async function ProductPage({
                 <li>
                   <Link
                     href={`/categories/${product.category.slug || product.category._id || ""}`}
-                    className="hover:text-orange-500 transition-colors"
+                    className="hover:text-slate-950"
                   >
                     {safeString(product.category)}
                   </Link>
@@ -107,35 +117,35 @@ export default async function ProductPage({
                 <ChevronRight className="h-3 w-3 text-slate-300" />
               </>
             )}
-            <li className="text-slate-600 truncate max-w-[200px] sm:max-w-sm normal-case">
+            <li aria-current="page" className="max-w-[200px] truncate text-slate-900 sm:max-w-sm">
               {safeString(product.name)}
             </li>
           </ol>
         </nav>
 
         {/* Main Product Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-12">
+        <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12 lg:gap-10">
 
           {/* LEFT: Gallery + Tabs */}
-          <div className="lg:col-span-7 space-y-6">
+          <div className="space-y-6 lg:col-span-7">
 
             {/* Gallery card */}
-            <div className="bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm">
+            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
               <ProductGallery images={images} productName={safeString(product.name)} />
             </div>
 
             {/* Tags row */}
             {product.tags && product.tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
-                {product.tags.map((tag: any) => (
+                {product.tags.map((tag: { _id: string; name: string; color?: string }) => (
                   <span
                     key={tag._id}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border"
-                    style={{
+                    className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1 text-xs font-medium text-slate-700"
+                    style={tag.color ? {
                       color: tag.color,
                       borderColor: tag.color + "40",
                       backgroundColor: tag.color + "12",
-                    }}
+                    } : undefined}
                   >
                     <Tag className="h-2.5 w-2.5" />
                     {tag.name}
@@ -145,23 +155,27 @@ export default async function ProductPage({
             )}
 
             {/* Tabs card */}
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-              <ProductTabs descriptionPoints={descriptionPoints} />
+            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+              <ProductTabs
+                descriptionPoints={descriptionPoints}
+                specifications={product.specifications}
+                highlights={product.highlights}
+              />
             </div>
           </div>
 
           {/* RIGHT: Product Info */}
-          <div className="lg:col-span-5 lg:sticky lg:top-6 self-start space-y-5">
+          <div className="space-y-5 lg:sticky lg:top-28 lg:col-span-5 lg:self-start">
 
             {/* Title + Brand */}
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-4">
+            <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
               <div className="space-y-2">
                 {product.brand && (
-                  <p className="text-xs font-bold tracking-widest text-orange-500 uppercase">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
                     {safeString(product.brand)}
                   </p>
                 )}
-                <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 leading-snug">
+                <h1 className="text-2xl font-semibold leading-tight tracking-tight text-slate-950 sm:text-3xl">
                   {safeString(product.name)}
                 </h1>
               </div>
@@ -169,38 +183,35 @@ export default async function ProductPage({
               {/* Stock badge */}
               <div className="flex flex-wrap items-center gap-2">
                 {product.stock > 0 && product.stock <= 10 ? (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-700 text-xs font-semibold rounded-full border border-amber-200">
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                  <span className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-800">
+                    <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
                     Only {product.stock} left in stock
                   </span>
                 ) : product.stock === 0 ? (
-                  <span className="inline-flex items-center px-3 py-1 bg-red-50 text-red-600 text-xs font-semibold rounded-full border border-red-200">
+                  <span className="inline-flex items-center rounded-full border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700">
                     Out of stock
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full border border-green-200">
-                    <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                  <span className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-800">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                     In stock
                   </span>
                 )}
               </div>
             </div>
 
-            {/* Google Login */}
-            {/* <GoogleLoginPrompt /> */}
-<div className="flex items-center gap-3">
-  {/* Your existing stock badge */}
-  <LiveViewers productId={product._id} />
-</div>
+            <div className="flex items-center gap-3">
+              <LiveViewers productId={product._id} />
+            </div>
             {/* Price */}
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-4xl font-extrabold text-slate-900 tracking-tight">
+                    <span className="text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
                       {displayPrice.toLocaleString("en-PK")}
                     </span>
-                    <span className="text-base font-semibold text-slate-400">
+                    <span className="text-sm font-medium text-slate-500">
                       {product.currency || "PKR"}
                     </span>
                   </div>
@@ -209,7 +220,7 @@ export default async function ProductPage({
                       <span className="text-sm text-slate-400 line-through">
                         {originalPrice.toLocaleString("en-PK")} {product.currency || "PKR"}
                       </span>
-                      <span className="text-xs text-green-600 font-semibold">
+                      <span className="text-xs font-medium text-emerald-700">
                         You save {(originalPrice - displayPrice).toLocaleString("en-PK")} {product.currency || "PKR"}
                       </span>
                     </div>
@@ -218,7 +229,7 @@ export default async function ProductPage({
 
                 {hasDiscount && (
                   <div className="flex-shrink-0">
-                    <span className="block px-3 py-1.5 bg-orange-500 text-white text-sm font-bold rounded-xl shadow-md shadow-orange-200">
+                    <span className="block rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white">
                       -{discountPercentage}% OFF
                     </span>
                   </div>
@@ -227,11 +238,11 @@ export default async function ProductPage({
             </div>
 
             {/* Size + Actions */}
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
               <form id="product-form" className="space-y-6">
                 {availableSizes.length > 0 && (
                   <div>
-                    <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-widest mb-3">
+                    <h3 className="mb-3 text-sm font-medium text-slate-800">
                       Select Size
                     </h3>
                     <div className="flex flex-wrap gap-2">
@@ -245,7 +256,7 @@ export default async function ProductPage({
                             defaultChecked={index === 0}
                             required
                           />
-                          <div className="min-w-[52px] px-4 py-2.5 text-center text-sm font-semibold rounded-xl border-2 border-slate-200 text-slate-600 transition-all duration-150 hover:border-orange-400 hover:text-orange-600 peer-checked:border-orange-500 peer-checked:bg-orange-50 peer-checked:text-orange-700">
+                          <div className="min-w-[52px] rounded-lg border border-slate-300 px-4 py-2.5 text-center text-sm font-medium text-slate-700 transition-colors hover:border-slate-500 peer-checked:border-slate-950 peer-checked:bg-slate-950 peer-checked:text-white">
                             {size}
                           </div>
                         </label>
@@ -259,69 +270,41 @@ export default async function ProductPage({
               </form>
             </div>
 
-            {/* Trust badges */}
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                {
-                  icon: <Truck className="h-4 w-4 text-orange-500" />,
-                  title: "Free Delivery",
-                  sub: "Over 5000 PKR",
-                },
-                {
-                  icon: <Shield className="h-4 w-4 text-orange-500" />,
-                  title: "Secure Pay",
-                  sub: "100% Protected",
-                },
-                {
-                  icon: <Check className="h-4 w-4 text-orange-500" />,
-                  title: "Easy Returns",
-                  sub: "7 Days Policy",
-                },
-              ].map((badge) => (
-                <div
-                  key={badge.title}
-                  className="bg-white rounded-xl border border-slate-100 shadow-sm p-3 flex flex-col items-center text-center gap-2"
-                >
-                  <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center">
-                    {badge.icon}
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-slate-800">{badge.title}</p>
-                    <p className="text-[10px] text-slate-400 leading-tight">{badge.sub}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Review form */}
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-              <h2 className="text-base font-bold text-slate-900 uppercase tracking-widest mb-5">
-                Write a Review
-              </h2>
-              <AddReviewForm productId={product._id} />
-            </div>
           </div>
         </div>
 
         {/* Reviews Section */}
-        <div className="mt-16">
+        <div className="mt-10">
           <ReviewsSection productId={product._id} />
         </div>
 
+        <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
+          <h2 className="text-lg font-semibold tracking-tight text-slate-950">
+            Write a review
+          </h2>
+          <AddReviewForm productId={product._id} />
+        </section>
+
         {/* Related Products */}
         {relatedProducts?.length > 0 && (
-          <section className="mt-16 pb-12">
-            <div className="flex items-center justify-between mb-8">
+          <section className="mt-12 pb-12">
+            <div className="mb-6 flex items-center justify-between">
               <div>
-                <p className="text-xs font-bold tracking-widest text-orange-500 uppercase mb-1">
+                <p className="mb-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
                   Explore more
                 </p>
-                <h2 className="text-2xl font-bold text-slate-900">You May Also Like</h2>
+                <h2 className="text-2xl font-semibold tracking-tight text-slate-950">You may also like</h2>
               </div>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-              {relatedProducts.map((item: any) => {
+              {relatedProducts.map((item: {
+                _id: string;
+                name: string;
+                thumbnail: string;
+                price: number;
+                discountPrice?: number;
+              }) => {
                 const hasDisc =
                   item.discountPrice && Number(item.discountPrice) < Number(item.price);
                 const dispPrice = hasDisc ? Number(item.discountPrice) : Number(item.price);
@@ -335,7 +318,7 @@ export default async function ProductPage({
                   <Link
                     key={item._id}
                     href={`/product/${item._id}`}
-                    className="group bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+                    className="group overflow-hidden rounded-xl border border-slate-200 bg-white transition-colors hover:border-slate-400"
                   >
                     <div className="relative aspect-square overflow-hidden bg-slate-50">
                       <Image
@@ -347,18 +330,18 @@ export default async function ProductPage({
                       />
                       {hasDisc && (
                         <div className="absolute top-3 left-3">
-                          <span className="px-2 py-0.5 text-[10px] font-bold bg-orange-500 text-white rounded-lg shadow">
+                          <span className="rounded-md bg-white px-2 py-1 text-xs font-semibold text-slate-900">
                             -{discPct}%
                           </span>
                         </div>
                       )}
                     </div>
                     <div className="p-4">
-                      <h3 className="line-clamp-2 text-xs font-medium text-slate-700 group-hover:text-orange-600 transition-colors leading-relaxed min-h-[2.8em]">
+                      <h3 className="line-clamp-2 min-h-[2.8em] text-sm font-medium leading-relaxed text-slate-800 group-hover:text-slate-950">
                         {safeString(item.name)}
                       </h3>
                       <div className="mt-3 flex items-baseline gap-1.5">
-                        <span className="text-base font-bold text-slate-900">
+                        <span className="text-base font-semibold text-slate-950">
                           {dispPrice.toLocaleString("en-PK")}
                         </span>
                         {hasDisc && (
@@ -375,6 +358,6 @@ export default async function ProductPage({
           </section>
         )}
       </div>
-    </div>
+    </main>
   );
 }

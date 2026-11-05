@@ -286,13 +286,14 @@ console.log("hello",imageUrl)
     <div className="space-y-6">
       {/* Quantity */}
       <div className="flex items-center gap-4">
-        <span className="text-sm font-medium text-gray-700">Quantity:</span>
-        <div className="flex border border-gray-300 rounded-lg overflow-hidden">
+      <span className="text-sm font-medium text-slate-700">Quantity:</span>
+      <div className="flex overflow-hidden rounded-lg border border-slate-300">
           <button
             type="button"
-            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-            disabled={isLoading}
-            className="px-5 py-2.5 hover:bg-gray-100 disabled:opacity-50 transition"
+          aria-label="Decrease quantity"
+          onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+          disabled={isLoading}
+          className="px-4 py-2.5 text-slate-700 hover:bg-slate-100 disabled:opacity-50"
           >
             −
           </button>
@@ -301,9 +302,10 @@ console.log("hello",imageUrl)
           </span>
           <button
             type="button"
+            aria-label="Increase quantity"
             onClick={() => setQuantity((q) => q + 1)}
             disabled={isLoading}
-            className="px-5 py-2.5 hover:bg-gray-100 disabled:opacity-50 transition"
+            className="px-4 py-2.5 text-slate-700 hover:bg-slate-100 disabled:opacity-50"
           >
             +
           </button>
@@ -316,7 +318,7 @@ console.log("hello",imageUrl)
           type="button"
           onClick={() => handleAddToCart(false)}
           disabled={isLoading}
-          className="flex items-center justify-center gap-3 py-4 px-6 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 disabled:cursor-not-allowed text-white font-semibold rounded-xl shadow transition-all"
+          className="flex min-h-12 items-center justify-center gap-3 rounded-lg bg-slate-900 px-6 py-3.5 font-semibold text-white hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {cartLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : <ShoppingCart className="w-6 h-6" />}
           {cartLoading ? "Adding..." : "Add to Cart"}
@@ -326,7 +328,7 @@ console.log("hello",imageUrl)
           type="button"
           onClick={() => handleAddToCart(true)}
           disabled={isLoading}
-          className="py-4 px-6 bg-black hover:bg-gray-900 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold rounded-xl shadow transition-all"
+          className="min-h-12 rounded-lg border border-slate-300 bg-white px-6 py-3.5 font-semibold text-slate-900 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Buy Now
         </button>
@@ -377,8 +379,8 @@ console.log("hello",imageUrl)
           disabled={wishlistLoading}
           className={`flex-1 flex items-center justify-center gap-2.5 py-3.5 rounded-xl border-2 font-medium transition-all ${
             wishlisted
-              ? "bg-red-50 border-red-500 text-red-600"
-              : "border-gray-300 hover:border-red-400 text-gray-700 hover:bg-red-50"
+              ? "border-red-300 bg-red-50 text-red-700"
+              : "border-slate-300 text-slate-700 hover:border-slate-500 hover:bg-slate-50"
           } ${wishlistLoading ? "opacity-70 cursor-wait" : ""}`}
         >
           {wishlistLoading ? (
@@ -397,7 +399,7 @@ console.log("hello",imageUrl)
           <button
             type="button"
             onClick={handleShare}
-            className="flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl border-2 border-gray-300 hover:border-indigo-400 hover:bg-indigo-50 transition-all w-full sm:w-auto"
+            className="flex w-full items-center justify-center gap-2.5 rounded-lg border border-slate-300 px-6 py-3.5 text-slate-700 hover:border-slate-500 hover:bg-slate-50 sm:w-auto"
           >
             <Share2 className="w-5 h-5" />
             Share
